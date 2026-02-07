@@ -1,0 +1,953 @@
+"use client";
+import { useState, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
+
+// --- KOMPONENTAI ---
+
+const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick: (idx: number) => void }) => {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const next = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx + 1) % images.length); };
+  const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
+
+  return (
+    <div className="relative w-full h-48 mb-4 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
+      <img src={images[currentIdx]} alt="Prekė" className="w-full h-full object-cover rounded-lg bg-gray-100 transition hover:opacity-90" />
+      {images.length > 1 && (
+        <><button onClick={prev} className="absolute left-1 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black">◀</button>
+        <button onClick={next} className="absolute right-1 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black">▶</button></>
+      )}
+    </div>
+  );
+};
+
+// Padidintos nuotraukos langas (Modal)
+const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIndex: number, onClose: () => void }) => {
+  const [idx, setIdx] = useState(startIndex);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
+  const next = () => {
+    setIdx((idx + 1) % images.length);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+  const prev = () => {
+    setIdx((idx - 1 + images.length) % images.length);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const toggleZoom = () => {
+    if (zoom === 1) {
+      setZoom(2.5);
+      setPan({ x: 0, y: 0 });
+    } else {
+      setZoom(1);
+      setPan({ x: 0, y: 0 });
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoom > 1) {
+      setPan({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={onClose}>
+      <button className="absolute top-6 right-6 text-[#c29a74] text-4xl hover:text-white transition" onClick={onClose}>&times;</button>
+      <div 
+        className="relative max-w-4xl w-full h-full flex items-center justify-center" 
+        onClick={e => e.stopPropagation()}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {images.length > 1 && (
+          <button onClick={prev} className="absolute left-0 text-[#c29a74] text-5xl p-4 hover:text-white transition z-30">❮</button>
+        )}
+        <div 
+          className={`overflow-hidden rounded-lg shadow-2xl ${zoom > 1 ? 'cursor-grab' : 'cursor-zoom-in'} ${isDragging ? 'cursor-grabbing' : ''}`}
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={toggleZoom}
+          onMouseDown={handleMouseDown}
+        >
+          <img 
+            src={images[idx]} 
+            className="max-w-full max-h-full object-contain select-none transition-transform"
+            style={{
+              transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+              transformOrigin: 'center center'
+            }}
+            alt="Padidinta" 
+            draggable={false}
+          />
+        </div>
+        {images.length > 1 && (
+          <button onClick={next} className="absolute right-0 text-[#c29a74] text-5xl p-4 hover:text-white transition z-30">❯</button>
+        )}
+        <div className="absolute bottom-4 text-white font-semibold">{idx + 1} / {images.length}</div>
+      </div>
+    </div>
+  );
+};
+
+const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
+  const [qty, setQty] = useState(1);
+  const price = getPrice(product.basePrice);
+
+  return (
+    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col text-slate-800">
+      <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
+      <h2 className="text-lg font-semibold leading-tight mb-2 h-12 overflow-hidden">{product.name}</h2>
+      <div className="flex justify-between items-end mt-auto">
+        <div>
+          <p className="text-xs text-gray-400 line-through">{product.basePrice.toFixed(2)} €</p>
+          <p className="text-black font-semibold text-xl">{price.toFixed(2)} €</p>
+        </div>
+        <div className="flex gap-2">
+          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-12 border rounded text-center text-sm" />
+          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-black transition">Įdėti</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- PAGRINDINIS PUSLAPIS ---
+
+export default function B2BPortal() {
+  const [view, setView] = useState("katalogas");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [clientCode, setClientCode] = useState("");
+  const [orderHistory, setOrderHistory] = useState<any[]>([]);
+  const [allCarts, setAllCarts] = useState<any>({ "flokati1": [], "testas": [] });
+  
+  // Modal būsena
+  const [modalData, setModalData] = useState<{images: string[], index: number} | null>(null);
+
+  // Įmonės duomenys ir pristatymo adresai
+  const [companyData, setCompanyData] = useState<any>({
+    name: "",
+    code: "",
+    phone: "",
+    email: "",
+    address: ""
+  });
+  const [editCompanyData, setEditCompanyData] = useState<any>({
+    name: "",
+    code: "",
+    phone: "",
+    email: "",
+    address: ""
+  });
+  const [editingCompany, setEditingCompany] = useState(false);
+  const [deliveryAddresses, setDeliveryAddresses] = useState<any[]>([]);
+  const [newAddress, setNewAddress] = useState({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+  const [editingAddressIdx, setEditingAddressIdx] = useState<number | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const clients: any = {
+    "flokati1": { name: "UAB Flokati", discount: 0.8 },
+    "testas": { name: "Bandomasis Klientas", discount: 1.0 }
+  };
+
+  const products = [
+    { id: 1, name: "Vilnonė antklodė Premium", basePrice: 89.0, category: "antklodės", images: ["/antklode.jpg", "/antklode1.jpg", "/antklode2.jpg"] },
+    { id: 2, name: "Pagalvė Merino", basePrice: 45.5, category: "pagalvės", images: ["/pagalve.jpg", "/pagalve1.jpg", "/pagalve2.jpg"] },
+    { id: 3, name: "Šlepetės (natūrali vilna)", basePrice: 29.99, category: "šlepetės", images: ["/slepetes.jpg", "/slepetes1.jpg", "/slepetes2.jpg"] },
+  ];
+
+  // Įkelti duomenis iš localStorage kai pasikeičia clientCode
+  useEffect(() => {
+    if (isLoggedIn && clientCode) {
+      const savedCompanyData = localStorage.getItem(`companyData_${clientCode}`);
+      const savedDeliveryAddresses = localStorage.getItem(`deliveryAddresses_${clientCode}`);
+      
+      if (savedCompanyData) {
+        const parsed = JSON.parse(savedCompanyData);
+        setCompanyData(parsed);
+        setEditCompanyData(parsed);
+        setEditingCompany(false);
+      } else {
+        const emptyData = {
+          name: "",
+          code: "",
+          phone: "",
+          email: "",
+          address: ""
+        };
+        setCompanyData(emptyData);
+        setEditCompanyData(emptyData);
+        setEditingCompany(true);
+      }
+      
+      if (savedDeliveryAddresses) {
+        setDeliveryAddresses(JSON.parse(savedDeliveryAddresses));
+      } else {
+        setDeliveryAddresses([]);
+      }
+      
+      setShowAddressForm(false);
+      setEditingAddressIdx(null);
+      setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+    }
+  }, [clientCode, isLoggedIn]);
+
+  const getPrice = (basePrice: number) => (clients[clientCode]?.discount || 1.0) * basePrice;
+
+  const filteredProducts = selectedCategory
+    ? products.filter((p) => p.category === selectedCategory)
+    : products;
+
+  const addToCart = (product: any, addedQty: number) => {
+    const price = getPrice(product.basePrice);
+    setAllCarts((prev: any) => {
+      const currentClientCart = prev[clientCode] || [];
+      const existingIdx = currentClientCart.findIndex((i: any) => i.id === product.id);
+      let newItems;
+      if (existingIdx > -1) {
+        newItems = currentClientCart.map((item: any, idx: number) => {
+          if (idx === existingIdx) {
+            const updatedQty = item.qty + addedQty;
+            return { ...item, qty: updatedQty, totalPrice: updatedQty * price };
+          }
+          return item;
+        });
+      } else {
+        newItems = [...currentClientCart, { ...product, price, qty: addedQty, totalPrice: price * addedQty }];
+      }
+      return { ...prev, [clientCode]: newItems };
+    });
+  };
+
+  const updateQty = (productId: number, newQty: number) => {
+    if (newQty < 1) return;
+    const price = getPrice(products.find(p => p.id === productId)?.basePrice || 0);
+    setAllCarts((prev: any) => ({
+      ...prev,
+      [clientCode]: prev[clientCode].map((item: any) => 
+        item.id === productId ? { ...item, qty: newQty, totalPrice: price * newQty } : item
+      )
+    }));
+  };
+
+  const removeItem = (productId: number) => {
+    setAllCarts((prev: any) => ({
+      ...prev,
+      [clientCode]: prev[clientCode].filter((item: any) => item.id !== productId)
+    }));
+  };
+
+  const clearCart = () => setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
+
+  const submitOrder = () => {
+    const cartItems = allCarts[clientCode];
+    const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
+    const newOrder = {
+      id: Math.floor(Math.random() * 100000),
+      date: new Date().toLocaleString("lt-LT"),
+      client: clients[clientCode].name,
+      items: [...cartItems],
+      total: total
+    };
+    setOrderHistory([newOrder, ...orderHistory]);
+    clearCart();
+    alert(`Užsakymas išsiųstas ernestas@flokati.lt!\nSuma: ${total.toFixed(2)} €`);
+  };
+
+  const exportOrderToPDF = (order: any) => {
+    const pdf = new jsPDF();
+    let yPosition = 20;
+
+    // Antraštė
+    pdf.setFontSize(20);
+    pdf.text('FLOKATI B2B', 20, yPosition);
+    
+    yPosition += 15;
+    pdf.setFontSize(12);
+    pdf.text(`Užsakymas #${order.id}`, 20, yPosition);
+    yPosition += 7;
+    pdf.setFontSize(10);
+    pdf.text(`Data: ${order.date}`, 20, yPosition);
+    
+    yPosition += 15;
+    pdf.setFontSize(11);
+    pdf.text(`Kliento vardas: ${order.client}`, 20, yPosition);
+    
+    yPosition += 15;
+    // Lentelės antraštės
+    pdf.setFontSize(10);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text('Prekė', 20, yPosition);
+    pdf.text('Kiekis', 100, yPosition);
+    pdf.text('Vnt. kaina', 130, yPosition);
+    pdf.text('Suma', 160, yPosition);
+    
+    yPosition += 8;
+    pdf.setFont('Helvetica', 'normal');
+    
+    // Prekės
+    order.items.forEach((item: any) => {
+      pdf.setFontSize(9);
+      pdf.text(item.name.substring(0, 45), 20, yPosition);
+      pdf.text(item.qty.toString(), 100, yPosition);
+      pdf.text(`${item.price.toFixed(2)} €`, 130, yPosition);
+      pdf.text(`${item.totalPrice.toFixed(2)} €`, 160, yPosition);
+      yPosition += 7;
+    });
+    
+    yPosition += 5;
+    pdf.setDrawColor(200);
+    pdf.line(20, yPosition, 180, yPosition);
+    
+    yPosition += 8;
+    pdf.setFontSize(12);
+    pdf.setFont('Helvetica', 'bold');
+    pdf.text(`VISO: ${order.total.toFixed(2)} €`, 160, yPosition, { align: 'left' });
+    
+    // Šaltinis ir data
+    yPosition += 20;
+    pdf.setFontSize(8);
+    pdf.setFont('Helvetica', 'normal');
+    pdf.text(`Generuota: ${new Date().toLocaleString('lt-LT')}`, 20, yPosition);
+    
+    // Išsaugoti failą
+    pdf.save(`Uzsakymas_${order.id}_${Date.now()}.pdf`);
+  };
+
+  const currentCart = allCarts[clientCode] || [];
+  const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
+
+  if (!isLoggedIn) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4 font-sans relative"
+        style={{ backgroundImage: "url('/background.jpg')" }}
+      >
+        {/* Tamsus sluoksnis gylio pojūčiui */}
+        <div className="absolute inset-0 bg-black/40"></div>
+
+        <form 
+          onSubmit={(e: any) => {
+            e.preventDefault();
+            const code = e.target.clientCode.value;
+            if (clients[code]) { setClientCode(code); setIsLoggedIn(true); setView("katalogas"); } else alert("Neteisingas kodas!");
+          }} 
+          className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
+        >
+          <div className="mb-4">
+            <span className="block text-6xl font-extralight text-white/95 uppercase tracking-[0.35em]">FLOKATI</span>
+            <div className="text-xl text-white/80 uppercase tracking-[0.15em] mt-2">B2B</div>
+          </div>
+
+          <div className="space-y-6">
+            <input 
+              name="clientCode" 
+              placeholder="Kliento kodas" 
+              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
+              required 
+            />
+            <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all">
+              PRISIJUNGTI
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans">
+      {/* Modal Langas */}
+      {modalData && (
+        <ImageModal 
+          images={modalData.images} 
+          startIndex={modalData.index} 
+          onClose={() => setModalData(null)} 
+        />
+      )}
+
+      <nav className="bg-white border-b sticky top-0 z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-slate-800">
+          <div className="flex gap-8 items-center">
+            <div className="relative group">
+              <button 
+                onClick={() => setView("katalogas")} 
+                className={`font-medium ${view === 'katalogas' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}
+              >
+                Katalogas
+              </button>
+              <div className="absolute left-0 mt-0 w-48 bg-white shadow-lg rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20">
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                    setSelectedCategory(null);
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${!selectedCategory ? 'text-[#c29a74]' : 'text-slate-800'}`}
+                >
+                  Visos prekės
+                </button>
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                    setSelectedCategory("antklodės");
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "antklodės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
+                >
+                  Antklodės
+                </button>
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                    setSelectedCategory("pagalvės");
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "pagalvės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
+                >
+                  Pagalvės
+                </button>
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                    setSelectedCategory("šlepetės");
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "šlepetės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
+                >
+                  Šlepetės
+                </button>
+              </div>
+            </div>
+            <button onClick={() => setView("uzsakymai")} className={`font-medium ${view === 'uzsakymai' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Užsakymai</button>
+            <button onClick={() => setView("mano-duomenis")} className={`font-medium ${view === 'mano-duomenis' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Mano duomenys</button>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-semibold bg-[#c29a74]/10 px-3 py-1 rounded-full text-black">{clients[clientCode].name}</span>
+            <button onClick={() => setIsLoggedIn(false)} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto p-6">
+        {view === "mano-duomenis" ? (
+          <div className="bg-white p-8 rounded-2xl shadow-sm border">
+            <h2 className="text-2xl font-extralight mb-8">Mano duomenys</h2>
+            
+            {/* Įmonės duomenys */}
+            <div className="mb-10 pb-8 border-b">
+              <h3 className="text-xl font-semibold mb-6 text-[#c29a74] flex items-center justify-between">
+                Įmonės informacija
+                {!editingCompany && companyData.name && (
+                  <button 
+                    onClick={() => {
+                      setEditCompanyData(companyData);
+                      setEditingCompany(true);
+                    }}
+                    className="text-sm bg-[#c29a74]/10 text-[#c29a74] px-3 py-1 rounded-lg hover:bg-[#c29a74]/20 transition"
+                  >
+                    Redaguoti
+                  </button>
+                )}
+              </h3>
+
+              {editingCompany || !companyData.name ? (
+                // Redagavimo režimas (arba jei nėra duomenų)
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.name} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės kodas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.code} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
+                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                      <input 
+                        type="tel" 
+                        value={editCompanyData.phone} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">El. paštas</label>
+                      <input 
+                        type="email" 
+                        value={editCompanyData.email} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
+                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"                        
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės registracijos adresas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.address} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
+                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"                       
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                        localStorage.setItem(`companyData_${clientCode}`, JSON.stringify(editCompanyData));
+                        setCompanyData(editCompanyData);
+                        setEditingCompany(false);
+                        alert("Įmonės duomenys išsaugoti!");
+                      }}
+                      className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                    >
+                      ✓ Išsaugoti
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setEditCompanyData(companyData);
+                        setEditingCompany(false);
+                      }}
+                      className="flex-1 bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-500 transition"
+                    >
+                      ✕ Atšaukti
+                    </button>
+                  </div>
+                </>
+              ) : companyData.name ? (
+                // Peržiūros režimas su duomenimis
+                <div className="bg-gray-50 p-6 rounded-lg border">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės pavadinimas</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės kodas</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.code || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Telefonas</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.phone || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">El. paštas</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.email || "—"}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės registracijos adresas</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.address || "—"}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Forma kai nėra duomenų
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.name} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        placeholder="pvz. UAB Flokati"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės kodas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.code} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        placeholder="pvz. 305522547"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                      <input 
+                        type="tel" 
+                        value={editCompanyData.phone} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        placeholder="pvz. +370 600 12345"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">El. paštas</label>
+                      <input 
+                        type="email" 
+                        value={editCompanyData.email} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        placeholder="pvz. info@flokati.lt"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Pagrindinės sėdybos adresas</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.address} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        placeholder="pvz. Kalnu g. 5, Vilnius"
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      localStorage.setItem(`companyData_${clientCode}`, JSON.stringify(editCompanyData));
+                      setCompanyData(editCompanyData);
+                      setEditingCompany(false);
+                      alert("Įmonės duomenys išsaugoti!");
+                    }}
+                    className="w-full bg-[#c29a74] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8885e] transition"
+                  >
+                    Išsaugoti
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Pristatymo adresai */}
+            <div>
+              <h3 className="text-xl font-semibold mb-6 text-[#c29a74]">Pristatymo adresai</h3>
+              
+              {/* Esamų adresų sąrašas */}
+              {deliveryAddresses.length > 0 && (
+                <div className="mb-8 space-y-3">
+                  {deliveryAddresses.map((addr, idx) => (
+                    <div key={addr.id || idx} className="bg-gray-50 p-4 rounded-lg border">
+                      {editingAddressIdx === idx ? (
+                        // Redagavimo režimas
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                              <input
+                                type="text" 
+                                value={addr.name} 
+                                onChange={(e) => {
+                                  const updated = [...deliveryAddresses];
+                                  updated[idx].name = e.target.value;
+                                  setDeliveryAddresses(updated);
+                                }}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold mb-2 text-gray-700">Adresas</label>
+                              <input 
+                                type="text" 
+                                value={addr.address} 
+                                onChange={(e) => {
+                                  const updated = [...deliveryAddresses];
+                                  updated[idx].address = e.target.value;
+                                  setDeliveryAddresses(updated);
+                                }}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold mb-2 text-gray-700">Miestas</label>
+                              <input 
+                                type="text" 
+                                value={addr.city} 
+                                onChange={(e) => {
+                                  const updated = [...deliveryAddresses];
+                                  updated[idx].city = e.target.value;
+                                  setDeliveryAddresses(updated);
+                                }}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold mb-2 text-gray-700">Pašto kodas</label>
+                              <input 
+                                type="text" 
+                                value={addr.postalCode} 
+                                onChange={(e) => {
+                                  const updated = [...deliveryAddresses];
+                                  updated[idx].postalCode = e.target.value;
+                                  setDeliveryAddresses(updated);
+                                }}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                              <input 
+                                type="tel" 
+                                value={addr.phone} 
+                                onChange={(e) => {
+                                  const updated = [...deliveryAddresses];
+                                  updated[idx].phone = e.target.value;
+                                  setDeliveryAddresses(updated);
+                                }}
+                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => {
+                                localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(deliveryAddresses));
+                                setEditingAddressIdx(null);
+                                alert("Adresas atnaujintas!");
+                              }}
+                              className="flex-1 bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition"
+                            >
+                              ✓ Išsaugoti
+                            </button>
+                            <button 
+                              onClick={() => setEditingAddressIdx(null)}
+                              className="flex-1 bg-gray-400 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
+                            >
+                              ✕ Atšaukti
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Peržiūros režimas
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 cursor-pointer hover:text-[#c29a74]" onClick={() => setEditingAddressIdx(idx)}>
+                            <h4 className="font-semibold text-slate-800 mb-1">{addr.name}</h4>
+                            <p className="text-sm text-gray-600">{addr.address}</p>
+                            <p className="text-sm text-gray-600">{addr.city}, {addr.postalCode}</p>
+                            {addr.phone && <p className="text-sm text-gray-600 mt-1">📞 {addr.phone}</p>}
+                            <p className="text-xs text-[#c29a74] mt-2">Spustelėkite redaguoti</p>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              const updated = deliveryAddresses.filter((_, i) => i !== idx);
+                              setDeliveryAddresses(updated);
+                              localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(updated));
+                            }}
+                            className="text-red-500 hover:text-red-700 font-bold ml-4 flex-shrink-0"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Mygtukas pridėti naują adresą */}
+              {!showAddressForm && (
+                <button 
+                  onClick={() => setShowAddressForm(true)}
+                  className="w-full bg-[#c29a74] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8885e] transition mb-6"
+                >
+                  Pridėti naują adresą
+                </button>
+              )}
+
+              {/* Naujo adreso forma */}
+              {showAddressForm && (
+                <div className="bg-[#c29a74]/10 p-6 rounded-xl border-2 border-[#c29a74]/30">
+                  <h4 className="font-semibold text-slate-800 mb-4">Pridėti naują adresą</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                    <input 
+                      type="text" 
+                      value={newAddress.name} 
+                      onChange={(e) => setNewAddress({...newAddress, name: e.target.value})}
+                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-700">Adresas</label>
+                    <input 
+                      type="text" 
+                      value={newAddress.address} 
+                      onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-700">Miestas</label>
+                    <input 
+                      type="text" 
+                      value={newAddress.city} 
+                      onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
+                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-700">Pašto kodas</label>
+                    <input 
+                      type="text" 
+                      value={newAddress.postalCode} 
+                      onChange={(e) => setNewAddress({...newAddress, postalCode: e.target.value})}
+                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                    <input 
+                      type="tel" 
+                      value={newAddress.phone} 
+                      onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                    />
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    if (newAddress.name && newAddress.address && newAddress.city && newAddress.postalCode) {
+                      const updatedAddress = { ...newAddress, id: Date.now().toString() };
+                      const updated = [...deliveryAddresses, updatedAddress];
+                      setDeliveryAddresses(updated);
+                      localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(updated));
+                      setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+                      setShowAddressForm(false);
+                      alert("Adresas pridėtas!");
+                    } else {
+                      alert("Prašome užpildyti visus laukus!");
+                    }
+                  }}
+                  className="mt-4 w-full bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                >
+                  Pridėti adresą
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowAddressForm(false);
+                    setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+                  }}
+                  className="mt-2 w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-500 transition"
+                >
+                  ✕ Atšaukti
+                </button>
+              </div>
+              )}
+            </div>
+          </div>
+        ) : view === "uzsakymai" ? (
+          <div className="bg-white p-8 rounded-2xl shadow-sm border">
+            <h2 className="text-2xl font-bold mb-6">Užsakymų istorija</h2>
+            {orderHistory.filter(o => o.client === clients[clientCode].name).length === 0 ? (
+              <p className="text-gray-400 italic text-center py-10">Istorija tuščia.</p>
+            ) : (
+              <div className="space-y-6">
+                {orderHistory.filter(o => o.client === clients[clientCode].name).map(order => (
+                  <div key={order.id} className="border rounded-xl p-6 bg-gray-50">
+                    <div className="flex justify-between mb-4 border-b pb-2 items-center">
+                      <div className="flex-1">
+                        <span className="font-bold">Užsakymas #{order.id}</span>
+                        <span className="text-gray-500 text-sm ml-4">{order.date}</span>
+                      </div>
+                      <button 
+                        onClick={() => exportOrderToPDF(order)}
+                        className="bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition text-sm whitespace-nowrap ml-4"
+                      >
+                        📥 PDF
+                      </button>
+                    </div>
+                    {order.items.map((it: any, idx: number) => (
+                      <div key={idx} className="text-sm flex justify-between py-1">
+                        <span>{it.name} ({it.qty} vnt.)</span>
+                        <span>{it.totalPrice.toFixed(2)} €</span>
+                      </div>
+                    ))}
+                    <div className="text-right mt-4 font-black text-lg text-green-700">VISO: {order.total.toFixed(2)} €</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredProducts.map(p => (
+                  <ProductCard 
+                    key={p.id} 
+                    product={p} 
+                    onAdd={addToCart} 
+                    getPrice={getPrice}
+                    onOpenModal={(images: string[], index: number) => setModalData({images, index})}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full lg:w-80 bg-white p-5 rounded-2xl shadow-xl border-t-4 border-[#c29a74] h-fit sticky top-24">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-black">Krepšelis</h2>
+                {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-red-400 hover:underline font-bold">IŠVALYTI</button>}
+              </div>
+              <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+                {currentCart.length === 0 ? <p className="text-gray-400 italic text-center py-3 text-sm">Tuščias</p> : 
+                  currentCart.map((item: any) => (
+                    <div key={item.id} className="border-b border-gray-100 pb-2">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-bold text-xs pr-2 text-black">{item.name}</span>
+                        <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">-</button>
+                          <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-8 text-center text-xs font-bold border-none bg-transparent text-black" />
+                          <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">+</button>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[8px] text-gray-400 mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
+                          <p className="font-bold text-xs text-black">{(item.price * item.qty).toFixed(2)} €</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+              {currentCart.length > 0 && (
+                <div className="pt-3 border-t-2 border-[#c29a74]/20">
+                  <div className="flex justify-between text-lg font-black text-green-700 mb-4 tracking-tighter">
+                    <span>VISO:</span><span>{currentTotal.toFixed(2)} €</span>
+                  </div>
+                  <button onClick={submitOrder} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-green-700 shadow-lg transition active:scale-95">PATVIRTINTI</button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
