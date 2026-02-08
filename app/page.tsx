@@ -181,11 +181,21 @@ export default function B2BPortal() {
     { id: 3, name: "Šlepetės (natūrali vilna)", basePrice: 29.99, category: "šlepetės", images: ["/slepetes.jpg", "/slepetes1.jpg", "/slepetes2.jpg"] },
   ];
 
-  // Patikrinti localStorage prisijungimo būsenai ir saugytam langui
+  // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
     const savedLoggedIn = localStorage.getItem('isLoggedIn');
     const savedClientCode = localStorage.getItem('clientCode');
     const savedView = localStorage.getItem('currentView');
+    const savedOrderHistory = localStorage.getItem('orderHistory');
+    
+    if (savedOrderHistory) {
+      try {
+        setOrderHistory(JSON.parse(savedOrderHistory));
+      } catch (e) {
+        console.log('Klaida skaitant užsakymus');
+      }
+    }
+    
     if (savedLoggedIn === 'true' && savedClientCode) {
       setIsLoggedIn(true);
       setClientCode(savedClientCode);
@@ -199,6 +209,11 @@ export default function B2BPortal() {
       localStorage.setItem('currentView', view);
     }
   }, [view, isLoggedIn]);
+
+  // Saugoti užsakymų istoriją į localStorage
+  useEffect(() => {
+    localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
+  }, [orderHistory]);
 
   // Įkelti duomenis iš localStorage kai pasikeičia clientCode
   useEffect(() => {
