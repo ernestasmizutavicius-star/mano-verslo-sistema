@@ -181,16 +181,24 @@ export default function B2BPortal() {
     { id: 3, name: "Šlepetės (natūrali vilna)", basePrice: 29.99, category: "šlepetės", images: ["/slepetes.jpg", "/slepetes1.jpg", "/slepetes2.jpg"] },
   ];
 
-  // Patikrinti localStorage prisijungimo būsenai
+  // Patikrinti localStorage prisijungimo būsenai ir saugytam langui
   useEffect(() => {
     const savedLoggedIn = localStorage.getItem('isLoggedIn');
     const savedClientCode = localStorage.getItem('clientCode');
+    const savedView = localStorage.getItem('currentView');
     if (savedLoggedIn === 'true' && savedClientCode) {
       setIsLoggedIn(true);
       setClientCode(savedClientCode);
-      setView('katalogas');
+      setView(savedView || 'katalogas');
     }
   }, []);
+
+  // Saugoti dabartinį langą į localStorage
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem('currentView', view);
+    }
+  }, [view, isLoggedIn]);
 
   // Įkelti duomenis iš localStorage kai pasikeičia clientCode
   useEffect(() => {
@@ -467,6 +475,7 @@ export default function B2BPortal() {
               setClientCode('');
               localStorage.removeItem('isLoggedIn');
               localStorage.removeItem('clientCode');
+              localStorage.removeItem('currentView');
             }} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
           </div>
         </div>
