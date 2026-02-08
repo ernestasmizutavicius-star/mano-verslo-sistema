@@ -181,6 +181,17 @@ export default function B2BPortal() {
     { id: 3, name: "Šlepetės (natūrali vilna)", basePrice: 29.99, category: "šlepetės", images: ["/slepetes.jpg", "/slepetes1.jpg", "/slepetes2.jpg"] },
   ];
 
+  // Patikrinti localStorage prisijungimo būsenai
+  useEffect(() => {
+    const savedLoggedIn = localStorage.getItem('isLoggedIn');
+    const savedClientCode = localStorage.getItem('clientCode');
+    if (savedLoggedIn === 'true' && savedClientCode) {
+      setIsLoggedIn(true);
+      setClientCode(savedClientCode);
+      setView('katalogas');
+    }
+  }, []);
+
   // Įkelti duomenis iš localStorage kai pasikeičia clientCode
   useEffect(() => {
     if (isLoggedIn && clientCode) {
@@ -355,7 +366,13 @@ export default function B2BPortal() {
           onSubmit={(e: any) => {
             e.preventDefault();
             const code = e.target.clientCode.value;
-            if (clients[code]) { setClientCode(code); setIsLoggedIn(true); setView("katalogas"); } else alert("Neteisingas kodas!");
+            if (clients[code]) {
+              setClientCode(code);
+              setIsLoggedIn(true);
+              setView("katalogas");
+              localStorage.setItem('isLoggedIn', 'true');
+              localStorage.setItem('clientCode', code);
+            } else alert("Neteisingas kodas!");
           }} 
           className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
         >
@@ -445,7 +462,12 @@ export default function B2BPortal() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm font-semibold bg-[#c29a74]/10 px-3 py-1 rounded-full text-black">{clients[clientCode].name}</span>
-            <button onClick={() => setIsLoggedIn(false)} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
+            <button onClick={() => {
+              setIsLoggedIn(false);
+              setClientCode('');
+              localStorage.removeItem('isLoggedIn');
+              localStorage.removeItem('clientCode');
+            }} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
           </div>
         </div>
       </nav>
