@@ -24,7 +24,7 @@ export default function LoginPage() {
       } = await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
-        setError(signInError.message || "Prisijungimo klaida");
+        setError("Neteisingas el. paštas arba slaptažodis");
         setLoading(false);
         return;
       }

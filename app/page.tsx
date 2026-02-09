@@ -144,7 +144,7 @@ export default function B2BPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
-  const [allCarts, setAllCarts] = useState<any>({ "flokati1": [], "testas": [] });
+  const [allCarts, setAllCarts] = useState<any>({});
   
   // Modal būsena
   const [modalData, setModalData] = useState<{images: string[], index: number} | null>(null);
@@ -171,10 +171,8 @@ export default function B2BPortal() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const clients: any = {
-    "flokati1": { name: "UAB Flokati", discount: 0.8 },
-    "testas": { name: "Bandomasis Klientas", discount: 1.0 }
-  };
+  // Client data will be loaded from localStorage after Supabase Auth login
+  const [clients, setClients] = useState<any>({});
 
   const [products, setProducts] = useState<any[]>([]);
 
@@ -237,6 +235,20 @@ export default function B2BPortal() {
       setIsLoggedIn(true);
       setClientCode(savedClientCode);
       setView(savedView || 'katalogas');
+      
+      // Load client profile from localStorage and populate clients object
+      const profileClientName = localStorage.getItem('profile_client_name');
+      const profileDiscountGroup = localStorage.getItem('profile_discount_group');
+      
+      // Parse discount (stored as string like "0.8" or "1.0")
+      const discount = profileDiscountGroup ? parseFloat(profileDiscountGroup) : 1.0;
+      
+      setClients({
+        [savedClientCode]: {
+          name: profileClientName || savedClientCode,
+          discount: discount
+        }
+      });
     }
   }, []);
 
@@ -460,46 +472,20 @@ export default function B2BPortal() {
   const currentCart = allCarts[clientCode] || [];
   const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
 
+  // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4 font-sans relative"
-        style={{ backgroundImage: "url('/background.jpg')" }}
-      >
-        {/* Tamsus sluoksnis gylio pojūčiui */}
-        <div className="absolute inset-0 bg-black/40"></div>
-
-        <form 
-          onSubmit={(e: any) => {
-            e.preventDefault();
-            const code = e.target.clientCode.value;
-            if (clients[code]) {
-              setClientCode(code);
-              setIsLoggedIn(true);
-              setView("katalogas");
-              localStorage.setItem('isLoggedIn', 'true');
-              localStorage.setItem('clientCode', code);
-            } else alert("Neteisingas kodas!");
-          }} 
-          className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
-        >
-          <div className="mb-4">
-            <span className="block text-6xl font-extralight text-white/95 uppercase tracking-[0.35em]">FLOKATI</span>
-            <div className="text-xl text-white/80 uppercase tracking-[0.15em] mt-2">B2B</div>
-          </div>
-
-          <div className="space-y-6">
-            <input 
-              name="clientCode" 
-              placeholder="Kliento kodas" 
-              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
-              required 
-            />
-            <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all">
-              PRISIJUNGTI
-            </button>
-          </div>
-        </form>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold mb-4">Prašome prisijungti</h1>
+          <p className="mb-6 text-gray-600">Turite būti prisijungęs, kad matytumėte katalogą</p>
+          <a 
+            href="/login"
+            className="inline-block bg-[#c29a74] text-white px-6 py-3 rounded font-semibold hover:opacity-95"
+          >
+            Eiti į prisijungimą
+          </a>
+        </div>
       </div>
     );
   }
