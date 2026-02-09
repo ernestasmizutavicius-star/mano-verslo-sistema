@@ -281,6 +281,40 @@ export default function B2BPortal() {
     localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
   }, [orderHistory]);
 
+  // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
+  useEffect(() => {
+    if (isLoggedIn) {
+      const fetchOrders = async () => {
+        try {
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
+          if (authError || !user) return;
+          
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          if (!error && data) {
+            const mapped = data.map((order: any) => ({
+              id: order.id,
+              date: new Date(order.created_at).toLocaleString('lt-LT'),
+              client: order.client_name,
+              items: order.order_items || [],
+              total: order.total_price,
+              status: order.status,
+              manager_email: order.manager_email
+            }));
+            setOrderHistory(mapped);
+          }
+        } catch (e) {
+          console.error('Klaida kraunant užsakymus:', e);
+        }
+      };
+      fetchOrders();
+    }
+  }, [isLoggedIn]);
+
   // Įkelti duomenis iš localStorage kai pasikeičia clientCode
   useEffect(() => {
     if (isLoggedIn && clientCode) {
