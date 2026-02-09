@@ -183,8 +183,15 @@ export default function B2BPortal() {
     const fetchProducts = async () => {
       try {
         const clientName = typeof window !== 'undefined' ? localStorage.getItem('client_name') : null;
+        console.log('📦 Fetching products...');
+        console.log('📦 isLoggedIn:', isLoggedIn);
+        console.log('📦 clientCode:', clientCode);
+        console.log('📦 client_name from localStorage:', clientName);
         const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
+        console.log('📦 Filter query:', orFilter);
         const { data, error } = await supabase.from('products').select('*').or(orFilter);
+        console.log('📦 Products data:', data);
+        console.log('📦 Products error:', error);
         if (error) {
           console.error('Klaida traukiant prekes:', error.message);
           return;
@@ -210,6 +217,8 @@ export default function B2BPortal() {
             client: row.client ?? 'all'
           };
         });
+        console.log('📦 Mapped products count:', mapped.length);
+        console.log('📦 Mapped products:', mapped);
         setProducts(mapped);
       } catch (e) {
         console.error('Fetch products error', e);
