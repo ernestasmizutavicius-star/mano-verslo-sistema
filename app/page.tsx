@@ -397,12 +397,14 @@ export default function B2BPortal() {
       return;
     }
 
+    const managerEmail = typeof window !== 'undefined' ? localStorage.getItem('manager_email') : null;
+    
     const payload = {
       user_id: userId,
       client_name: clients[clientCode]?.name || clientCode || 'unknown',
       order_items: cartItems,
       total_price: total,
-      manager_email: companyData?.email || 'orders@flokati.lt',
+      manager_email: managerEmail || companyData?.email || 'orders@flokati.lt',
       status: 'Išsiųsta',
       created_at: new Date().toISOString()
     };
@@ -536,7 +538,7 @@ export default function B2BPortal() {
               // Fetch profile from 'customers' table
               const { data: profiles, error: profileError } = await supabase
                 .from("customers")
-                .select("client_name, discount_group")
+                .select("client_name, discount_group, manager_email")
                 .eq("id", user.id);
 
               console.log('🔍 User ID:', user.id);
@@ -552,6 +554,7 @@ export default function B2BPortal() {
 
               const clientName = profile?.client_name || null;
               const discountGroup = profile?.discount_group || null;
+              const managerEmail = profile?.manager_email || null;
               const clientCode = discountGroup || clientName || "";
 
               // Save to localStorage
@@ -559,6 +562,7 @@ export default function B2BPortal() {
               if (clientCode) localStorage.setItem('clientCode', clientCode);
               if (clientName) localStorage.setItem('client_name', clientName);
               if (discountGroup) localStorage.setItem('discount_group', discountGroup);
+              if (managerEmail) localStorage.setItem('manager_email', managerEmail);
 
               // Update state
               setClientCode(clientCode);

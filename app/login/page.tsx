@@ -41,7 +41,7 @@ export default function LoginPage() {
       // Fetch profile from 'customers' table by user id (UUID)
       const { data: profiles, error: profileError } = await supabase
         .from("customers")
-        .select("client_name, discount_group")
+        .select("client_name, discount_group, manager_email")
         .eq("id", user.id);
 
       console.log('🔍 User ID:', user.id);
@@ -57,6 +57,7 @@ export default function LoginPage() {
 
       const clientName = profile?.client_name || null;
       const discountGroup = profile?.discount_group || null;
+      const managerEmail = profile?.manager_email || null;
 
       // Decide a clientCode to integrate with existing app. Prefer discount_group, then client_name
       const clientCode = discountGroup || clientName || "";
@@ -67,6 +68,7 @@ export default function LoginPage() {
         if (clientCode) localStorage.setItem("clientCode", clientCode);
         if (clientName) localStorage.setItem("client_name", clientName);
         if (discountGroup) localStorage.setItem("discount_group", discountGroup);
+        if (managerEmail) localStorage.setItem("manager_email", managerEmail);
       } catch (e) {
         console.warn("localStorage write failed", e);
       }
