@@ -34,4 +34,4 @@ if (typeof window !== 'undefined') {
 }
 
 // Eksportuojame modulį naudojant ES Modules standartą
-export default supabaseInstance as SupabaseClient
+export const supabase = supabaseInstance as SupabaseClient
