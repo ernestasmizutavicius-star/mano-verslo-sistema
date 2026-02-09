@@ -1236,21 +1236,21 @@ export default function B2BPortal() {
                         <div className="flex justify-between mb-1">
                           <span className="font-bold text-xs pr-2 text-black">{item.name}</span>
                           <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">-</button>
-                          <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-8 text-center text-xs font-bold border-none bg-transparent text-black" />
-                          <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">+</button>
                         </div>
-                        <div className="text-right">
-                          <p className="text-[8px] text-gray-400 mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
-                          <p className="font-bold text-xs text-black">{(item.price * item.qty).toFixed(2)} €</p>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">-</button>
+                            <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-8 text-center text-xs font-bold border-none bg-transparent text-black" />
+                            <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">+</button>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[8px] text-gray-400 mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
+                            <p className="font-bold text-xs text-black">{(item.price * item.qty).toFixed(2)} €</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                }
+                    ))
+                  }
               </div>
               {currentCart.length > 0 && (
                 <div className="pt-3 border-t-2 border-[#c29a74]/20">
