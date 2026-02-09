@@ -189,14 +189,27 @@ export default function B2BPortal() {
           console.error('Klaida traukiant prekes:', error.message);
           return;
         }
-        const mapped = (data || []).map((row: any) => ({
-          id: row.id,
-          name: row.name,
-          basePrice: row.base_price ?? row.basePrice ?? 0,
-          category: row.category ?? 'general',
-          images: row.images ?? (row.image ? [row.image] : ['/placeholder.jpg']),
-          client: row.client ?? 'all'
-        }));
+        const mapped = (data || []).map((row: any) => {
+          // Determine images from image_url, images, image fields
+          let images: string[] = ['/placeholder.jpg'];
+          if (row.image_url) {
+            if (Array.isArray(row.image_url)) images = row.image_url;
+            else if (typeof row.image_url === 'string') images = [row.image_url];
+          } else if (row.images) {
+            images = Array.isArray(row.images) ? row.images : [row.images];
+          } else if (row.image) {
+            images = [row.image];
+          }
+
+          return {
+            id: row.id,
+            name: row.name,
+            basePrice: row.base_price ?? row.basePrice ?? 0,
+            category: row.category ?? 'general',
+            images,
+            client: row.client ?? 'all'
+          };
+        });
         setProducts(mapped);
       } catch (e) {
         console.error('Fetch products error', e);
