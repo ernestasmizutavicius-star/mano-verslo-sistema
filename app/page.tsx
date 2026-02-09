@@ -296,8 +296,9 @@ export default function B2BPortal() {
             .order('created_at', { ascending: false });
           
           if (!error && data) {
-            const mapped = data.map((order: any) => ({
+            const mapped = data.map((order: any, index: number) => ({
               id: order.id,
+              order_number: index + 1,
               date: new Date(order.created_at).toLocaleString('lt-LT'),
               client: order.client_name,
               items: order.order_items || [],
@@ -454,8 +455,13 @@ export default function B2BPortal() {
 
       const serverOrder = data || null;
 
+      const nextOrderNumber = orderHistory.length > 0 
+        ? Math.max(...orderHistory.map(o => o.order_number || 0)) + 1 
+        : 1;
+
       const newOrder = {
         id: serverOrder?.id ?? Math.floor(Math.random() * 100000),
+        order_number: nextOrderNumber,
         date: new Date().toLocaleString('lt-LT'),
         client: payload.client_name,
         items: [...cartItems],
@@ -483,7 +489,7 @@ export default function B2BPortal() {
     
     yPosition += 15;
     pdf.setFontSize(12);
-    pdf.text(`Užsakymas #${order.id}`, 20, yPosition);
+    pdf.text(`Užsakymas #${order.order_number}`, 20, yPosition);
     yPosition += 7;
     pdf.setFontSize(10);
     pdf.text(`Data: ${order.date}`, 20, yPosition);
@@ -1192,7 +1198,7 @@ export default function B2BPortal() {
                   <div key={order.id} className="border rounded-xl p-6 bg-gray-50">
                     <div className="flex justify-between mb-4 border-b pb-2 items-center">
                       <div className="flex-1">
-                        <span className="font-bold">Užsakymas #{order.id}</span>
+                        <span className="font-bold">Užsakymas #{order.order_number}</span>
                         <span className="text-gray-500 text-sm ml-4">{order.date}</span>
                       </div>
                       <button 
