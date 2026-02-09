@@ -1262,6 +1262,7 @@ export default function B2BPortal() {
               )}
             </div>
           </div>
+          </div>
         )}
       </main>
     </div>
