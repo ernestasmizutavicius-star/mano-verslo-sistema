@@ -182,13 +182,18 @@ export default function B2BPortal() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const clientName = typeof window !== 'undefined' ? localStorage.getItem('profile_client_name') : null;
+        // Get clientName from clients state instead of localStorage to avoid timing issues
+        const clientName = clients && clientCode ? clients[clientCode]?.name : null;
+        console.log('📦 Filtruojamas pagal clientName:', clientName);
+        console.log('📦 Available clients:', clients);
         const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
+        console.log('📦 Filter query:', orFilter);
         const { data, error } = await supabase.from('products').select('*').or(orFilter);
         if (error) {
           console.error('Klaida traukiant prekes:', error.message);
           return;
         }
+        console.log('📦 Gauti produktai:', data);
         const mapped = (data || []).map((row: any) => {
           // Determine images from image_url, images, image fields
           let images: string[] = ['/placeholder.jpg'];
@@ -216,7 +221,7 @@ export default function B2BPortal() {
       }
     };
     fetchProducts();
-  }, [isLoggedIn, clientCode]);
+  }, [isLoggedIn, clientCode, clients]);
 
   // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
