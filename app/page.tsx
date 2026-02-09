@@ -725,8 +725,13 @@ export default function B2BPortal() {
             <button onClick={() => {
               setIsLoggedIn(false);
               setClientCode('');
+              setFormPassword('');
+              setShowPassword(false);
               localStorage.removeItem('isLoggedIn');
               localStorage.removeItem('clientCode');
+              localStorage.removeItem('client_name');
+              localStorage.removeItem('discount_group');
+              localStorage.removeItem('manager_email');
               localStorage.removeItem('currentView');
             }} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
           </div>
