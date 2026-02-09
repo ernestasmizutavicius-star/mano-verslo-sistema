@@ -475,17 +475,101 @@ export default function B2BPortal() {
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold mb-4">Prašome prisijungti</h1>
-          <p className="mb-6 text-gray-600">Turite būti prisijungęs, kad matytumėte katalogą</p>
-          <a 
-            href="/login"
-            className="inline-block bg-[#c29a74] text-white px-6 py-3 rounded font-semibold hover:opacity-95"
-          >
-            Eiti į prisijungimą
-          </a>
-        </div>
+      <div 
+        className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4 font-sans relative"
+        style={{ backgroundImage: "url('/background.jpg')" }}
+      >
+        {/* Tamsus sluoksnis gylio pojūčiui */}
+        <div className="absolute inset-0 bg-black/40"></div>
+
+        <form 
+          onSubmit={async (e: any) => {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+            
+            try {
+              const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ 
+                email, 
+                password 
+              });
+
+              if (signInError) {
+                alert("Neteisingas prisijungimo vardas arba slaptažodis");
+                return;
+              }
+
+              const user = signInData.user;
+              if (!user) {
+                alert("Vartotojas nerastas");
+                return;
+              }
+
+              // Fetch profile from 'profiles' table
+              const { data: profile, error: profileError } = await supabase
+                .from("profiles")
+                .select("client_name, discount_group")
+                .eq("id", user.id)
+                .single();
+
+              if (profileError) {
+                console.warn("Klaida gaunant profile:", profileError.message);
+              }
+
+              const clientName = profile?.client_name || null;
+              const discountGroup = profile?.discount_group || null;
+              const clientCode = discountGroup || clientName || "";
+
+              // Save to localStorage
+              localStorage.setItem('isLoggedIn', 'true');
+              if (clientCode) localStorage.setItem('clientCode', clientCode);
+              if (clientName) localStorage.setItem('profile_client_name', clientName);
+              if (discountGroup) localStorage.setItem('profile_discount_group', discountGroup);
+
+              // Update state
+              setClientCode(clientCode);
+              setIsLoggedIn(true);
+              setView("katalogas");
+              
+              // Populate clients object
+              const discount = discountGroup ? parseFloat(discountGroup) : 1.0;
+              setClients({
+                [clientCode]: {
+                  name: clientName || clientCode,
+                  discount: discount
+                }
+              });
+            } catch (err: any) {
+              alert(err?.message || "Prisijungimo klaida");
+            }
+          }} 
+          className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
+        >
+          <div className="mb-4">
+            <span className="block text-6xl font-extralight text-white/95 uppercase tracking-[0.35em]">FLOKATI</span>
+            <div className="text-xl text-white/80 uppercase tracking-[0.15em] mt-2">B2B</div>
+          </div>
+
+          <div className="space-y-6">
+            <input 
+              name="email"
+              type="email"
+              placeholder="Prisijungimo vardas" 
+              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
+              required 
+            />
+            <input 
+              name="password"
+              type="password"
+              placeholder="Slaptažodis" 
+              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
+              required 
+            />
+            <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all hover:bg-slate-900/90">
+              PRISIJUNGTI
+            </button>
+          </div>
+        </form>
       </div>
     );
   }
