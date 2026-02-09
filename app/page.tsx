@@ -711,52 +711,7 @@ export default function B2BPortal() {
       <nav className="bg-white border-b sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-slate-800">
           <div className="flex gap-8 items-center">
-            <div className="relative group">
-              <button 
-                onClick={() => setView("katalogas")} 
-                className={`font-medium ${view === 'katalogas' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}
-              >
-                Katalogas
-              </button>
-              <div className="absolute left-0 mt-0 w-48 bg-white shadow-lg rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20">
-                <button
-                  onClick={() => {
-                    setView("katalogas");
-                    setSelectedCategory(null);
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${!selectedCategory ? 'text-[#c29a74]' : 'text-slate-800'}`}
-                >
-                  Visos prekės
-                </button>
-                <button
-                  onClick={() => {
-                    setView("katalogas");
-                    setSelectedCategory("antklodės");
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "antklodės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
-                >
-                  Antklodės
-                </button>
-                <button
-                  onClick={() => {
-                    setView("katalogas");
-                    setSelectedCategory("pagalvės");
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "pagalvės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
-                >
-                  Pagalvės
-                </button>
-                <button
-                  onClick={() => {
-                    setView("katalogas");
-                    setSelectedCategory("šlepetės");
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 ${selectedCategory === "šlepetės" ? 'text-[#c29a74]' : 'text-slate-800'}`}
-                >
-                  Šlepetės
-                </button>
-              </div>
-            </div>
+            <button onClick={() => setView("katalogas")} className={`font-medium ${view === 'katalogas' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Katalogas</button>
             <button onClick={() => setView("uzsakymai")} className={`font-medium ${view === 'uzsakymai' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Užsakymai</button>
             <button onClick={() => setView("mano-duomenis")} className={`font-medium ${view === 'mano-duomenis' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Mano duomenys</button>
           </div>
@@ -1221,33 +1176,66 @@ export default function B2BPortal() {
             )}
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProducts.map(p => (
-                  <ProductCard 
-                    key={p.id} 
-                    product={p} 
-                    onAdd={addToCart} 
-                    getPrice={getPrice}
-                    onOpenModal={(images: string[], index: number) => setModalData({images, index})}
-                  />
-                ))}
+          <div className="flex gap-8">
+            {/* Kategorijų Sidebar */}
+            <div className="w-48 bg-white p-6 rounded-2xl shadow-sm border h-fit">
+              <h3 className="text-lg font-bold mb-6 text-slate-800">Kategorijos</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${!selectedCategory ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
+                >
+                  Visos prekės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("antklodės")}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "antklodės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
+                >
+                  Antklodės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("pagalvės")}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
+                >
+                  Pagalvės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("šlepetės")}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
+                >
+                  Šlepetės
+                </button>
               </div>
             </div>
 
-            <div className="w-full lg:w-80 bg-white p-5 rounded-2xl shadow-xl border-t-4 border-[#c29a74] h-fit sticky top-24">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-black">Krepšelis</h2>
-                {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-red-400 hover:underline font-bold">IŠVALYTI</button>}
+            {/* Produktai ir Krepšelis */}
+            <div className="flex-1 flex flex-col lg:flex-row gap-8">
+              <div className="flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+                  {filteredProducts.map(p => (
+                    <ProductCard 
+                      key={p.id} 
+                      product={p} 
+                      onAdd={addToCart} 
+                      getPrice={getPrice}
+                      onOpenModal={(images: string[], index: number) => setModalData({images, index})}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
-                {currentCart.length === 0 ? <p className="text-gray-400 italic text-center py-3 text-sm">Tuščias</p> : 
-                  currentCart.map((item: any) => (
-                    <div key={item.id} className="border-b border-gray-100 pb-2">
-                      <div className="flex justify-between mb-1">
-                        <span className="font-bold text-xs pr-2 text-black">{item.name}</span>
-                        <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
+
+              <div className="w-full lg:w-80 bg-white p-5 rounded-2xl shadow-xl border-t-4 border-[#c29a74] h-fit sticky top-24">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold text-black">Krepšelis</h2>
+                  {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-red-400 hover:underline font-bold">IŠVALYTI</button>}
+                </div>
+                <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+                  {currentCart.length === 0 ? <p className="text-gray-400 italic text-center py-3 text-sm">Tuščias</p> : 
+                    currentCart.map((item: any) => (
+                      <div key={item.id} className="border-b border-gray-100 pb-2">
+                        <div className="flex justify-between mb-1">
+                          <span className="font-bold text-xs pr-2 text-black">{item.name}</span>
+                          <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1">
