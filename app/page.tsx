@@ -513,19 +513,19 @@ export default function B2BPortal() {
                 .select("client_name, discount_group")
                 .eq("id", user.id);
 
+              console.log('🔍 User ID:', user.id);
+              console.log('🔍 Profiles result:', profiles);
+              console.log('🔍 Profile error:', profileError);
+
               if (profileError) {
                 console.warn("Klaida gaunant profile:", profileError.message);
               }
 
               const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-              
-              if (!profile) {
-                alert("Vartotojas nerastas customers lentelėje. Susisiekite su administratoriumi.");
-                return;
-              }
+              console.log('🔍 Selected profile:', profile);
 
-              const clientName = profile.client_name || null;
-              const discountGroup = profile.discount_group || null;
+              const clientName = profile?.client_name || null;
+              const discountGroup = profile?.discount_group || null;
               const clientCode = discountGroup || clientName || "";
 
               // Save to localStorage

@@ -44,20 +44,19 @@ export default function LoginPage() {
         .select("client_name, discount_group")
         .eq("id", user.id);
 
+      console.log('🔍 User ID:', user.id);
+      console.log('🔍 Profiles result:', profiles);
+      console.log('🔍 Profile error:', profileError);
+
       if (profileError) {
         console.warn("Klaida gaunant profile:", profileError.message);
       }
 
       const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-      
-      if (!profile) {
-        setError("Vartotojas nerastas customers lentelėje. Susisiekite su administratoriumi.");
-        setLoading(false);
-        return;
-      }
+      console.log('🔍 Selected profile:', profile);
 
-      const clientName = profile.client_name || null;
-      const discountGroup = profile.discount_group || null;
+      const clientName = profile?.client_name || null;
+      const discountGroup = profile?.discount_group || null;
 
       // Decide a clientCode to integrate with existing app. Prefer discount_group, then client_name
       const clientCode = discountGroup || clientName || "";
