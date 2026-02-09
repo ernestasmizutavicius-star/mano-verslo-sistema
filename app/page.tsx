@@ -187,9 +187,15 @@ export default function B2BPortal() {
         console.log('📦 isLoggedIn:', isLoggedIn);
         console.log('📦 clientCode:', clientCode);
         console.log('📦 client_name from localStorage:', clientName);
-        const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
-        console.log('📦 Filter query:', orFilter);
-        const { data, error } = await supabase.from('products').select('*').or(orFilter);
+        const clientFilter = clientName ? `client.eq.${clientName}` : `client.eq.all`;
+        console.log('📦 Client filter query:', clientFilter);
+        let { data, error } = await supabase.from('products').select('*').or(clientFilter);
+        if (!error && clientName && (!data || data.length === 0)) {
+          console.log('📦 No client products found, falling back to all');
+          const fallback = await supabase.from('products').select('*').eq('client', 'all');
+          data = fallback.data;
+          error = fallback.error;
+        }
         console.log('📦 Products data:', data);
         console.log('📦 Products error:', error);
         if (error) {
@@ -211,7 +217,7 @@ export default function B2BPortal() {
           return {
             id: row.id,
             name: row.name,
-            basePrice: row.base_price ?? row.basePrice ?? 0,
+            basePrice: row.price ?? row.base_price ?? row.basePrice ?? 0,
             category: row.category ?? 'general',
             images,
             client: row.client ?? 'all'
@@ -381,7 +387,18 @@ export default function B2BPortal() {
 
     const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
 
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      console.error('Klaida gaunant vartotoją:', authError.message);
+    }
+    const userId = authData?.user?.id || null;
+    if (!userId) {
+      alert('Nepavyko nustatyti vartotojo. Prisijunkite iš naujo.');
+      return;
+    }
+
     const payload = {
+      user_id: userId,
       client_name: clients[clientCode]?.name || clientCode || 'unknown',
       order_items: cartItems,
       total_price: total,
