@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import TestSupabase from "@/components/TestSupabase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -77,7 +76,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <TestSupabase />
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow">
         <h1 className="text-2xl font-semibold mb-4">Prisijungimas</h1>
         {error && <div className="mb-4 text-red-600">{error}</div>}
