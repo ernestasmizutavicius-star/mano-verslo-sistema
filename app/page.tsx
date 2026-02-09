@@ -182,18 +182,13 @@ export default function B2BPortal() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Get clientName from clients state instead of localStorage to avoid timing issues
-        const clientName = clients && clientCode ? clients[clientCode]?.name : null;
-        console.log('📦 Filtruojamas pagal clientName:', clientName);
-        console.log('📦 Available clients:', clients);
+        const clientName = typeof window !== 'undefined' ? localStorage.getItem('profile_client_name') : null;
         const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
-        console.log('📦 Filter query:', orFilter);
         const { data, error } = await supabase.from('products').select('*').or(orFilter);
         if (error) {
           console.error('Klaida traukiant prekes:', error.message);
           return;
         }
-        console.log('📦 Gauti produktai:', data);
         const mapped = (data || []).map((row: any) => {
           // Determine images from image_url, images, image fields
           let images: string[] = ['/placeholder.jpg'];
@@ -221,7 +216,7 @@ export default function B2BPortal() {
       }
     };
     fetchProducts();
-  }, [isLoggedIn, clientCode, clients]);
+  }, [isLoggedIn, clientCode]);
 
   // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
@@ -513,24 +508,18 @@ export default function B2BPortal() {
               }
 
               // Fetch profile from 'customers' table
-              const { data: profiles, error: profileError } = await supabase
+              const { data: profile, error: profileError } = await supabase
                 .from("customers")
                 .select("client_name, discount_group")
-                .eq("id", user.id);
+                .eq("id", user.id)
+                .single();
 
               if (profileError) {
                 console.warn("Klaida gaunant profile:", profileError.message);
               }
 
-              const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-              
-              if (!profile) {
-                alert("Vartotojas nerastas customers lentelėje. Susisiekite su administratoriumi.");
-                return;
-              }
-
-              const clientName = profile.client_name || null;
-              const discountGroup = profile.discount_group || null;
+              const clientName = profile?.client_name || null;
+              const discountGroup = profile?.discount_group || null;
               const clientCode = discountGroup || clientName || "";
 
               // Save to localStorage
