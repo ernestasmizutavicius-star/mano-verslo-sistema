@@ -507,9 +507,9 @@ export default function B2BPortal() {
                 return;
               }
 
-              // Fetch profile from 'profiles' table
+              // Fetch profile from 'customers' table
               const { data: profile, error: profileError } = await supabase
-                .from("profiles")
+                .from("customers")
                 .select("client_name, discount_group")
                 .eq("id", user.id)
                 .single();

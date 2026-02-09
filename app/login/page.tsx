@@ -38,9 +38,9 @@ export default function LoginPage() {
         return;
       }
 
-      // Fetch profile from 'profiles' table by user id (UUID)
+      // Fetch profile from 'customers' table by user id (UUID)
       const { data: profile, error: profileError } = await supabase
-        .from("profiles")
+        .from("customers")
         .select("client_name, discount_group")
         .eq("id", user.id)
         .single();
