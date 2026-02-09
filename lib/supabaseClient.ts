@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Naudojame tuščią tekstą kaip atsarginį variantą, kad build procesas nesugriūtų
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Naudojame placeholder reikšmes build metu
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
 // Tikriname kintamuosius tik tada, kai kodas veikia vartotojo naršyklėje
-if (typeof window !== 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
-  console.warn('⚠️ Supabase raktai nerasti! Patikrink Vercel nustatymus.')
+if (typeof window !== 'undefined' && (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder-key')) {
+  console.error('⚠️ Supabase raktai nerasti! Patikrink Vercel nustatymus.')
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
