@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import supabase from '../lib/supabaseClient';
 import { jsPDF } from 'jspdf';
 
 // --- KOMPONENTAI ---
@@ -175,11 +176,34 @@ export default function B2BPortal() {
     "testas": { name: "Bandomasis Klientas", discount: 1.0 }
   };
 
-  const products = [
-    { id: 1, name: "Vilnonė antklodė Premium", basePrice: 89.0, category: "antklodės", images: ["/antklode.jpg", "/antklode1.jpg", "/antklode2.jpg"] },
-    { id: 2, name: "Pagalvė Merino", basePrice: 45.5, category: "pagalvės", images: ["/pagalve.jpg", "/pagalve1.jpg", "/pagalve2.jpg"] },
-    { id: 3, name: "Šlepetės (natūrali vilna)", basePrice: 29.99, category: "šlepetės", images: ["/slepetes.jpg", "/slepetes1.jpg", "/slepetes2.jpg"] },
-  ];
+  const [products, setProducts] = useState<any[]>([]);
+
+  // Fetch products from Supabase and filter by client ('all' or client's name)
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const clientName = typeof window !== 'undefined' ? localStorage.getItem('profile_client_name') : null;
+        const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
+        const { data, error } = await supabase.from('products').select('*').or(orFilter);
+        if (error) {
+          console.error('Klaida traukiant prekes:', error.message);
+          return;
+        }
+        const mapped = (data || []).map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          basePrice: row.base_price ?? row.basePrice ?? 0,
+          category: row.category ?? 'general',
+          images: row.images ?? (row.image ? [row.image] : ['/placeholder.jpg']),
+          client: row.client ?? 'all'
+        }));
+        setProducts(mapped);
+      } catch (e) {
+        console.error('Fetch products error', e);
+      }
+    };
+    fetchProducts();
+  }, [isLoggedIn, clientCode]);
 
   // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
@@ -251,7 +275,21 @@ export default function B2BPortal() {
     }
   }, [clientCode, isLoggedIn]);
 
-  const getPrice = (basePrice: number) => (clients[clientCode]?.discount || 1.0) * basePrice;
+  const getPrice = (basePrice: number) => {
+    let multiplier = 1;
+    try {
+      const discountGroup = typeof window !== 'undefined' ? localStorage.getItem('profile_discount_group') : null;
+      if (discountGroup && discountGroup.startsWith('D')) {
+        const pct = parseInt(discountGroup.slice(1));
+        if (!isNaN(pct)) multiplier = 1 - pct / 100;
+      } else {
+        multiplier = (clients[clientCode]?.discount) || 1;
+      }
+    } catch (e) {
+      multiplier = (clients[clientCode]?.discount) || 1;
+    }
+    return basePrice * multiplier;
+  };
 
   const filteredProducts = selectedCategory
     ? products.filter((p) => p.category === selectedCategory)
