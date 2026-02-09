@@ -182,7 +182,7 @@ export default function B2BPortal() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const clientName = typeof window !== 'undefined' ? localStorage.getItem('profile_client_name') : null;
+        const clientName = typeof window !== 'undefined' ? localStorage.getItem('client_name') : null;
         const orFilter = clientName ? `client.eq.all,client.eq.${clientName}` : `client.eq.all`;
         const { data, error } = await supabase.from('products').select('*').or(orFilter);
         if (error) {
@@ -239,8 +239,8 @@ export default function B2BPortal() {
       setView(savedView || 'katalogas');
       
       // Load client profile from localStorage and populate clients object
-      const profileClientName = localStorage.getItem('profile_client_name');
-      const profileDiscountGroup = localStorage.getItem('profile_discount_group');
+      const profileClientName = localStorage.getItem('client_name');
+      const profileDiscountGroup = localStorage.getItem('discount_group');
       
       // Parse discount (stored as string like "0.8" or "1.0")
       const discount = profileDiscountGroup ? parseFloat(profileDiscountGroup) : 1.0;
@@ -305,7 +305,7 @@ export default function B2BPortal() {
   const getPrice = (basePrice: number) => {
     let multiplier = 1;
     try {
-      const discountGroup = typeof window !== 'undefined' ? localStorage.getItem('profile_discount_group') : null;
+      const discountGroup = typeof window !== 'undefined' ? localStorage.getItem('discount_group') : null;
       if (discountGroup && discountGroup.startsWith('D')) {
         const pct = parseInt(discountGroup.slice(1));
         if (!isNaN(pct)) multiplier = 1 - pct / 100;
@@ -525,8 +525,8 @@ export default function B2BPortal() {
               // Save to localStorage
               localStorage.setItem('isLoggedIn', 'true');
               if (clientCode) localStorage.setItem('clientCode', clientCode);
-              if (clientName) localStorage.setItem('profile_client_name', clientName);
-              if (discountGroup) localStorage.setItem('profile_discount_group', discountGroup);
+              if (clientName) localStorage.setItem('client_name', clientName);
+              if (discountGroup) localStorage.setItem('discount_group', discountGroup);
 
               // Update state
               setClientCode(clientCode);

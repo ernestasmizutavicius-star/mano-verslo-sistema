@@ -60,8 +60,8 @@ export default function LoginPage() {
       try {
         localStorage.setItem("isLoggedIn", "true");
         if (clientCode) localStorage.setItem("clientCode", clientCode);
-        if (clientName) localStorage.setItem("profile_client_name", clientName);
-        if (discountGroup) localStorage.setItem("profile_discount_group", discountGroup);
+        if (clientName) localStorage.setItem("client_name", clientName);
+        if (discountGroup) localStorage.setItem("discount_group", discountGroup);
       } catch (e) {
         console.warn("localStorage write failed", e);
       }
