@@ -39,19 +39,26 @@ export default function LoginPage() {
       }
 
       // Fetch profile from 'customers' table by user id (UUID)
-      const { data: profile, error: profileError } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from("customers")
         .select("client_name, discount_group")
-        .eq("id", user.id)
-        .single();
+        .eq("id", user.id);
 
       if (profileError) {
         // Not fatal — still proceed but notify
         console.warn("Klaida gaunant profile:", profileError.message);
       }
 
-      const clientName = profile?.client_name || null;
-      const discountGroup = profile?.discount_group || null;
+      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+      
+      if (!profile) {
+        setError("Vartotojas nerastas customers lentelėje. Susisiekite su administratoriumi.");
+        setLoading(false);
+        return;
+      }
+
+      const clientName = profile.client_name || null;
+      const discountGroup = profile.discount_group || null;
 
       // Decide a clientCode to integrate with existing app. Prefer discount_group, then client_name
       const clientCode = discountGroup || clientName || "";

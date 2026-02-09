@@ -513,18 +513,24 @@ export default function B2BPortal() {
               }
 
               // Fetch profile from 'customers' table
-              const { data: profile, error: profileError } = await supabase
+              const { data: profiles, error: profileError } = await supabase
                 .from("customers")
                 .select("client_name, discount_group")
-                .eq("id", user.id)
-                .single();
+                .eq("id", user.id);
 
               if (profileError) {
                 console.warn("Klaida gaunant profile:", profileError.message);
               }
 
-              const clientName = profile?.client_name || null;
-              const discountGroup = profile?.discount_group || null;
+              const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+              
+              if (!profile) {
+                alert("Vartotojas nerastas customers lentelėje. Susisiekite su administratoriumi.");
+                return;
+              }
+
+              const clientName = profile.client_name || null;
+              const discountGroup = profile.discount_group || null;
               const clientCode = discountGroup || clientName || "";
 
               // Save to localStorage
