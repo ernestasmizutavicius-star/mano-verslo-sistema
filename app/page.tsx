@@ -171,6 +171,7 @@ export default function B2BPortal() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [formPassword, setFormPassword] = useState("");
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -487,7 +488,7 @@ export default function B2BPortal() {
           onSubmit={async (e: any) => {
             e.preventDefault();
             const email = e.target.email.value;
-            const password = e.target.password.value;
+            const password = formPassword;
             
             try {
               const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ 
@@ -562,11 +563,14 @@ export default function B2BPortal() {
             <div className="relative">
               <input 
                 name="password"
+                value={formPassword}
+                onChange={(e) => setFormPassword(e.target.value)}
                 type={showPassword ? "text" : "password"}
                 placeholder="Slaptažodis" 
                 className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg pr-10"
                 required 
               />
+              {formPassword.length > 0 && (
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
@@ -606,6 +610,7 @@ export default function B2BPortal() {
                   </svg>
                 )}
               </button>
+              )}
             </div>
             <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all hover:bg-slate-900/90">
               PRISIJUNGTI
