@@ -336,19 +336,52 @@ export default function B2BPortal() {
 
   const clearCart = () => setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
 
-  const submitOrder = () => {
-    const cartItems = allCarts[clientCode];
+  const submitOrder = async () => {
+    const cartItems = allCarts[clientCode] || [];
+    if (!cartItems || cartItems.length === 0) {
+      alert('Krepšelis tuščias');
+      return;
+    }
+
     const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
-    const newOrder = {
-      id: Math.floor(Math.random() * 100000),
-      date: new Date().toLocaleString("lt-LT"),
-      client: clients[clientCode].name,
-      items: [...cartItems],
-      total: total
+
+    const payload = {
+      client_name: clients[clientCode]?.name || clientCode || 'unknown',
+      order_items: cartItems,
+      total_price: total,
+      manager_email: companyData?.email || 'orders@flokati.lt',
+      status: 'Išsiųsta',
+      created_at: new Date().toISOString()
     };
-    setOrderHistory([newOrder, ...orderHistory]);
-    clearCart();
-    alert(`Užsakymas išsiųstas ernestas@flokati.lt!\nSuma: ${total.toFixed(2)} €`);
+
+    // Insert into Supabase 'orders' table
+    try {
+      const { data, error } = await supabase.from('orders').insert(payload).select().single();
+      if (error) {
+        console.error('Klaida įrašant užsakymą:', error.message);
+        alert('Įvyko klaida siunčiant užsakymą. Bandykite vėliau.');
+        return;
+      }
+
+      const serverOrder = data || null;
+
+      const newOrder = {
+        id: serverOrder?.id ?? Math.floor(Math.random() * 100000),
+        date: new Date().toLocaleString('lt-LT'),
+        client: payload.client_name,
+        items: [...cartItems],
+        total: total,
+        status: payload.status,
+        manager_email: payload.manager_email
+      };
+
+      setOrderHistory([newOrder, ...orderHistory]);
+      clearCart();
+      alert(`Užsakymas išsiųstas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
+    } catch (e) {
+      console.error('submitOrder error', e);
+      alert('Įvyko klaida siunčiant užsakymą.');
+    }
   };
 
   const exportOrderToPDF = (order: any) => {
