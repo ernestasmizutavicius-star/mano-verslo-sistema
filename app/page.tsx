@@ -1489,30 +1489,29 @@ export default function B2BPortal() {
         ) : (
           <div className="bg-[var(--surface)] p-6 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-1">Katalogas</h2>
-              <p className="text-sm text-[var(--ink-soft)] mb-4">Atrinkti produktai pagal jūsų kainodara.</p>
-              <div className="flex gap-3 flex-wrap">
+              <h2 className="text-2xl font-semibold mb-3">Katalogas</h2>
+              <div className="flex gap-5 flex-wrap text-sm">
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${!selectedCategory ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  className={`font-medium transition ${!selectedCategory ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
                 >
                   Visos prekės
                 </button>
                 <button
                   onClick={() => setSelectedCategory("antklodės")}
-                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "antklodės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  className={`font-medium transition ${selectedCategory === "antklodės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
                 >
                   Antklodės
                 </button>
                 <button
                   onClick={() => setSelectedCategory("pagalvės")}
-                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  className={`font-medium transition ${selectedCategory === "pagalvės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
                 >
                   Pagalvės
                 </button>
                 <button
                   onClick={() => setSelectedCategory("šlepetės")}
-                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  className={`font-medium transition ${selectedCategory === "šlepetės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
                 >
                   Šlepetės
                 </button>
