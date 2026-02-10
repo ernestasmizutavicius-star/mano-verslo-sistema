@@ -455,7 +455,10 @@ export default function B2BPortal() {
     }));
   };
 
-  const clearCart = () => setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
+  const clearCart = () => {
+    setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
+    setSelectedDeliveryAddress(null);
+  };
 
   const submitOrder = async () => {
     const cartItems = allCarts[clientCode] || [];
@@ -1562,15 +1565,15 @@ export default function B2BPortal() {
           <aside className="order-3 lg:order-none">
             <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 sticky top-6 overflow-hidden">
               <div className="p-5 pb-0">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-2">
                   <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
-                  <div className="flex gap-2">
-                    {currentCart.length > 0 && (
-                      <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
-                    )}
-                    <button onClick={() => setIsCartVisible(!isCartVisible)} className="text-2xl text-gray-400 hover:text-[var(--foreground)]">{isCartVisible ? '←' : '→'}</button>
-                  </div>
+                  <button onClick={() => setIsCartVisible(!isCartVisible)} className="text-2xl text-gray-400 hover:text-[var(--foreground)]">{isCartVisible ? '←' : '→'}</button>
                 </div>
+                {isCartVisible && currentCart.length > 0 && (
+                  <div className="flex justify-end pb-3">
+                    <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+                  </div>
+                )}
               </div>
               {isCartVisible && (
               <div className="space-y-0 mb-0 max-h-[50vh] overflow-y-auto">
@@ -1586,7 +1589,14 @@ export default function B2BPortal() {
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start mb-1">
                             <h3 className="font-semibold text-sm text-[var(--foreground)] pr-2">{item.name}</h3>
-                            <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-red-500 text-lg">⋯</button>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="text-gray-400 hover:text-red-500 text-lg"
+                              title="Pašalinti prekę"
+                              aria-label="Pašalinti prekę"
+                            >
+                              x
+                            </button>
                           </div>
                           <div className="flex justify-between items-center mt-2">
                             <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
