@@ -10,9 +10,13 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const next = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx + 1) % images.length); };
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
+  if (!images || images.length === 0) {
+    return <div className="w-full h-48 mb-4 rounded-3xl bg-[var(--surface-muted)]" />;
+  }
+
   return (
     <div className="relative w-full h-48 mb-4 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
-      <img src={images[currentIdx]} alt="Prekė" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
+      <img src={images[currentIdx]} alt="" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
       {images.length > 1 && (
         <><button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">◀</button>
         <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">▶</button></>
@@ -1582,7 +1586,7 @@ export default function B2BPortal() {
                     <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
                       <div className="flex gap-3">
                         {item.images && item.images.length > 0 ? (
-                          <img src={item.images[0]} alt={item.name} className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
+                          <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
                         ) : (
                           <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
                         )}
