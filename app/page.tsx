@@ -11,11 +11,11 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
   if (!images || images.length === 0) {
-    return <div className="w-full h-36 mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
+    return <div className="w-full aspect-[4/3] mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
   }
 
   return (
-    <div className="relative w-full h-36 mb-3 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
+    <div className="relative w-full aspect-[4/3] mb-3 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
       <img src={images[currentIdx]} alt="" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
       {images.length > 1 && (
         <><button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">◀</button>
@@ -822,12 +822,9 @@ export default function B2BPortal() {
       <div className="max-w-[1800px] mx-auto px-4 lg:px-6 py-6">
         <div className="grid gap-6 lg:grid-cols-[260px_1fr_320px] items-start">
           <aside className="order-1 lg:order-none bg-[var(--surface)] rounded-3xl p-5 shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
-                <div className="text-lg font-semibold">B2B Portalas</div>
-              </div>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)]">Online</span>
+            <div className="mb-6">
+              <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
+              <div className="text-lg font-semibold">B2B Portalas</div>
             </div>
             <div className="rounded-2xl bg-[var(--surface-muted)] p-3 mb-6">
               <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)]">Klientas</div>
@@ -1522,7 +1519,7 @@ export default function B2BPortal() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="bg-[var(--surface)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
-                      <div className="w-full h-36 bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
+                      <div className="w-full aspect-[4/3] bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
                       <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-2 w-3/4"></div>
                       <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-4 w-1/2"></div>
                       <div className="flex justify-between items-end mt-auto">
