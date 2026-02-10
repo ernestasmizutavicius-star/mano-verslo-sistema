@@ -1,15 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f2ea;
+  --foreground: #1f1c18;
+  --surface: #ffffff;
+  --surface-muted: #efe8dc;
+  --accent: #c7a27a;
+  --accent-strong: #b48a5e;
+  --ink-soft: #5b5248;
+  --shadow-soft: 0 18px 40px rgba(31, 28, 24, 0.12);
+  --shadow-strong: 0 28px 70px rgba(31, 28, 24, 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-sans: 'Manrope', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -23,7 +30,18 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: 'Manrope', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(600px 320px at 8% 12%, rgba(199, 162, 122, 0.28), transparent 60%),
+    radial-gradient(600px 360px at 85% 18%, rgba(180, 138, 94, 0.18), transparent 65%),
+    linear-gradient(180deg, #fbf8f3 0%, #f6f2ea 50%, #f3eee6 100%);
 }
 
 /* Disable autofill yellow background */

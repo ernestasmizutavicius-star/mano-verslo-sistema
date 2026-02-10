@@ -12,10 +12,10 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
 
   return (
     <div className="relative w-full h-48 mb-4 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
-      <img src={images[currentIdx]} alt="Prekė" className="w-full h-full object-cover rounded-lg bg-gray-100 transition hover:opacity-90" />
+      <img src={images[currentIdx]} alt="Prekė" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
       {images.length > 1 && (
-        <><button onClick={prev} className="absolute left-1 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black">◀</button>
-        <button onClick={next} className="absolute right-1 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black">▶</button></>
+        <><button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">◀</button>
+        <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">▶</button></>
       )}
     </div>
   );
@@ -72,7 +72,7 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={onClose}>
-      <button className="absolute top-6 right-6 text-[#c29a74] text-4xl hover:text-white transition" onClick={onClose}>&times;</button>
+      <button className="absolute top-6 right-6 text-[var(--accent)] text-4xl hover:text-white transition" onClick={onClose}>&times;</button>
       <div 
         className="relative max-w-4xl w-full h-full flex items-center justify-center" 
         onClick={e => e.stopPropagation()}
@@ -81,7 +81,7 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
         onMouseLeave={handleMouseUp}
       >
         {images.length > 1 && (
-          <button onClick={prev} className="absolute left-0 text-[#c29a74] text-5xl p-4 hover:text-white transition z-30">❮</button>
+          <button onClick={prev} className="absolute left-0 text-[var(--accent)] text-5xl p-4 hover:text-white transition z-30">❮</button>
         )}
         <div 
           className={`overflow-hidden rounded-lg shadow-2xl ${zoom > 1 ? 'cursor-grab' : 'cursor-zoom-in'} ${isDragging ? 'cursor-grabbing' : ''}`}
@@ -107,7 +107,7 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
           />
         </div>
         {images.length > 1 && (
-          <button onClick={next} className="absolute right-0 text-[#c29a74] text-5xl p-4 hover:text-white transition z-30">❯</button>
+          <button onClick={next} className="absolute right-0 text-[var(--accent)] text-5xl p-4 hover:text-white transition z-30">❯</button>
         )}
         <div className="absolute bottom-4 text-white font-semibold">{idx + 1} / {images.length}</div>
       </div>
@@ -120,17 +120,17 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const price = getPrice(product.basePrice);
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col text-slate-800">
+    <div className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
-      <h2 className="text-lg font-semibold leading-tight mb-2 h-12 overflow-hidden">{product.name}</h2>
+      <h2 className="text-lg font-semibold leading-tight mb-2 min-h-[3rem]">{product.name}</h2>
       <div className="flex justify-between items-end mt-auto">
         <div>
-          <p className="text-xs text-gray-400 line-through">{product.basePrice.toFixed(2)} €</p>
+          <p className="text-xs text-[var(--ink-soft)] line-through">{product.basePrice.toFixed(2)} €</p>
           <p className="text-black font-semibold text-xl">{price.toFixed(2)} €</p>
         </div>
         <div className="flex gap-2">
-          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-12 border rounded text-center text-sm" />
-          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-black transition">Įdėti</button>
+          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-12 border border-black/10 rounded-2xl text-center text-sm bg-white" />
+          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-[var(--foreground)] text-white px-4 py-2 rounded-2xl text-sm hover:opacity-90 transition">Įdėti</button>
         </div>
       </div>
     </div>
@@ -622,16 +622,24 @@ export default function B2BPortal() {
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4 font-sans relative"
-        style={{ backgroundImage: "url('/background.jpg')" }}
-      >
-        {/* Tamsus sluoksnis gylio pojūčiui */}
-        <div className="absolute inset-0 bg-black/40"></div>
+      <div className="min-h-screen px-4 py-12 flex items-center justify-center">
+        <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
+          <div className="hidden lg:block">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
+              Flokati B2B
+            </div>
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-[var(--foreground)]">
+              Premium tekstile verslui.
+              <span className="block text-[var(--ink-soft)]">Užsakymai be triukšmo.</span>
+            </h1>
+            <p className="mt-4 max-w-md text-sm text-[var(--ink-soft)]">
+              Prisijunkite prie savo paskyros ir valdykite kataloga, užsakymus bei pristatymo adresus vienoje vietoje.
+            </p>
+          </div>
 
-        <form 
-          key={isLoggedIn ? 'logged-in' : 'logged-out'}
-          onSubmit={async (e: any) => {
+          <form 
+            key={isLoggedIn ? 'logged-in' : 'logged-out'}
+            onSubmit={async (e: any) => {
             e.preventDefault();
             const email = formEmail;
             const password = formPassword;
@@ -711,42 +719,47 @@ export default function B2BPortal() {
               alert(err?.message || "Prisijungimo klaida");
             }
           }} 
-          className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
-        >
-          <div className="mb-4">
-            <span className="block text-6xl font-extralight text-white/95 uppercase tracking-[0.35em]">FLOKATI</span>
-            <div className="text-xl text-white/80 uppercase tracking-[0.15em] mt-2">B2B</div>
-          </div>
+            className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-8 shadow-[var(--shadow-strong)] border border-black/5"
+          >
+            <div className="mb-8">
+              <div className="text-xs uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
+              <div className="text-3xl font-semibold text-[var(--foreground)] mt-2">B2B Prisijungimas</div>
+              <p className="text-sm text-[var(--ink-soft)] mt-2">Prisijunkite, kad matytumėte savo kataloga.</p>
+            </div>
 
-          <div className="space-y-6">
-            <input 
-              name="email"
-              type="email"
-              value={formEmail}
-              onChange={(e) => setFormEmail(e.target.value)}
-              placeholder="Prisijungimo vardas" 
-              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
-              autoComplete="off"
-              required 
-            />
-            <div className="relative">
-              <input 
-                name="password"
-                value={formPassword}
-                onChange={(e) => setFormPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder="Slaptažodis" 
-                className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg pr-10"
-                autoComplete="new-password"
-                required 
-              />
-              {formPassword.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
-                aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
-              >
+            <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">El. paštas</label>
+                <input 
+                  name="email"
+                  type="email"
+                  value={formEmail}
+                  onChange={(e) => setFormEmail(e.target.value)}
+                  placeholder="vardenis@imone.lt" 
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+                  autoComplete="off"
+                  required 
+                />
+              </div>
+              <div className="relative">
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Slaptažodis</label>
+                <input 
+                  name="password"
+                  value={formPassword}
+                  onChange={(e) => setFormPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Slaptažodis" 
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
+                  autoComplete="new-password"
+                  required 
+                />
+                {formPassword.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-[38px] text-[var(--ink-soft)] hover:text-[var(--foreground)]"
+                  aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
+                >
                 {showPassword ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -779,20 +792,21 @@ export default function B2BPortal() {
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
+                </button>
+                )}
+              </div>
+              <button className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90">
+                PRISIJUNGTI
               </button>
-              )}
             </div>
-            <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all hover:bg-slate-900/90">
-              PRISIJUNGTI
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans">
+    <div className="min-h-screen text-slate-800 font-sans">
       {/* Modal Langas */}
       {modalData && (
         <ImageModal 
@@ -802,40 +816,80 @@ export default function B2BPortal() {
         />
       )}
 
-      <nav className="bg-white border-b sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-slate-800">
-          <div className="flex gap-8 items-center">
-            <button onClick={() => setView("katalogas")} className={`font-medium ${view === 'katalogas' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Katalogas</button>
-            <button onClick={() => setView("uzsakymai")} className={`font-medium ${view === 'uzsakymai' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Užsakymai</button>
-            <button onClick={() => setView("mano-duomenis")} className={`font-medium ${view === 'mano-duomenis' ? 'text-[#c29a74] border-b-2 border-[#c29a74]' : 'text-gray-500'}`}>Mano duomenys</button>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold bg-[#c29a74]/10 px-3 py-1 rounded-full text-black">{clients[clientCode].name}</span>
-            <button onClick={() => {
-              setIsLoggedIn(false);
-              setClientCode('');
-              setFormEmail('');
-              setFormPassword('');
-              setShowPassword(false);
-              localStorage.removeItem('isLoggedIn');
-              localStorage.removeItem('clientCode');
-              localStorage.removeItem('client_name');
-              localStorage.removeItem('discount_group');
-              localStorage.removeItem('manager_email');
-              localStorage.removeItem('currentView');
-            }} className="text-gray-400 hover:text-[#c29a74] text-sm">Atsijungti</button>
-          </div>
-        </div>
-      </nav>
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+        <div className="grid gap-6 lg:grid-cols-[260px_1fr_320px] items-start">
+          <aside className="order-1 lg:order-none bg-[var(--surface)] rounded-3xl p-5 shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
+                <div className="text-lg font-semibold">B2B Portalas</div>
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)]">Online</span>
+            </div>
+            <div className="rounded-2xl bg-[var(--surface-muted)] p-3 mb-6">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)]">Klientas</div>
+              <div className="text-sm font-semibold text-[var(--foreground)]">{clients[clientCode]?.name || 'Klientas'}</div>
+              <button onClick={() => {
+                setIsLoggedIn(false);
+                setClientCode('');
+                setFormEmail('');
+                setFormPassword('');
+                setShowPassword(false);
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('clientCode');
+                localStorage.removeItem('client_name');
+                localStorage.removeItem('discount_group');
+                localStorage.removeItem('manager_email');
+                localStorage.removeItem('currentView');
+              }} className="mt-2 text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)]">Atsijungti</button>
+            </div>
+            <nav className="space-y-2">
+              <button onClick={() => setView("katalogas")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'katalogas' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Katalogas</button>
+              <button onClick={() => setView("uzsakymai")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'uzsakymai' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Užsakymai</button>
+              <button onClick={() => setView("mano-duomenis")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'mano-duomenis' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Mano duomenys</button>
+            </nav>
 
-      <main className="max-w-7xl mx-auto p-6">
-        {view === "mano-duomenis" ? (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border">
+            {view === "katalogas" && (
+              <div className="mt-6">
+                <div className="text-[10px] uppercase tracking-[0.3em] text-[var(--ink-soft)] mb-3">Kategorijos</div>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${!selectedCategory ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  >
+                    Visos prekės
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory("antklodės")}
+                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "antklodės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  >
+                    Antklodės
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory("pagalvės")}
+                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  >
+                    Pagalvės
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory("šlepetės")}
+                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                  >
+                    Šlepetės
+                  </button>
+                </div>
+              </div>
+            )}
+          </aside>
+
+          <main className="order-2 lg:order-none">
+            {view === "mano-duomenis" ? (
+              <div className="bg-[var(--surface)] p-8 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
             <h2 className="text-2xl font-extralight mb-8">Mano duomenys</h2>
             
             {/* Įmonės duomenys */}
-            <div className="mb-10 pb-8 border-b">
-              <h3 className="text-xl font-semibold mb-6 text-[#c29a74] flex items-center justify-between">
+            <div className="mb-10 pb-8 border-b border-black/5">
+              <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)] flex items-center justify-between">
                 Įmonės informacija
                 {!editingCompany && companyData.name && (
                   <button 
@@ -843,7 +897,7 @@ export default function B2BPortal() {
                       setEditCompanyData(companyData);
                       setEditingCompany(true);
                     }}
-                    className="text-sm bg-[#c29a74]/10 text-[#c29a74] px-3 py-1 rounded-lg hover:bg-[#c29a74]/20 transition"
+                    className="text-sm bg-[var(--surface-muted)] text-[var(--foreground)] px-3 py-1 rounded-2xl hover:opacity-80 transition"
                   >
                     Redaguoti
                   </button>
@@ -860,7 +914,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.name} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
@@ -869,7 +923,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.code} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
-                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
@@ -878,7 +932,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.contactPerson} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, contactPerson: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
@@ -887,7 +941,7 @@ export default function B2BPortal() {
                         type="tel" 
                         value={editCompanyData.phone} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
@@ -896,7 +950,7 @@ export default function B2BPortal() {
                         type="email" 
                         value={editCompanyData.email} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
-                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"                        
+                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"                        
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -905,7 +959,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.address} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
-                           className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"                       
+                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"                       
                       />
                     </div>
                   </div>
@@ -966,7 +1020,7 @@ export default function B2BPortal() {
                           alert('Klaida išsaugant duomenis');
                         }
                       }}
-                      className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                      className="flex-1 bg-[var(--foreground)] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                     >
                       ✓ Išsaugoti
                     </button>
@@ -975,7 +1029,7 @@ export default function B2BPortal() {
                         setEditCompanyData(companyData);
                         setEditingCompany(false);
                       }}
-                      className="flex-1 bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-500 transition"
+                      className="flex-1 bg-gray-200 text-[var(--foreground)] px-6 py-3 rounded-2xl font-semibold hover:bg-gray-300 transition"
                     >
                       ✕ Atšaukti
                     </button>
@@ -983,7 +1037,7 @@ export default function B2BPortal() {
                 </>
               ) : companyData.name ? (
                 // Peržiūros režimas su duomenimis
-                <div className="bg-gray-50 p-6 rounded-lg border">
+                <div className="bg-[var(--surface-muted)] p-6 rounded-3xl border border-black/5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės pavadinimas</p>
@@ -1021,7 +1075,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.name} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. UAB Flokati"
                       />
                     </div>
@@ -1031,7 +1085,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.code} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. 305522547"
                       />
                     </div>
@@ -1041,7 +1095,7 @@ export default function B2BPortal() {
                         type="tel" 
                         value={editCompanyData.phone} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. +370 600 12345"
                       />
                     </div>
@@ -1051,7 +1105,7 @@ export default function B2BPortal() {
                         type="email" 
                         value={editCompanyData.email} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. info@flokati.lt"
                       />
                     </div>
@@ -1061,7 +1115,7 @@ export default function B2BPortal() {
                         type="text" 
                         value={editCompanyData.address} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
-                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. Kalnu g. 5, Vilnius"
                       />
                     </div>
@@ -1122,7 +1176,7 @@ export default function B2BPortal() {
                         alert('Klaida išsaugant duomenis');
                       }
                     }}
-                    className="w-full bg-[#c29a74] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8885e] transition"
+                    className="w-full bg-[var(--accent)] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition"
                   >
                     Išsaugoti
                   </button>
@@ -1132,13 +1186,13 @@ export default function B2BPortal() {
 
             {/* Pristatymo adresai */}
             <div>
-              <h3 className="text-xl font-semibold mb-6 text-[#c29a74]">Pristatymo adresai</h3>
+              <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)]">Pristatymo adresai</h3>
               
               {/* Esamų adresų sąrašas */}
               {deliveryAddresses.length > 0 && (
                 <div className="mb-8 space-y-3">
                   {deliveryAddresses.map((addr, idx) => (
-                    <div key={addr.id || idx} className="bg-gray-50 p-4 rounded-lg border">
+                    <div key={addr.id || idx} className="bg-[var(--surface-muted)] p-4 rounded-3xl border border-black/5">
                       {editingAddressIdx === idx ? (
                         // Redagavimo režimas
                         <div className="space-y-4">
@@ -1153,7 +1207,7 @@ export default function B2BPortal() {
                                   updated[idx].name = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
@@ -1166,7 +1220,7 @@ export default function B2BPortal() {
                                   updated[idx].address = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
@@ -1179,7 +1233,7 @@ export default function B2BPortal() {
                                   updated[idx].city = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
@@ -1192,7 +1246,7 @@ export default function B2BPortal() {
                                   updated[idx].postalCode = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
@@ -1205,7 +1259,7 @@ export default function B2BPortal() {
                                   updated[idx].phone = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                           </div>
@@ -1244,13 +1298,13 @@ export default function B2BPortal() {
                                   alert('Klaida išsaugant adresą');
                                 }
                               }}
-                              className="flex-1 bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition"
+                              className="flex-1 bg-[var(--accent)] text-white px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition"
                             >
                               ✓ Išsaugoti
                             </button>
                             <button 
                               onClick={() => setEditingAddressIdx(null)}
-                              className="flex-1 bg-gray-400 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-500 transition"
+                              className="flex-1 bg-gray-200 text-[var(--foreground)] px-4 py-2 rounded-2xl font-semibold hover:bg-gray-300 transition"
                             >
                               ✕ Atšaukti
                             </button>
@@ -1259,12 +1313,12 @@ export default function B2BPortal() {
                       ) : (
                         // Peržiūros režimas
                         <div className="flex justify-between items-start">
-                          <div className="flex-1 cursor-pointer hover:text-[#c29a74]" onClick={() => setEditingAddressIdx(idx)}>
+                          <div className="flex-1 cursor-pointer hover:text-[var(--accent)]" onClick={() => setEditingAddressIdx(idx)}>
                             <h4 className="font-semibold text-slate-800 mb-1">{addr.name}</h4>
                             <p className="text-sm text-gray-600">{addr.address}</p>
                             <p className="text-sm text-gray-600">{addr.city}, {addr.postalCode}</p>
                             {addr.phone && <p className="text-sm text-gray-600 mt-1">📞 {addr.phone}</p>}
-                            <p className="text-xs text-[#c29a74] mt-2">Spustelėkite redaguoti</p>
+                            <p className="text-xs text-[var(--accent)] mt-2">Spustelekite redaguoti</p>
                           </div>
                           <button 
                             onClick={async () => {
@@ -1305,7 +1359,7 @@ export default function B2BPortal() {
               {!showAddressForm && (
                 <button 
                   onClick={() => setShowAddressForm(true)}
-                  className="w-full bg-[#c29a74] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8885e] transition mb-6"
+                  className="w-full bg-[var(--accent)] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition mb-6"
                 >
                   Pridėti naują adresą
                 </button>
@@ -1313,7 +1367,7 @@ export default function B2BPortal() {
 
               {/* Naujo adreso forma */}
               {showAddressForm && (
-                <div className="bg-[#c29a74]/10 p-6 rounded-xl border-2 border-[#c29a74]/30">
+                <div className="bg-[var(--surface-muted)] p-6 rounded-3xl border border-black/5">
                   <h4 className="font-semibold text-slate-800 mb-4">Pridėti naują adresą</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -1322,7 +1376,7 @@ export default function B2BPortal() {
                       type="text" 
                       value={newAddress.name} 
                       onChange={(e) => setNewAddress({...newAddress, name: e.target.value})}
-                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
@@ -1331,7 +1385,7 @@ export default function B2BPortal() {
                       type="text" 
                       value={newAddress.address} 
                       onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
-                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
 
                     />
                   </div>
@@ -1341,7 +1395,7 @@ export default function B2BPortal() {
                       type="text" 
                       value={newAddress.city} 
                       onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
-                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
@@ -1350,7 +1404,7 @@ export default function B2BPortal() {
                       type="text" 
                       value={newAddress.postalCode} 
                       onChange={(e) => setNewAddress({...newAddress, postalCode: e.target.value})}
-                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
@@ -1359,7 +1413,7 @@ export default function B2BPortal() {
                       type="tel" 
                       value={newAddress.phone} 
                       onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
-                      className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                 </div>
@@ -1406,7 +1460,7 @@ export default function B2BPortal() {
                       alert("Prašome užpildyti visus laukus!");
                     }
                   }}
-                  className="mt-4 w-full bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                  className="mt-4 w-full bg-[var(--foreground)] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                 >
                   Pridėti adresą
                 </button>
@@ -1415,7 +1469,7 @@ export default function B2BPortal() {
                     setShowAddressForm(false);
                     setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
                   }}
-                  className="mt-2 w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-500 transition"
+                  className="mt-2 w-full bg-gray-200 text-[var(--foreground)] px-6 py-3 rounded-2xl font-semibold hover:bg-gray-300 transition"
                 >
                   ✕ Atšaukti
                 </button>
@@ -1424,15 +1478,15 @@ export default function B2BPortal() {
             </div>
           </div>
         ) : view === "uzsakymai" ? (
-          <div className="bg-white p-8 rounded-2xl shadow-sm border">
-            <h2 className="text-2xl font-bold mb-6">Užsakymų istorija</h2>
+          <div className="bg-[var(--surface)] p-8 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
+            <h2 className="text-2xl font-semibold mb-6">Užsakymų istorija</h2>
             {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).length === 0 ? (
               <p className="text-gray-400 italic text-center py-10">Istorija tuščia.</p>
             ) : (
               <div className="space-y-6">
                 {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).map(order => (
-                  <div key={order.id} className="border rounded-xl p-6 bg-gray-50">
-                    <div className="flex justify-between mb-4 border-b pb-2 items-center">
+                  <div key={order.id} className="border border-black/5 rounded-3xl p-6 bg-[var(--surface-muted)]">
+                    <div className="flex justify-between mb-4 border-b border-black/5 pb-2 items-center">
                       <div className="flex-1">
                         <span className="font-bold">Užsakymas #{order.order_number}</span>
                         <span className="text-gray-500 text-sm ml-4">{order.date}</span>
@@ -1443,7 +1497,7 @@ export default function B2BPortal() {
                         </span>
                         <button 
                           onClick={() => exportOrderToPDF(order)}
-                          className="bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition text-sm whitespace-nowrap"
+                          className="bg-[var(--accent)] text-white px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition text-sm whitespace-nowrap"
                         >
                           📥 PDF
                         </button>
@@ -1462,127 +1516,121 @@ export default function B2BPortal() {
             )}
           </div>
         ) : (
-          <div className="flex gap-8">
-            {/* Kategorijų Sidebar */}
-            <div className="w-48 bg-white p-6 rounded-2xl shadow-sm border h-fit">
-              <h3 className="text-lg font-bold mb-6 text-slate-800">Kategorijos</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${!selectedCategory ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
-                >
-                  Visos prekės
-                </button>
-                <button
-                  onClick={() => setSelectedCategory("antklodės")}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "antklodės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
-                >
-                  Antklodės
-                </button>
-                <button
-                  onClick={() => setSelectedCategory("pagalvės")}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
-                >
-                  Pagalvės
-                </button>
-                <button
-                  onClick={() => setSelectedCategory("šlepetės")}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[#c29a74] text-white' : 'text-slate-800 hover:bg-gray-100'}`}
-                >
-                  Šlepetės
-                </button>
+          <div className="bg-[var(--surface)] p-6 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-semibold">Katalogas</h2>
+                <p className="text-sm text-[var(--ink-soft)]">Atrinkti produktai pagal jūsų kainodara.</p>
+              </div>
+              <div className="text-xs uppercase tracking-[0.2em] text-[var(--ink-soft)]">
+                {selectedCategory ? `Kategorija: ${selectedCategory}` : "Visos prekės"}
               </div>
             </div>
-
-            {/* Produktai ir Krepšelis */}
-            <div className="flex-1 flex flex-col lg:flex-row gap-8">
-              <div className="flex-1">
-                {isProductsLoading ? (
-                  <div className="py-16 text-center text-sm text-gray-500">Kraunama...</div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-                    {filteredProducts.map(p => (
-                      <ProductCard 
-                        key={p.id} 
-                        product={p} 
-                        onAdd={addToCart} 
-                        getPrice={getPrice}
-                        onOpenModal={(images: string[], index: number) => setModalData({images, index})}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="w-full lg:w-80 bg-white p-5 rounded-2xl shadow-xl border-t-4 border-[#c29a74] h-fit sticky top-24">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-black">Krepšelis</h2>
-                  {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-red-400 hover:underline font-bold">IŠVALYTI</button>}
-                </div>
-                <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
-                  {currentCart.length === 0 ? <p className="text-gray-400 italic text-center py-3 text-sm">Tuščias</p> : 
-                    currentCart.map((item: any) => (
-                      <div key={item.id} className="border-b border-gray-100 pb-2">
-                        <div className="flex justify-between mb-1">
-                          <span className="font-bold text-xs pr-2 text-black">{item.name}</span>
-                          <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
+            {isProductsLoading ? (
+              <div className="py-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
+                      <div className="w-full h-48 bg-[var(--surface-muted)] rounded-3xl mb-4"></div>
+                      <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-2 w-3/4"></div>
+                      <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-4 w-1/2"></div>
+                      <div className="flex justify-between items-end mt-auto">
+                        <div className="space-y-2">
+                          <div className="h-3 bg-[var(--surface-muted)] rounded-2xl w-16"></div>
+                          <div className="h-6 bg-[var(--surface-muted)] rounded-2xl w-20"></div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">-</button>
-                            <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-8 text-center text-xs font-bold border-none bg-transparent text-black" />
-                            <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center border rounded bg-gray-50 hover:bg-gray-100 text-black text-xs">+</button>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[8px] text-gray-400 mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
-                            <p className="font-bold text-xs text-black">{(item.price * item.qty).toFixed(2)} €</p>
-                          </div>
-                        </div>
+                        <div className="h-10 w-24 bg-[var(--surface-muted)] rounded-2xl"></div>
                       </div>
-                    ))
-                  }
-              </div>
-              {currentCart.length > 0 && (
-                <div className="pt-3 border-t-2 border-[#c29a74]/20">
-                  {deliveryAddresses.length > 0 && (
-                    <div className="mb-4">
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Pristatymo adresas</label>
-                      <select
-                        value={selectedDeliveryAddress ?? ''}
-                        onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full border border-gray-300 rounded-lg p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
-                      >
-                        <option value="">-- Pasirinkite adresą --</option>
-                        {deliveryAddresses.map((addr, idx) => (
-                          <option key={idx} value={idx}>
-                            {addr.name} - {addr.address}, {addr.city}
-                          </option>
-                        ))}
-                      </select>
                     </div>
-                  )}
-                  {deliveryAddresses.length === 0 && (
-                    <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs text-yellow-800">
-                      ⚠️ Prieš pateikiant užsakymą, pridėkite pristatymo adresą skirtuke "Mano duomenys"
-                    </div>
-                  )}
-                  <div className="flex justify-between text-lg font-black text-green-700 mb-4 tracking-tighter">
-                    <span>VISO:</span><span>{currentTotal.toFixed(2)} €</span>
-                  </div>
-                  <button 
-                    onClick={submitOrder}
-                    disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
-                    className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-green-700 shadow-lg transition active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    UŽSAKYTI
-                  </button>
+                  ))}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                {filteredProducts.map(p => (
+                  <ProductCard 
+                    key={p.id} 
+                    product={p} 
+                    onAdd={addToCart} 
+                    getPrice={getPrice}
+                    onOpenModal={(images: string[], index: number) => setModalData({images, index})}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
-      </main>
+          </main>
+
+          <aside className="order-3 lg:order-none">
+            <div className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-[var(--foreground)]">Krepšelis</h2>
+                {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>}
+              </div>
+              <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-3 text-sm">Tuščias</p> : 
+                  currentCart.map((item: any) => (
+                    <div key={item.id} className="border-b border-black/5 pb-3">
+                      <div className="flex justify-between mb-2">
+                        <span className="font-semibold text-xs pr-2 text-[var(--foreground)]">{item.name}</span>
+                        <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-7 h-7 flex items-center justify-center border border-black/10 rounded-xl bg-white hover:bg-[var(--surface-muted)] text-[var(--foreground)] text-xs">-</button>
+                          <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-10 text-center text-xs font-bold border-none bg-transparent text-[var(--foreground)]" />
+                          <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-7 h-7 flex items-center justify-center border border-black/10 rounded-xl bg-white hover:bg-[var(--surface-muted)] text-[var(--foreground)] text-xs">+</button>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-[var(--ink-soft)] mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
+                          <p className="font-semibold text-xs text-[var(--foreground)]">{(item.price * item.qty).toFixed(2)} €</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
+            </div>
+            {currentCart.length > 0 && (
+              <div className="pt-3 border-t border-black/5">
+                {deliveryAddresses.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                    <select
+                      value={selectedDeliveryAddress ?? ''}
+                      onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
+                      className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                    >
+                      <option value="">-- Pasirinkite adresą --</option>
+                      {deliveryAddresses.map((addr, idx) => (
+                        <option key={idx} value={idx}>
+                          {addr.name} - {addr.address}, {addr.city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {deliveryAddresses.length === 0 && (
+                  <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
+                    Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                  </div>
+                )}
+                <div className="flex justify-between text-lg font-semibold text-[var(--foreground)] mb-4">
+                  <span>Viso:</span><span>{currentTotal.toFixed(2)} €</span>
+                </div>
+                <button 
+                  onClick={submitOrder}
+                  disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
+                  className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-bold text-sm hover:opacity-90 shadow-lg transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  UŽSAKYTI
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
+  </div>
   );
 }
