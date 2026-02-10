@@ -11,11 +11,11 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
   if (!images || images.length === 0) {
-    return <div className="w-full h-48 mb-4 rounded-3xl bg-[var(--surface-muted)]" />;
+    return <div className="w-full h-36 mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
   }
 
   return (
-    <div className="relative w-full h-48 mb-4 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
+    <div className="relative w-full h-36 mb-3 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
       <img src={images[currentIdx]} alt="" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
       {images.length > 1 && (
         <><button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">◀</button>
@@ -120,22 +120,18 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
 };
 
 const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
-  const [qty, setQty] = useState(1);
   const price = getPrice(product.basePrice);
 
   return (
-    <div className="bg-[var(--surface-muted)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
+    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
-      <h2 className="text-base font-semibold leading-tight mb-4 text-[var(--foreground)]">{product.name}</h2>
+      <h2 className="text-sm font-semibold leading-tight mb-3 text-[var(--foreground)] min-h-[2.5rem]">{product.name}</h2>
       <div className="flex justify-between items-center mt-auto">
         <div>
-          <p className="text-xs text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
-          <p className="text-green-700 font-bold text-xl">{price.toFixed(2)} €</p>
+          <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+          <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
         </div>
-        <div className="flex gap-2 items-center">
-          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-14 border border-black/10 rounded-xl text-center text-sm bg-white py-2" />
-          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-white border border-black/10 text-[var(--foreground)] px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--surface)] transition">Užsakyti</button>
-        </div>
+        <button onClick={() => onAdd(product, 1)} className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition">Užsakyti</button>
       </div>
     </div>
   );
@@ -1535,10 +1531,10 @@ export default function B2BPortal() {
             </div>
             {isProductsLoading ? (
               <div className="py-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
-                      <div className="w-full h-48 bg-[var(--surface-muted)] rounded-3xl mb-4"></div>
+                    <div key={i} className="bg-[var(--surface)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
+                      <div className="w-full h-36 bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
                       <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-2 w-3/4"></div>
                       <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-4 w-1/2"></div>
                       <div className="flex justify-between items-end mt-auto">
@@ -1553,7 +1549,7 @@ export default function B2BPortal() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {filteredProducts.map(p => (
                   <ProductCard 
                     key={p.id} 
