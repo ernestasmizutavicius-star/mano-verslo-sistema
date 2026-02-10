@@ -449,10 +449,16 @@ export default function B2BPortal() {
   };
 
   const removeItem = (productId: number) => {
-    setAllCarts((prev: any) => ({
-      ...prev,
-      [clientCode]: prev[clientCode].filter((item: any) => item.id !== productId)
-    }));
+    setAllCarts((prev: any) => {
+      const nextItems = (prev[clientCode] || []).filter((item: any) => item.id !== productId);
+      if (nextItems.length === 0) {
+        setIsCartVisible(false);
+      }
+      return {
+        ...prev,
+        [clientCode]: nextItems
+      };
+    });
   };
 
   const clearCart = () => {
