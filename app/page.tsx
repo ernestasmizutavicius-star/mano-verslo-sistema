@@ -168,6 +168,7 @@ export default function B2BPortal() {
   });
   const [editingCompany, setEditingCompany] = useState(false);
   const [deliveryAddresses, setDeliveryAddresses] = useState<any[]>([]);
+  const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState<number | null>(null);
   const [newAddress, setNewAddress] = useState({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
   const [editingAddressIdx, setEditingAddressIdx] = useState<number | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -356,6 +357,7 @@ export default function B2BPortal() {
       setShowAddressForm(false);
       setEditingAddressIdx(null);
       setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+      setSelectedDeliveryAddress(null);
     }
   }, [clientCode, isLoggedIn]);
 
@@ -427,7 +429,13 @@ export default function B2BPortal() {
       return;
     }
 
+    if (deliveryAddresses.length === 0 || selectedDeliveryAddress === null) {
+      alert('Prieš pateikiant užsakymą, pasirinkite pristatymo adresą');
+      return;
+    }
+
     const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
+    const selectedAddress = deliveryAddresses[selectedDeliveryAddress];
 
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError) {
@@ -447,6 +455,7 @@ export default function B2BPortal() {
       order_items: cartItems,
       total_price: total,
       manager_email: managerEmail || companyData?.email || 'orders@flokati.lt',
+      delivery_address: selectedAddress,
       status: 'Išsiųsta',
       created_at: new Date().toISOString()
     };
@@ -473,12 +482,14 @@ export default function B2BPortal() {
         client: payload.client_name,
         items: [...cartItems],
         total: total,
+        delivery_address: selectedAddress,
         status: payload.status,
         manager_email: payload.manager_email
       };
 
       setOrderHistory([newOrder, ...orderHistory]);
       clearCart();
+      setSelectedDeliveryAddress(null);
       alert(`Užsakymas išsiųstas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
     } catch (e) {
       console.error('submitOrder error', e);
@@ -505,7 +516,23 @@ export default function B2BPortal() {
     pdf.setFontSize(11);
     pdf.text(`Kliento vardas: ${order.client}`, 20, yPosition);
     
-    yPosition += 15;
+    if (order.delivery_address) {
+      yPosition += 7;
+      pdf.setFontSize(10);
+      pdf.text(`Pristatymo adresas:`, 20, yPosition);
+      yPosition += 5;
+      pdf.setFontSize(9);
+      const addr = order.delivery_address;
+      pdf.text(`${addr.name}`, 25, yPosition);
+      yPosition += 5;
+      pdf.text(`${addr.address}, ${addr.city} ${addr.postalCode}`, 25, yPosition);
+      if (addr.phone) {
+        yPosition += 5;
+        pdf.text(`Tel: ${addr.phone}`, 25, yPosition);
+      }
+    }
+    
+    yPosition += 10;
     // Lentelės antraštės
     pdf.setFontSize(10);
     pdf.setFont('Helvetica', 'bold');
@@ -1459,10 +1486,38 @@ export default function B2BPortal() {
               </div>
               {currentCart.length > 0 && (
                 <div className="pt-3 border-t-2 border-[#c29a74]/20">
+                  {deliveryAddresses.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">Pristatymo adresas</label>
+                      <select
+                        value={selectedDeliveryAddress ?? ''}
+                        onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
+                        className="w-full border border-gray-300 rounded-lg p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      >
+                        <option value="">-- Pasirinkite adresą --</option>
+                        {deliveryAddresses.map((addr, idx) => (
+                          <option key={idx} value={idx}>
+                            {addr.name} - {addr.address}, {addr.city}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {deliveryAddresses.length === 0 && (
+                    <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs text-yellow-800">
+                      ⚠️ Prieš pateikiant užsakymą, pridėkite pristatymo adresą skirtuke "Mano duomenys"
+                    </div>
+                  )}
                   <div className="flex justify-between text-lg font-black text-green-700 mb-4 tracking-tighter">
                     <span>VISO:</span><span>{currentTotal.toFixed(2)} €</span>
                   </div>
-                  <button onClick={submitOrder} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-green-700 shadow-lg transition active:scale-95">PATVIRTINTI</button>
+                  <button 
+                    onClick={submitOrder}
+                    disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
+                    className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-green-700 shadow-lg transition active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    PATVIRTINTI
+                  </button>
                 </div>
               )}
             </div>
