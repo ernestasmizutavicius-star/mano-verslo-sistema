@@ -124,17 +124,17 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const price = getPrice(product.basePrice);
 
   return (
-    <div className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
+    <div className="bg-[var(--surface-muted)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
-      <h2 className="text-lg font-semibold leading-tight mb-2 min-h-[3rem]">{product.name}</h2>
-      <div className="flex justify-between items-end mt-auto">
+      <h2 className="text-base font-semibold leading-tight mb-4 text-[var(--foreground)]">{product.name}</h2>
+      <div className="flex justify-between items-center mt-auto">
         <div>
-          <p className="text-xs text-[var(--ink-soft)] line-through">{product.basePrice.toFixed(2)} €</p>
-          <p className="text-black font-semibold text-xl">{price.toFixed(2)} €</p>
+          <p className="text-xs text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+          <p className="text-green-700 font-bold text-xl">{price.toFixed(2)} €</p>
         </div>
-        <div className="flex gap-2">
-          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-12 border border-black/10 rounded-2xl text-center text-sm bg-white" />
-          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-[var(--foreground)] text-white px-4 py-2 rounded-2xl text-sm hover:opacity-90 transition">Įdėti</button>
+        <div className="flex gap-2 items-center">
+          <input type="number" min="1" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 1)} className="w-14 border border-black/10 rounded-xl text-center text-sm bg-white py-2" />
+          <button onClick={() => {onAdd(product, qty); setQty(1);}} className="bg-white border border-black/10 text-[var(--foreground)] px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--surface)] transition">Užsakyti</button>
         </div>
       </div>
     </div>
