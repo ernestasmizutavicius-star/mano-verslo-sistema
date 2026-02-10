@@ -622,14 +622,22 @@ export default function B2BPortal() {
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4 font-sans relative"
-        style={{ backgroundImage: "url('/background.jpg')" }}
-      >
-        {/* Tamsus sluoksnis gylio pojūčiui */}
-        <div className="absolute inset-0 bg-black/40"></div>
+      <div className="min-h-screen px-4 py-12 flex items-center justify-center">
+        <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
+          <div className="hidden lg:block">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
+              Flokati B2B
+            </div>
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-[var(--foreground)]">
+              Premium tekstile verslui.
+              <span className="block text-[var(--ink-soft)]">Užsakymai be triukšmo.</span>
+            </h1>
+            <p className="mt-4 max-w-md text-sm text-[var(--ink-soft)]">
+              Prisijunkite prie savo paskyros ir valdykite kataloga, užsakymus bei pristatymo adresus vienoje vietoje.
+            </p>
+          </div>
 
-        <form 
+          <form 
             key={isLoggedIn ? 'logged-in' : 'logged-out'}
             onSubmit={async (e: any) => {
             e.preventDefault();
@@ -711,48 +719,53 @@ export default function B2BPortal() {
               alert(err?.message || "Prisijungimo klaida");
             }
           }} 
-          className="relative z-10 p-6 w-full max-w-md bg-transparent text-center"
-        >
-          <div className="mb-4">
-            <span className="block text-6xl font-extralight text-white/95 uppercase tracking-[0.35em]">FLOKATI</span>
-            <div className="text-xl text-white/80 uppercase tracking-[0.15em] mt-2">B2B</div>
-          </div>
+            className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-8 shadow-[var(--shadow-strong)] border border-black/5"
+          >
+            <div className="mb-8">
+              <div className="text-xs uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
+              <div className="text-3xl font-semibold text-[var(--foreground)] mt-2">B2B Prisijungimas</div>
+              <p className="text-sm text-[var(--ink-soft)] mt-2">Prisijunkite, kad matytumėte savo kataloga.</p>
+            </div>
 
-          <div className="space-y-6">
-            <input 
-              name="email"
-              type="email"
-              value={formEmail}
-              onChange={(e) => setFormEmail(e.target.value)}
-              placeholder="Prisijungimo vardas" 
-              className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
-              autoComplete="off"
-              required 
-            />
-            <div className="relative">
-              <input 
-                name="password"
-                value={formPassword}
-                onChange={(e) => setFormPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder="Slaptažodis" 
-                className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg pr-10"
-                autoComplete="new-password"
-                required 
-              />
-              {formPassword.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
-                aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
-              >
-              {showPassword ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
+            <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">El. paštas</label>
+                <input 
+                  name="email"
+                  type="email"
+                  value={formEmail}
+                  onChange={(e) => setFormEmail(e.target.value)}
+                  placeholder="vardenis@imone.lt" 
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+                  autoComplete="off"
+                  required 
+                />
+              </div>
+              <div className="relative">
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Slaptažodis</label>
+                <input 
+                  name="password"
+                  value={formPassword}
+                  onChange={(e) => setFormPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Slaptažodis" 
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
+                  autoComplete="new-password"
+                  required 
+                />
+                {formPassword.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-[38px] text-[var(--ink-soft)] hover:text-[var(--foreground)]"
+                  aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
+                >
+                {showPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -779,14 +792,15 @@ export default function B2BPortal() {
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
+                </button>
+                )}
+              </div>
+              <button className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90">
+                PRISIJUNGTI
               </button>
-              )}
             </div>
-            <button className="w-full bg-slate-900/80 text-white py-3 rounded-md font-semibold uppercase tracking-[0.18em] transition-all hover:bg-slate-900/90">
-              PRISIJUNGTI
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }
