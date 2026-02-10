@@ -285,6 +285,15 @@ export default function B2BPortal() {
     localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
   }, [orderHistory]);
 
+  // Išvalyti prisijungimo laukus kai atsijungiama
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setFormEmail('');
+      setFormPassword('');
+      setShowPassword(false);
+    }
+  }, [isLoggedIn]);
+
   // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
   useEffect(() => {
     if (isLoggedIn) {
@@ -598,6 +607,7 @@ export default function B2BPortal() {
         <div className="absolute inset-0 bg-black/40"></div>
 
         <form 
+          key={isLoggedIn ? 'logged-in' : 'logged-out'}
           onSubmit={async (e: any) => {
             e.preventDefault();
             const email = formEmail;
@@ -693,6 +703,8 @@ export default function B2BPortal() {
               onChange={(e) => setFormEmail(e.target.value)}
               placeholder="Prisijungimo vardas" 
               className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
+              autoComplete="off"
+              style={{ WebkitBoxShadow: '0 0 0 30px transparent inset', WebkitTextFillColor: 'white' }}
               required 
             />
             <div className="relative">
@@ -703,6 +715,8 @@ export default function B2BPortal() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Slaptažodis" 
                 className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg pr-10"
+                autoComplete="new-password"
+                style={{ WebkitBoxShadow: '0 0 0 30px transparent inset', WebkitTextFillColor: 'white' }}
                 required 
               />
               {formPassword.length > 0 && (
