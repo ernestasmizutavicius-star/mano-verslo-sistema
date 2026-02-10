@@ -851,38 +851,6 @@ export default function B2BPortal() {
               <button onClick={() => setView("uzsakymai")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'uzsakymai' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Užsakymai</button>
               <button onClick={() => setView("mano-duomenis")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'mano-duomenis' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Mano duomenys</button>
             </nav>
-
-            {view === "katalogas" && (
-              <div className="mt-6">
-                <div className="text-[10px] uppercase tracking-[0.3em] text-[var(--ink-soft)] mb-3">Kategorijos</div>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${!selectedCategory ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
-                  >
-                    Visos prekės
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory("antklodės")}
-                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "antklodės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
-                  >
-                    Antklodės
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory("pagalvės")}
-                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
-                  >
-                    Pagalvės
-                  </button>
-                  <button
-                    onClick={() => setSelectedCategory("šlepetės")}
-                    className={`block w-full text-left px-4 py-3 rounded-2xl font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[var(--accent)] text-white' : 'text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
-                  >
-                    Šlepetės
-                  </button>
-                </div>
-              </div>
-            )}
           </aside>
 
           <main className="order-2 lg:order-none">
@@ -1520,13 +1488,34 @@ export default function B2BPortal() {
           </div>
         ) : (
           <div className="bg-[var(--surface)] p-6 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-semibold">Katalogas</h2>
-                <p className="text-sm text-[var(--ink-soft)]">Atrinkti produktai pagal jūsų kainodara.</p>
-              </div>
-              <div className="text-xs uppercase tracking-[0.2em] text-[var(--ink-soft)]">
-                {selectedCategory ? `Kategorija: ${selectedCategory}` : "Visos prekės"}
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold mb-1">Katalogas</h2>
+              <p className="text-sm text-[var(--ink-soft)] mb-4">Atrinkti produktai pagal jūsų kainodara.</p>
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${!selectedCategory ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                >
+                  Visos prekės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("antklodės")}
+                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "antklodės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                >
+                  Antklodės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("pagalvės")}
+                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "pagalvės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                >
+                  Pagalvės
+                </button>
+                <button
+                  onClick={() => setSelectedCategory("šlepetės")}
+                  className={`px-5 py-2.5 rounded-2xl text-sm font-medium transition ${selectedCategory === "šlepetės" ? 'bg-[var(--accent)] text-white' : 'bg-white border border-black/10 text-[var(--ink-soft)] hover:bg-[var(--surface-muted)]'}`}
+                >
+                  Šlepetės
+                </button>
               </div>
             </div>
             {isProductsLoading ? (
