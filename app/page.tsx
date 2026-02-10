@@ -663,7 +663,7 @@ export default function B2BPortal() {
           backgroundPosition: 'center'
         }}
       >
-        <div className="absolute inset-0 bg-white/35" />
+        <div className="absolute inset-0 bg-white/0" />
         <div className="relative w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="hidden lg:block">
             <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
