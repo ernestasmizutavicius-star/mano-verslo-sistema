@@ -176,17 +176,37 @@ export default function B2BPortal() {
   const [showPassword, setShowPassword] = useState(false);
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
+  const [isProductsLoading, setIsProductsLoading] = useState(false);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
 
   const [products, setProducts] = useState<any[]>([]);
 
+  // Set loading state when clientCode changes
+  useEffect(() => {
+    if (isLoggedIn && clientCode) {
+      setIsProductsLoading(true);
+    }
+  }, [isLoggedIn, clientCode]);
+
   // Fetch products from Supabase and filter by client ('all' or client's name)
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!isLoggedIn || !clientCode) {
+        setProducts([]);
+        setIsProductsLoading(false);
+        return;
+      }
+
+      const clientNameFromState = clients[clientCode]?.name;
       try {
-        const clientName = typeof window !== 'undefined' ? localStorage.getItem('client_name') : null;
+        const clientName = clientNameFromState || (typeof window !== 'undefined' ? localStorage.getItem('client_name') : null);
+        if (!clientName) {
+          setProducts([]);
+          setIsProductsLoading(false);
+          return;
+        }
         console.log('📦 Fetching products...');
         console.log('📦 isLoggedIn:', isLoggedIn);
         console.log('📦 clientCode:', clientCode);
@@ -232,10 +252,13 @@ export default function B2BPortal() {
         setProducts(mapped);
       } catch (e) {
         console.error('Fetch products error', e);
+        setIsProductsLoading(false);
+      } finally {
+        setIsProductsLoading(false);
       }
     };
     fetchProducts();
-  }, [isLoggedIn, clientCode]);
+  }, [isLoggedIn, clientCode, clients]);
 
   // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
@@ -1474,17 +1497,21 @@ export default function B2BPortal() {
             {/* Produktai ir Krepšelis */}
             <div className="flex-1 flex flex-col lg:flex-row gap-8">
               <div className="flex-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
-                  {filteredProducts.map(p => (
-                    <ProductCard 
-                      key={p.id} 
-                      product={p} 
-                      onAdd={addToCart} 
-                      getPrice={getPrice}
-                      onOpenModal={(images: string[], index: number) => setModalData({images, index})}
-                    />
-                  ))}
-                </div>
+                {isProductsLoading ? (
+                  <div className="py-16 text-center text-sm text-gray-500">Kraunama...</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
+                    {filteredProducts.map(p => (
+                      <ProductCard 
+                        key={p.id} 
+                        product={p} 
+                        onAdd={addToCart} 
+                        getPrice={getPrice}
+                        onOpenModal={(images: string[], index: number) => setModalData({images, index})}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="w-full lg:w-80 bg-white p-5 rounded-2xl shadow-xl border-t-4 border-[#c29a74] h-fit sticky top-24">
