@@ -462,6 +462,7 @@ export default function B2BPortal() {
   const clearCart = () => {
     setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
     setSelectedDeliveryAddress(null);
+    setIsCartVisible(false);
   };
 
   const submitOrder = async () => {
@@ -1572,7 +1573,11 @@ export default function B2BPortal() {
             <div className={`sticky top-6 ${isCartVisible ? 'bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden' : 'w-fit ml-auto'}`}>
               {!isCartVisible ? (
                 <button
-                  onClick={() => setIsCartVisible(!isCartVisible)}
+                  onClick={() => {
+                    if (cartItemCount > 0) {
+                      setIsCartVisible(!isCartVisible);
+                    }
+                  }}
                   className="relative text-gray-400 hover:text-[var(--foreground)] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
                   title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
                   aria-label="Krepšelis"
