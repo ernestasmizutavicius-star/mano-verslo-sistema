@@ -1381,11 +1381,11 @@ export default function B2BPortal() {
         ) : view === "uzsakymai" ? (
           <div className="bg-white p-8 rounded-2xl shadow-sm border">
             <h2 className="text-2xl font-bold mb-6">Užsakymų istorija</h2>
-            {orderHistory.filter(o => o.client === clients[clientCode].name).length === 0 ? (
+            {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).length === 0 ? (
               <p className="text-gray-400 italic text-center py-10">Istorija tuščia.</p>
             ) : (
               <div className="space-y-6">
-                {orderHistory.filter(o => o.client === clients[clientCode].name).map(order => (
+                {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).map(order => (
                   <div key={order.id} className="border rounded-xl p-6 bg-gray-50">
                     <div className="flex justify-between mb-4 border-b pb-2 items-center">
                       <div className="flex-1">
