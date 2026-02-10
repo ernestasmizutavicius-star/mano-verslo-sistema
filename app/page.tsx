@@ -829,7 +829,7 @@ export default function B2BPortal() {
       )}
 
       <div className="max-w-[1800px] mx-auto px-4 lg:px-6 py-6">
-        <div className="grid gap-6 lg:gap-x-4 lg:gap-y-6 lg:grid-cols-[260px_1fr_320px] items-start">
+        <div className="grid gap-6 lg:gap-x-0 lg:gap-y-6 lg:grid-cols-[260px_1fr_auto] items-start">
           <aside className="order-1 lg:order-none bg-[var(--surface)] rounded-3xl p-5 shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
             <div className="mb-6">
               <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
@@ -1594,7 +1594,7 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full">
+                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] lg:absolute lg:right-0 lg:top-12 lg:z-20">
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
