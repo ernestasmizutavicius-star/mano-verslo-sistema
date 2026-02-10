@@ -819,7 +819,7 @@ export default function B2BPortal() {
         />
       )}
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+      <div className="max-w-[1800px] mx-auto px-4 lg:px-6 py-6">
         <div className="grid gap-6 lg:grid-cols-[260px_1fr_320px] items-start">
           <aside className="order-1 lg:order-none bg-[var(--surface)] rounded-3xl p-5 shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
             <div className="flex items-center justify-between mb-6">
@@ -1531,7 +1531,7 @@ export default function B2BPortal() {
             </div>
             {isProductsLoading ? (
               <div className="py-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="bg-[var(--surface)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
                       <div className="w-full h-36 bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
@@ -1549,7 +1549,7 @@ export default function B2BPortal() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                 {filteredProducts.map(p => (
                   <ProductCard 
                     key={p.id} 
