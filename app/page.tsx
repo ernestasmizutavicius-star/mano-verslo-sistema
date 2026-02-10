@@ -155,14 +155,16 @@ export default function B2BPortal() {
     code: "",
     phone: "",
     email: "",
-    address: ""
+    address: "",
+    contactPerson: ""
   });
   const [editCompanyData, setEditCompanyData] = useState<any>({
     name: "",
     code: "",
     phone: "",
     email: "",
-    address: ""
+    address: "",
+    contactPerson: ""
   });
   const [editingCompany, setEditingCompany] = useState(false);
   const [deliveryAddresses, setDeliveryAddresses] = useState<any[]>([]);
@@ -319,29 +321,34 @@ export default function B2BPortal() {
   // Įkelti duomenis iš localStorage kai pasikeičia clientCode
   useEffect(() => {
     if (isLoggedIn && clientCode) {
-      const savedCompanyData = localStorage.getItem(`companyData_${clientCode}`);
-      const savedDeliveryAddresses = localStorage.getItem(`deliveryAddresses_${clientCode}`);
+      const clientName = localStorage.getItem('client_name') || '';
+      const companyCode = localStorage.getItem('company_code') || '';
+      const phone = localStorage.getItem('phone') || '';
+      const email = localStorage.getItem('email') || '';
+      const registrationAddress = localStorage.getItem('registration_address') || '';
+      const contactPerson = localStorage.getItem('contact_person') || '';
+      const deliveryAddressesStr = localStorage.getItem('delivery_addresses');
       
-      if (savedCompanyData) {
-        const parsed = JSON.parse(savedCompanyData);
-        setCompanyData(parsed);
-        setEditCompanyData(parsed);
-        setEditingCompany(false);
-      } else {
-        const emptyData = {
-          name: "",
-          code: "",
-          phone: "",
-          email: "",
-          address: ""
-        };
-        setCompanyData(emptyData);
-        setEditCompanyData(emptyData);
-        setEditingCompany(true);
-      }
+      const loadedData = {
+        name: clientName,
+        code: companyCode,
+        phone: phone,
+        email: email,
+        address: registrationAddress,
+        contactPerson: contactPerson
+      };
       
-      if (savedDeliveryAddresses) {
-        setDeliveryAddresses(JSON.parse(savedDeliveryAddresses));
+      setCompanyData(loadedData);
+      setEditCompanyData(loadedData);
+      setEditingCompany(false);
+      
+      if (deliveryAddressesStr) {
+        try {
+          const parsed = JSON.parse(deliveryAddressesStr);
+          setDeliveryAddresses(Array.isArray(parsed) ? parsed : []);
+        } catch (e) {
+          setDeliveryAddresses([]);
+        }
       } else {
         setDeliveryAddresses([]);
       }
@@ -578,7 +585,7 @@ export default function B2BPortal() {
               // Fetch profile from 'customers' table
               const { data: profiles, error: profileError } = await supabase
                 .from("customers")
-                .select("client_name, discount_group, manager_email")
+                .select("*")
                 .eq("id", user.id);
 
               console.log('🔍 User ID:', user.id);
@@ -595,6 +602,12 @@ export default function B2BPortal() {
               const clientName = profile?.client_name || null;
               const discountGroup = profile?.discount_group || null;
               const managerEmail = profile?.manager_email || null;
+              const companyCode = profile?.company_code || null;
+              const phone = profile?.phone || null;
+              const companyEmail = profile?.email || null;
+              const registrationAddress = profile?.registration_address || null;
+              const contactPerson = profile?.contact_person || null;
+              const deliveryAddresses = profile?.delivery_addresses || [];
               const clientCode = discountGroup || clientName || "";
 
               // Save to localStorage
@@ -603,6 +616,12 @@ export default function B2BPortal() {
               if (clientName) localStorage.setItem('client_name', clientName);
               if (discountGroup) localStorage.setItem('discount_group', discountGroup);
               if (managerEmail) localStorage.setItem('manager_email', managerEmail);
+              if (companyCode) localStorage.setItem('company_code', companyCode);
+              if (phone) localStorage.setItem('phone', phone);
+              if (companyEmail) localStorage.setItem('email', companyEmail);
+              if (registrationAddress) localStorage.setItem('registration_address', registrationAddress);
+              if (contactPerson) localStorage.setItem('contact_person', contactPerson);
+              localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
 
               // Update state
               setClientCode(clientCode);
@@ -778,6 +797,15 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
+                      <label className="block text-sm font-semibold mb-2 text-gray-700">Kontaktinis asmuo</label>
+                      <input 
+                        type="text" 
+                        value={editCompanyData.contactPerson} 
+                        onChange={(e) => setEditCompanyData({...editCompanyData, contactPerson: e.target.value})}
+                        className="w-full border rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-[#c29a74] outline-none"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
                       <input 
                         type="tel" 
@@ -807,11 +835,47 @@ export default function B2BPortal() {
                   </div>
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => {
-                        localStorage.setItem(`companyData_${clientCode}`, JSON.stringify(editCompanyData));
-                        setCompanyData(editCompanyData);
-                        setEditingCompany(false);
-                        alert("Įmonės duomenys išsaugoti!");
+                      onClick={async () => {
+                        try {
+                          const { data: { user } } = await supabase.auth.getUser();
+                          if (!user) {
+                            alert('Vartotojas nerastas');
+                            return;
+                          }
+                          
+                          const { error } = await supabase
+                            .from('customers')
+                            .update({
+                              client_name: editCompanyData.name,
+                              company_code: editCompanyData.code,
+                              contact_person: editCompanyData.contactPerson,
+                              phone: editCompanyData.phone,
+                              email: editCompanyData.email,
+                              registration_address: editCompanyData.address
+                            })
+                            .eq('id', user.id);
+                          
+                          if (error) {
+                            console.error('Klaida išsaugant:', error);
+                            alert('Klaida išsaugant duomenis');
+                            return;
+                          }
+                          
+                          // Update localStorage
+                          localStorage.setItem('client_name', editCompanyData.name);
+                          localStorage.setItem('company_code', editCompanyData.code);
+                          localStorage.setItem('contact_person', editCompanyData.contactPerson);
+                          localStorage.setItem('phone', editCompanyData.phone);
+                          localStorage.setItem('email', editCompanyData.email);
+                          localStorage.setItem('registration_address', editCompanyData.address);
+                          
+                          setCompanyData(editCompanyData);
+                          setEditingCompany(false);
+                          alert("Įmonės duomenys išsaugoti!");
+                        } catch (e) {
+                          console.error('Save error:', e);
+                          alert('Klaida išsaugant duomenis');
+                        }
                       }}
                       className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
                     >
@@ -839,6 +903,10 @@ export default function B2BPortal() {
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės kodas</p>
                       <p className="text-lg text-slate-800 font-semibold">{companyData.code || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Kontaktinis asmuo</p>
+                      <p className="text-lg text-slate-800 font-semibold">{companyData.contactPerson || "—"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Telefonas</p>
@@ -1005,10 +1073,32 @@ export default function B2BPortal() {
                           </div>
                           <div className="flex gap-2">
                             <button 
-                              onClick={() => {
-                                localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(deliveryAddresses));
-                                setEditingAddressIdx(null);
-                                alert("Adresas atnaujintas!");
+                              onClick={async () => {
+                                try {
+                                  const { data: { user } } = await supabase.auth.getUser();
+                                  if (!user) {
+                                    alert('Vartotojas nerastas');
+                                    return;
+                                  }
+                                  
+                                  const { error } = await supabase
+                                    .from('customers')
+                                    .update({ delivery_addresses: deliveryAddresses })
+                                    .eq('id', user.id);
+                                  
+                                  if (error) {
+                                    console.error('Klaida išsaugant adresą:', error);
+                                    alert('Klaida išsaugant adresą');
+                                    return;
+                                  }
+                                  
+                                  localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
+                                  setEditingAddressIdx(null);
+                                  alert("Adresas atnaujintas!");
+                                } catch (e) {
+                                  console.error('Save address error:', e);
+                                  alert('Klaida išsaugant adresą');
+                                }
                               }}
                               className="flex-1 bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition"
                             >
@@ -1033,10 +1123,22 @@ export default function B2BPortal() {
                             <p className="text-xs text-[#c29a74] mt-2">Spustelėkite redaguoti</p>
                           </div>
                           <button 
-                            onClick={() => {
+                            onClick={async () => {
                               const updated = deliveryAddresses.filter((_, i) => i !== idx);
-                              setDeliveryAddresses(updated);
-                              localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(updated));
+                              try {
+                                const { data: { user } } = await supabase.auth.getUser();
+                                if (user) {
+                                  await supabase
+                                    .from('customers')
+                                    .update({ delivery_addresses: updated })
+                                    .eq('id', user.id);
+                                }
+                                localStorage.setItem('delivery_addresses', JSON.stringify(updated));
+                                setDeliveryAddresses(updated);
+                              } catch (e) {
+                                console.error('Delete address error:', e);
+                                setDeliveryAddresses(updated);
+                              }
                             }}
                             className="text-red-500 hover:text-red-700 font-bold ml-4 flex-shrink-0"
                           >
@@ -1112,15 +1214,38 @@ export default function B2BPortal() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (newAddress.name && newAddress.address && newAddress.city && newAddress.postalCode) {
-                      const updatedAddress = { ...newAddress, id: Date.now().toString() };
-                      const updated = [...deliveryAddresses, updatedAddress];
-                      setDeliveryAddresses(updated);
-                      localStorage.setItem(`deliveryAddresses_${clientCode}`, JSON.stringify(updated));
-                      setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
-                      setShowAddressForm(false);
-                      alert("Adresas pridėtas!");
+                      try {
+                        const updatedAddress = { ...newAddress, id: Date.now().toString() };
+                        const updated = [...deliveryAddresses, updatedAddress];
+                        
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) {
+                          alert('Vartotojas nerastas');
+                          return;
+                        }
+                        
+                        const { error } = await supabase
+                          .from('customers')
+                          .update({ delivery_addresses: updated })
+                          .eq('id', user.id);
+                        
+                        if (error) {
+                          console.error('Klaida pridedant adresą:', error);
+                          alert('Klaida pridedant adresą');
+                          return;
+                        }
+                        
+                        localStorage.setItem('delivery_addresses', JSON.stringify(updated));
+                        setDeliveryAddresses(updated);
+                        setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
+                        setShowAddressForm(false);
+                        alert("Adresas pridėtas!");
+                      } catch (e) {
+                        console.error('Add address error:', e);
+                        alert('Klaida pridedant adresą');
+                      }
                     } else {
                       alert("Prašome užpildyti visus laukus!");
                     }
