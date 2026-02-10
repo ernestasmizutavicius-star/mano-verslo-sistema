@@ -1566,62 +1566,60 @@ export default function B2BPortal() {
 
           <aside className="order-3 lg:order-none">
             <div className="sticky top-6 space-y-3">
-              <div className="bg-[var(--surface)] rounded-3xl p-4 shadow-[var(--shadow-soft)] border border-black/5">
-                <div className="flex items-center justify-end gap-3">
-                  <button
-                    onClick={() => {
-                      setIsLoggedIn(false);
-                      setClientCode('');
-                      setFormEmail('');
-                      setFormPassword('');
-                      setShowPassword(false);
-                      localStorage.removeItem('isLoggedIn');
-                      localStorage.removeItem('clientCode');
-                      localStorage.removeItem('client_name');
-                      localStorage.removeItem('discount_group');
-                      localStorage.removeItem('manager_email');
-                      localStorage.removeItem('currentView');
-                      localStorage.removeItem('profile_image');
-                    }}
-                    className="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-2"
-                    aria-label="Atsijungti"
+              <div className="flex items-center justify-end gap-3">
+                <div className="relative">
+                  <input
+                    id="profile-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleProfileImageChange}
+                  />
+                  <label
+                    htmlFor="profile-upload"
+                    className="w-10 h-10 rounded-full bg-[var(--surface-muted)] border border-black/10 flex items-center justify-center overflow-hidden cursor-pointer"
+                    title="Įkelti profilio nuotrauką"
                   >
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-red-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <path d="M16 17l5-5-5-5" />
-                        <path d="M21 12H9" />
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profilis" className="w-full h-full object-cover" />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-[var(--ink-soft)]">
+                        <path d="M12 5v14" />
+                        <path d="M5 12h14" />
                       </svg>
-                    </span>
-                    Atsijungti
-                  </button>
-                  <div className="text-sm font-semibold text-[var(--foreground)]">
-                    {clients[clientCode]?.name || 'Klientas'}
-                  </div>
-                  <div className="relative">
-                    <input
-                      id="profile-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleProfileImageChange}
-                    />
-                    <label
-                      htmlFor="profile-upload"
-                      className="w-10 h-10 rounded-full bg-[var(--surface-muted)] border border-black/10 flex items-center justify-center overflow-hidden cursor-pointer"
-                      title="Įkelti profilio nuotrauką"
-                    >
-                      {profileImage ? (
-                        <img src={profileImage} alt="Profilis" className="w-full h-full object-cover" />
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-[var(--ink-soft)]">
-                          <path d="M12 5v14" />
-                          <path d="M5 12h14" />
-                        </svg>
-                      )}
-                    </label>
-                  </div>
+                    )}
+                  </label>
                 </div>
+                <div className="text-sm font-semibold text-[var(--foreground)]">
+                  {clients[clientCode]?.name || 'Klientas'}
+                </div>
+                <button
+                  onClick={() => {
+                    setIsLoggedIn(false);
+                    setClientCode('');
+                    setFormEmail('');
+                    setFormPassword('');
+                    setShowPassword(false);
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('clientCode');
+                    localStorage.removeItem('client_name');
+                    localStorage.removeItem('discount_group');
+                    localStorage.removeItem('manager_email');
+                    localStorage.removeItem('currentView');
+                    localStorage.removeItem('profile_image');
+                  }}
+                  className="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-2"
+                  aria-label="Atsijungti"
+                >
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-red-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <path d="M16 17l5-5-5-5" />
+                      <path d="M21 12H9" />
+                    </svg>
+                  </span>
+                  Atsijungti
+                </button>
               </div>
               <div className={`${isCartVisible ? 'bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden' : 'w-fit ml-auto'}`}>
                 {!isCartVisible ? (
