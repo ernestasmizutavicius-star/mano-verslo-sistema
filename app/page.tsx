@@ -632,9 +632,6 @@ export default function B2BPortal() {
               Premium tekstile verslui.
               <span className="block text-[var(--ink-soft)]">Užsakymai be triukšmo.</span>
             </h1>
-            <p className="mt-4 max-w-md text-sm text-[var(--ink-soft)]">
-              Prisijunkite prie savo paskyros ir valdykite kataloga, užsakymus bei pristatymo adresus vienoje vietoje.
-            </p>
           </div>
 
           <form 
@@ -724,7 +721,6 @@ export default function B2BPortal() {
             <div className="mb-8">
               <div className="text-xs uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
               <div className="text-3xl font-semibold text-[var(--foreground)] mt-2">B2B Prisijungimas</div>
-              <p className="text-sm text-[var(--ink-soft)] mt-2">Prisijunkite, kad matytumėte savo kataloga.</p>
             </div>
 
             <div className="space-y-5">
@@ -735,7 +731,7 @@ export default function B2BPortal() {
                   type="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  placeholder="vardenis@imone.lt" 
+                  placeholder="" 
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
                   autoComplete="off"
                   required 
@@ -748,7 +744,7 @@ export default function B2BPortal() {
                   value={formPassword}
                   onChange={(e) => setFormPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Slaptažodis" 
+                  placeholder="" 
                   className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
                   autoComplete="new-password"
                   required 
