@@ -1559,28 +1559,35 @@ export default function B2BPortal() {
           </main>
 
           <aside className="order-3 lg:order-none">
-            <div className="bg-[var(--surface)] p-5 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-[var(--foreground)]">Krepšelis</h2>
-                {currentCart.length > 0 && <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>}
+            <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 sticky top-6 overflow-hidden">
+              <div className="p-5 pb-0">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-semibold text-[var(--foreground)]">My Cart</h2>
+                  {currentCart.length > 0 && (
+                    <button onClick={clearCart} className="text-2xl text-gray-400 hover:text-[var(--foreground)]">←</button>
+                  )}
+                </div>
               </div>
-              <div className="space-y-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
-                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-3 text-sm">Tuščias</p> : 
+              <div className="space-y-0 mb-0 max-h-[50vh] overflow-y-auto">
+                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Tuščias</p> : 
                   currentCart.map((item: any) => (
-                    <div key={item.id} className="border-b border-black/5 pb-3">
-                      <div className="flex justify-between mb-2">
-                        <span className="font-semibold text-xs pr-2 text-[var(--foreground)]">{item.name}</span>
-                        <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 text-sm">✕</button>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-7 h-7 flex items-center justify-center border border-black/10 rounded-xl bg-white hover:bg-[var(--surface-muted)] text-[var(--foreground)] text-xs">-</button>
-                          <input type="number" value={item.qty} onChange={(e) => updateQty(item.id, parseInt(e.target.value) || 1)} className="w-10 text-center text-xs font-bold border-none bg-transparent text-[var(--foreground)]" />
-                          <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-7 h-7 flex items-center justify-center border border-black/10 rounded-xl bg-white hover:bg-[var(--surface-muted)] text-[var(--foreground)] text-xs">+</button>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] text-[var(--ink-soft)] mb-0.5">{item.price.toFixed(2)} € / vnt.</p>
-                          <p className="font-semibold text-xs text-[var(--foreground)]">{(item.price * item.qty).toFixed(2)} €</p>
+                    <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
+                      <div className="flex gap-3">
+                        <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start mb-1">
+                            <h3 className="font-semibold text-sm text-[var(--foreground)] pr-2">{item.name}</h3>
+                            <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-red-500 text-lg">⋯</button>
+                          </div>
+                          <div className="text-xs text-green-600 font-medium mb-2">SIZE L</div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-lg font-bold text-[var(--foreground)]">$ {item.price.toFixed(2)}</div>
+                            <div className="flex items-center gap-3 bg-white border border-black/10 rounded-full px-3 py-1">
+                              <button onClick={() => updateQty(item.id, item.qty - 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">-</button>
+                              <span className="text-sm font-bold text-[var(--foreground)] min-w-[20px] text-center">{item.qty}</span>
+                              <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1588,7 +1595,7 @@ export default function B2BPortal() {
                 }
             </div>
             {currentCart.length > 0 && (
-              <div className="pt-3 border-t border-black/5">
+              <div className="p-5 border-t border-black/5 bg-white">
                 {deliveryAddresses.length > 0 && (
                   <div className="mb-4">
                     <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
@@ -1611,15 +1618,23 @@ export default function B2BPortal() {
                     Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-semibold text-[var(--foreground)] mb-4">
-                  <span>Viso:</span><span>{currentTotal.toFixed(2)} €</span>
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-sm text-[var(--foreground)]">
+                    <span>Sub Total</span><span className="font-semibold">$ {currentTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-[var(--foreground)]">
+                    <span>Shipping</span><span className="font-semibold text-green-600">FREE</span>
+                  </div>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
+                  <span>Total</span><span>$ {currentTotal.toFixed(2)}</span>
                 </div>
                 <button 
                   onClick={submitOrder}
                   disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
-                  className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-bold text-sm hover:opacity-90 shadow-lg transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 >
-                  UŽSAKYTI
+                  Checkout
                 </button>
               </div>
             )}
