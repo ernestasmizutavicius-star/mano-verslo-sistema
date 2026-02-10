@@ -704,7 +704,6 @@ export default function B2BPortal() {
               placeholder="Prisijungimo vardas" 
               className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
               autoComplete="off"
-              style={{ WebkitBoxShadow: '0 0 0 30px transparent inset', WebkitTextFillColor: 'white' }}
               required 
             />
             <div className="relative">
@@ -716,7 +715,6 @@ export default function B2BPortal() {
                 placeholder="Slaptažodis" 
                 className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg pr-10"
                 autoComplete="new-password"
-                style={{ WebkitBoxShadow: '0 0 0 30px transparent inset', WebkitTextFillColor: 'white' }}
                 required 
               />
               {formPassword.length > 0 && (
