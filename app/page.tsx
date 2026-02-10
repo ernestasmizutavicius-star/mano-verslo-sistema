@@ -462,10 +462,14 @@ export default function B2BPortal() {
 
     // Insert into Supabase 'orders' table
     try {
+      console.log('📤 Siuntimas į Supabase:', payload);
       const { data, error } = await supabase.from('orders').insert(payload).select().single();
       if (error) {
-        console.error('Klaida įrašant užsakymą:', error.message);
-        alert('Įvyko klaida siunčiant užsakymą. Bandykite vėliau.');
+        console.error('❌ Klaida įrašant užsakymą:', error);
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
+        console.error('Error hint:', error.hint);
+        alert(`Įvyko klaida siunčiant užsakymą:\n${error.message || 'Nežinoma klaida'}`);
         return;
       }
 
