@@ -456,7 +456,7 @@ export default function B2BPortal() {
       total_price: total,
       manager_email: managerEmail || companyData?.email || 'orders@flokati.lt',
       delivery_address: selectedAddress,
-      status: 'Išsiųsta',
+      status: 'Patvirtintas',
       created_at: new Date().toISOString()
     };
 
@@ -494,7 +494,7 @@ export default function B2BPortal() {
       setOrderHistory([newOrder, ...orderHistory]);
       clearCart();
       setSelectedDeliveryAddress(null);
-      alert(`Užsakymas išsiųstas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
+      alert(`Užsakymas patvirtintas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
     } catch (e) {
       console.error('submitOrder error', e);
       alert('Įvyko klaida siunčiant užsakymą.');
@@ -1393,7 +1393,7 @@ export default function B2BPortal() {
                         <span className="text-gray-500 text-sm ml-4">{order.date}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiųsta' ? 'bg-blue-100 text-blue-800' : order.status === 'Dostavinta' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Patvirtintas' ? 'bg-blue-100 text-blue-800' : order.status === 'Išsiųsta' ? 'bg-orange-100 text-orange-800' : order.status === 'Įvykdytas' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                           {order.status || 'Nežinomas'}
                         </span>
                         <button 
