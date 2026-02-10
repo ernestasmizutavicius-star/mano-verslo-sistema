@@ -174,6 +174,7 @@ export default function B2BPortal() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
 
   // Client data will be loaded from localStorage after Supabase Auth login
@@ -599,7 +600,7 @@ export default function B2BPortal() {
         <form 
           onSubmit={async (e: any) => {
             e.preventDefault();
-            const email = e.target.email.value;
+            const email = formEmail;
             const password = formPassword;
             
             try {
@@ -688,6 +689,8 @@ export default function B2BPortal() {
             <input 
               name="email"
               type="email"
+              value={formEmail}
+              onChange={(e) => setFormEmail(e.target.value)}
               placeholder="Prisijungimo vardas" 
               className="w-full bg-transparent border-0 border-b border-white placeholder-white/50 py-3 outline-none text-white text-lg"
               required 
@@ -776,6 +779,7 @@ export default function B2BPortal() {
             <button onClick={() => {
               setIsLoggedIn(false);
               setClientCode('');
+              setFormEmail('');
               setFormPassword('');
               setShowPassword(false);
               localStorage.removeItem('isLoggedIn');
