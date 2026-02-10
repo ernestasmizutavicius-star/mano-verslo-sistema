@@ -438,12 +438,13 @@ export default function B2BPortal() {
   };
 
   const updateQty = (productId: number, newQty: number) => {
-    if (newQty < 1) return;
+    const normalizedQty = Math.floor(newQty);
+    if (!Number.isFinite(normalizedQty) || normalizedQty < 1) return;
     const price = getPrice(products.find(p => p.id === productId)?.basePrice || 0);
     setAllCarts((prev: any) => ({
       ...prev,
       [clientCode]: prev[clientCode].map((item: any) => 
-        item.id === productId ? { ...item, qty: newQty, totalPrice: price * newQty } : item
+        item.id === productId ? { ...item, qty: normalizedQty, totalPrice: price * normalizedQty } : item
       )
     }));
   };
@@ -1630,9 +1631,18 @@ export default function B2BPortal() {
                           </div>
                           <div className="flex justify-between items-center mt-2">
                             <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
-                            <div className="flex items-center gap-3 bg-white border border-black/10 rounded-full px-3 py-1">
+                            <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
                               <button onClick={() => updateQty(item.id, item.qty - 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">-</button>
-                              <span className="text-sm font-bold text-[var(--foreground)] min-w-[20px] text-center">{item.qty}</span>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                min={1}
+                                step={1}
+                                value={item.qty}
+                                onChange={(e) => updateQty(item.id, Number(e.target.value))}
+                                className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none"
+                                aria-label="Kiekis"
+                              />
                               <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
                             </div>
                           </div>
