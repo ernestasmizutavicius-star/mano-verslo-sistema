@@ -296,7 +296,7 @@ export default function B2BPortal() {
             .from('orders')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: true });
           
           if (!error && data) {
             const mapped = data.map((order: any, index: number) => ({
@@ -306,6 +306,7 @@ export default function B2BPortal() {
               client: order.client_name,
               items: order.order_items || [],
               total: order.total_price,
+              delivery_address: order.delivery_address,
               status: order.status,
               manager_email: order.manager_email
             }));
@@ -475,9 +476,14 @@ export default function B2BPortal() {
 
       const serverOrder = data || null;
 
-      const nextOrderNumber = orderHistory.length > 0 
-        ? Math.max(...orderHistory.map(o => o.order_number || 0)) + 1 
-        : 1;
+      // Fetch all user's orders to calculate correct order number
+      const { data: allOrders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true });
+      
+      const nextOrderNumber = allOrders ? allOrders.length : 1;
 
       const newOrder = {
         id: serverOrder?.id ?? Math.floor(Math.random() * 100000),
