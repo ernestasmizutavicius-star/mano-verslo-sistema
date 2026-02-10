@@ -626,6 +626,7 @@ export default function B2BPortal() {
 
   const currentCart = allCarts[clientCode] || [];
   const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
+  const cartItemCount = currentCart.reduce((s: number, i: any) => s + i.qty, 0);
 
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
@@ -1571,17 +1572,25 @@ export default function B2BPortal() {
             <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 sticky top-6 overflow-hidden">
               <div className="p-5 pb-0">
                 <div className="flex justify-between items-center mb-2">
-                  {isCartVisible ? (
+                  {isCartVisible && (
                     <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
-                  ) : (
-                    <div className="text-sm text-[var(--ink-soft)]">Krepšelis</div>
                   )}
-                  <button onClick={() => setIsCartVisible(!isCartVisible)} className="text-gray-400 hover:text-[var(--foreground)]">
+                  <button
+                    onClick={() => setIsCartVisible(!isCartVisible)}
+                    className="relative text-gray-400 hover:text-[var(--foreground)]"
+                    title={!isCartVisible && cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
+                    aria-label="Krepšelis"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
                       <circle cx="9" cy="20" r="1" />
                       <circle cx="17" cy="20" r="1" />
                       <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
                     </svg>
+                    {!isCartVisible && cartItemCount > 0 && (
+                      <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-white text-[10px] font-semibold flex items-center justify-center">
+                        {cartItemCount}
+                      </span>
+                    )}
                   </button>
                 </div>
                 {isCartVisible && currentCart.length > 0 && (
