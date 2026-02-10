@@ -669,9 +669,9 @@ export default function B2BPortal() {
             <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
               Flokati B2B
             </div>
-            <h1 className="mt-6 text-4xl font-semibold leading-tight text-[var(--foreground)]">
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-white">
               Premium tekstile verslui.
-              <span className="block text-[var(--ink-soft)]">Užsakymai be triukšmo.</span>
+              <span className="block text-white/80">Užsakymai be triukšmo.</span>
             </h1>
           </div>
 
