@@ -5,6 +5,14 @@ import { jsPDF } from 'jspdf';
 
 // --- KOMPONENTAI ---
 
+const loginBackgrounds = [
+  "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background.jpg",
+  "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background2.jpg",
+  "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background3.jpg",
+  "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background4.jpg",
+  "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background5.jpg"
+];
+
 const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick: (idx: number) => void }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const next = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx + 1) % images.length); };
@@ -178,6 +186,7 @@ export default function B2BPortal() {
   const [formPassword, setFormPassword] = useState("");
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
+  const [loginBgIndex, setLoginBgIndex] = useState(0);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -315,6 +324,15 @@ export default function B2BPortal() {
       setFormEmail('');
       setFormPassword('');
       setShowPassword(false);
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const intervalId = setInterval(() => {
+        setLoginBgIndex((prev) => (prev + 1) % loginBackgrounds.length);
+      }, 3000);
+      return () => clearInterval(intervalId);
     }
   }, [isLoggedIn]);
 
@@ -637,8 +655,16 @@ export default function B2BPortal() {
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-        <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
+      <div
+        className="min-h-screen px-4 py-12 flex items-center justify-center relative overflow-hidden"
+        style={{
+          backgroundImage: `url(${loginBackgrounds[loginBgIndex]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-white/70" />
+        <div className="relative w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="hidden lg:block">
             <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
               Flokati B2B
