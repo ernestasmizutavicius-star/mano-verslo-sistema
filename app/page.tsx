@@ -843,7 +843,17 @@ export default function B2BPortal() {
                             return;
                           }
                           
-                          const { error } = await supabase
+                          console.log('🔄 Updating company data for user:', user.id);
+                          console.log('📝 Data to update:', {
+                            client_name: editCompanyData.name,
+                            company_code: editCompanyData.code,
+                            contact_person: editCompanyData.contactPerson,
+                            phone: editCompanyData.phone,
+                            email: editCompanyData.email,
+                            registration_address: editCompanyData.address
+                          });
+                          
+                          const { data, error } = await supabase
                             .from('customers')
                             .update({
                               client_name: editCompanyData.name,
@@ -853,11 +863,14 @@ export default function B2BPortal() {
                               email: editCompanyData.email,
                               registration_address: editCompanyData.address
                             })
-                            .eq('id', user.id);
+                            .eq('id', user.id)
+                            .select();
+                          
+                          console.log('✅ Update response:', { data, error });
                           
                           if (error) {
-                            console.error('Klaida išsaugant:', error);
-                            alert('Klaida išsaugant duomenis');
+                            console.error('❌ Klaida išsaugant:', error);
+                            alert(`Klaida išsaugant duomenis: ${error.message}`);
                             return;
                           }
                           
@@ -978,11 +991,60 @@ export default function B2BPortal() {
                     </div>
                   </div>
                   <button 
-                    onClick={() => {
-                      localStorage.setItem(`companyData_${clientCode}`, JSON.stringify(editCompanyData));
-                      setCompanyData(editCompanyData);
-                      setEditingCompany(false);
-                      alert("Įmonės duomenys išsaugoti!");
+                    onClick={async () => {
+                      try {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) {
+                          alert('Vartotojas nerastas');
+                          return;
+                        }
+                        
+                        console.log('🔄 Updating company data (initial save) for user:', user.id);
+                        console.log('📝 Data to update:', {
+                          client_name: editCompanyData.name,
+                          company_code: editCompanyData.code,
+                          contact_person: editCompanyData.contactPerson,
+                          phone: editCompanyData.phone,
+                          email: editCompanyData.email,
+                          registration_address: editCompanyData.address
+                        });
+                        
+                        const { data, error } = await supabase
+                          .from('customers')
+                          .update({
+                            client_name: editCompanyData.name,
+                            company_code: editCompanyData.code,
+                            contact_person: editCompanyData.contactPerson,
+                            phone: editCompanyData.phone,
+                            email: editCompanyData.email,
+                            registration_address: editCompanyData.address
+                          })
+                          .eq('id', user.id)
+                          .select();
+                        
+                        console.log('✅ Update response:', { data, error });
+                        
+                        if (error) {
+                          console.error('❌ Klaida išsaugant:', error);
+                          alert(`Klaida išsaugant duomenis: ${error.message}`);
+                          return;
+                        }
+                        
+                        // Update localStorage
+                        localStorage.setItem('client_name', editCompanyData.name);
+                        localStorage.setItem('company_code', editCompanyData.code);
+                        localStorage.setItem('contact_person', editCompanyData.contactPerson);
+                        localStorage.setItem('phone', editCompanyData.phone);
+                        localStorage.setItem('email', editCompanyData.email);
+                        localStorage.setItem('registration_address', editCompanyData.address);
+                        
+                        setCompanyData(editCompanyData);
+                        setEditingCompany(false);
+                        alert("Įmonės duomenys išsaugoti!");
+                      } catch (e) {
+                        console.error('Save error:', e);
+                        alert('Klaida išsaugant duomenis');
+                      }
                     }}
                     className="w-full bg-[#c29a74] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8885e] transition"
                   >
@@ -1081,14 +1143,20 @@ export default function B2BPortal() {
                                     return;
                                   }
                                   
-                                  const { error } = await supabase
+                                  console.log('🔄 Updating delivery addresses for user:', user.id);
+                                  console.log('📦 Addresses:', deliveryAddresses);
+                                  
+                                  const { data, error } = await supabase
                                     .from('customers')
                                     .update({ delivery_addresses: deliveryAddresses })
-                                    .eq('id', user.id);
+                                    .eq('id', user.id)
+                                    .select();
+                                  
+                                  console.log('✅ Update response:', { data, error });
                                   
                                   if (error) {
-                                    console.error('Klaida išsaugant adresą:', error);
-                                    alert('Klaida išsaugant adresą');
+                                    console.error('❌ Klaida išsaugant adresą:', error);
+                                    alert(`Klaida išsaugant adresą: ${error.message}`);
                                     return;
                                   }
                                   
@@ -1128,10 +1196,16 @@ export default function B2BPortal() {
                               try {
                                 const { data: { user } } = await supabase.auth.getUser();
                                 if (user) {
-                                  await supabase
+                                  console.log('🗑️ Deleting address for user:', user.id);
+                                  const { error } = await supabase
                                     .from('customers')
                                     .update({ delivery_addresses: updated })
                                     .eq('id', user.id);
+                                  if (error) {
+                                    console.error('❌ Delete error:', error);
+                                    alert(`Klaida trinant adresą: ${error.message}`);
+                                    return;
+                                  }
                                 }
                                 localStorage.setItem('delivery_addresses', JSON.stringify(updated));
                                 setDeliveryAddresses(updated);
@@ -1226,14 +1300,20 @@ export default function B2BPortal() {
                           return;
                         }
                         
-                        const { error } = await supabase
+                        console.log('➕ Adding new address for user:', user.id);
+                        console.log('📦 New address:', updatedAddress);
+                        
+                        const { data, error } = await supabase
                           .from('customers')
                           .update({ delivery_addresses: updated })
-                          .eq('id', user.id);
+                          .eq('id', user.id)
+                          .select();
+                        
+                        console.log('✅ Add response:', { data, error });
                         
                         if (error) {
-                          console.error('Klaida pridedant adresą:', error);
-                          alert('Klaida pridedant adresą');
+                          console.error('❌ Klaida pridedant adresą:', error);
+                          alert(`Klaida pridedant adresą: ${error.message}`);
                           return;
                         }
                         
