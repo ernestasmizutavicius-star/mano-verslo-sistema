@@ -1640,7 +1640,7 @@ export default function B2BPortal() {
                                 step={1}
                                 value={item.qty}
                                 onChange={(e) => updateQty(item.id, Number(e.target.value))}
-                                className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none"
+                                className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 aria-label="Kiekis"
                               />
                               <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
