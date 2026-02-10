@@ -178,7 +178,6 @@ export default function B2BPortal() {
   const [formPassword, setFormPassword] = useState("");
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -319,14 +318,6 @@ export default function B2BPortal() {
     }
   }, [isLoggedIn]);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      const savedImage = localStorage.getItem('profile_image');
-      setProfileImage(savedImage || null);
-    } else {
-      setProfileImage(null);
-    }
-  }, [isLoggedIn, clientCode]);
 
   // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
   useEffect(() => {
@@ -422,19 +413,6 @@ export default function B2BPortal() {
     return basePrice * multiplier;
   };
 
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === 'string' ? reader.result : null;
-      setProfileImage(result);
-      if (result) {
-        localStorage.setItem('profile_image', result);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
 
   const filteredProducts = selectedCategory
     ? products.filter((p) => p.category === selectedCategory)
@@ -1567,32 +1545,6 @@ export default function B2BPortal() {
           <aside className="order-3 lg:order-none">
             <div className="sticky top-6 space-y-3">
               <div className="flex items-center justify-end gap-3">
-                <div className="relative">
-                  <input
-                    id="profile-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleProfileImageChange}
-                  />
-                  <label
-                    htmlFor="profile-upload"
-                    className="w-10 h-10 rounded-full bg-[var(--surface-muted)] border border-black/10 flex items-center justify-center overflow-hidden cursor-pointer"
-                    title="Įkelti profilio nuotrauką"
-                  >
-                    {profileImage ? (
-                      <img src={profileImage} alt="Profilis" className="w-full h-full object-cover" />
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-[var(--ink-soft)]">
-                        <path d="M12 5v14" />
-                        <path d="M5 12h14" />
-                      </svg>
-                    )}
-                  </label>
-                </div>
-                <div className="text-sm font-semibold text-[var(--foreground)]">
-                  {clients[clientCode]?.name || 'Klientas'}
-                </div>
                 <button
                   onClick={() => {
                     setIsLoggedIn(false);
@@ -1606,7 +1558,6 @@ export default function B2BPortal() {
                     localStorage.removeItem('discount_group');
                     localStorage.removeItem('manager_email');
                     localStorage.removeItem('currentView');
-                    localStorage.removeItem('profile_image');
                   }}
                   className="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-2"
                   aria-label="Atsijungti"
@@ -1620,144 +1571,140 @@ export default function B2BPortal() {
                   </span>
                   Atsijungti
                 </button>
+                <button
+                  onClick={() => {
+                    if (cartItemCount > 0 || isCartVisible) {
+                      setIsCartVisible(!isCartVisible);
+                    }
+                  }}
+                  className="relative text-gray-400 hover:text-[var(--foreground)] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
+                  title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
+                  aria-label="Krepšelis"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                    <circle cx="9" cy="20" r="1" />
+                    <circle cx="17" cy="20" r="1" />
+                    <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
+                  </svg>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-white text-[10px] font-semibold flex items-center justify-center">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </button>
               </div>
-              <div className={`${isCartVisible ? 'bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden' : 'w-fit ml-auto'}`}>
-                {!isCartVisible ? (
-                  <button
-                    onClick={() => {
-                      if (cartItemCount > 0) {
-                        setIsCartVisible(!isCartVisible);
-                      }
-                    }}
-                    className="relative text-gray-400 hover:text-[var(--foreground)] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
-                    title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
-                    aria-label="Krepšelis"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                      <circle cx="9" cy="20" r="1" />
-                      <circle cx="17" cy="20" r="1" />
-                      <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
-                    </svg>
-                    {cartItemCount > 0 && (
-                      <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-white text-[10px] font-semibold flex items-center justify-center">
-                        {cartItemCount}
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <>
-                    <div className="p-5 pb-0">
-                      <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
-                        <button
-                          onClick={() => setIsCartVisible(!isCartVisible)}
-                          className="relative text-gray-400 hover:text-[var(--foreground)]"
-                          aria-label="Uždaryti krepšelį"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                            <circle cx="9" cy="20" r="1" />
-                            <circle cx="17" cy="20" r="1" />
-                            <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
-                          </svg>
-                        </button>
-                      </div>
-                      {currentCart.length > 0 && (
-                        <div className="flex justify-end pb-3">
-                          <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
-                        </div>
-                      )}
+              {isCartVisible && (
+                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden">
+                  <div className="p-5 pb-0">
+                    <div className="flex justify-between items-center mb-2">
+                      <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
+                      <button
+                        onClick={() => setIsCartVisible(false)}
+                        className="relative text-gray-400 hover:text-[var(--foreground)]"
+                        aria-label="Uždaryti krepšelį"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                          <circle cx="9" cy="20" r="1" />
+                          <circle cx="17" cy="20" r="1" />
+                          <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
+                        </svg>
+                      </button>
                     </div>
-                  </>
-                )}
-                {isCartVisible && (
-                <div className="space-y-0 mb-0 max-h-[50vh] overflow-y-auto">
-                  {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
-                    currentCart.map((item: any) => (
-                      <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
-                        <div className="flex gap-3">
-                          {item.images && item.images.length > 0 ? (
-                            <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
-                          ) : (
-                            <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start mb-1">
-                              <h3 className="font-semibold text-sm text-[var(--foreground)] pr-2">{item.name}</h3>
-                              <button
-                                onClick={() => removeItem(item.id)}
-                                className="text-gray-400 hover:text-red-500 text-lg"
-                                title="Pašalinti prekę"
-                                aria-label="Pašalinti prekę"
-                              >
-                                x
-                              </button>
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
-                              <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
-                                <button onClick={() => updateQty(item.id, item.qty - 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">-</button>
-                                <input
-                                  type="number"
-                                  inputMode="numeric"
-                                  min={1}
-                                  step={1}
-                                  value={item.qty}
-                                  onChange={(e) => updateQty(item.id, Number(e.target.value))}
-                                  className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                  aria-label="Kiekis"
-                                />
-                                <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
+                    {currentCart.length > 0 && (
+                      <div className="flex justify-end pb-3">
+                        <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-0 mb-0 max-h-[50vh] overflow-y-auto">
+                    {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
+                      currentCart.map((item: any) => (
+                        <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
+                          <div className="flex gap-3">
+                            {item.images && item.images.length > 0 ? (
+                              <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start mb-1">
+                                <h3 className="font-semibold text-sm text-[var(--foreground)] pr-2">{item.name}</h3>
+                                <button
+                                  onClick={() => removeItem(item.id)}
+                                  className="text-gray-400 hover:text-red-500 text-lg"
+                                  title="Pašalinti prekę"
+                                  aria-label="Pašalinti prekę"
+                                >
+                                  x
+                                </button>
+                              </div>
+                              <div className="flex justify-between items-center mt-2">
+                                <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
+                                <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
+                                  <button onClick={() => updateQty(item.id, item.qty - 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">-</button>
+                                  <input
+                                    type="number"
+                                    inputMode="numeric"
+                                    min={1}
+                                    step={1}
+                                    value={item.qty}
+                                    onChange={(e) => updateQty(item.id, Number(e.target.value))}
+                                    className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    aria-label="Kiekis"
+                                  />
+                                  <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
+                      ))
+                    }
+                  </div>
+                  {currentCart.length > 0 && (
+                    <div className="p-5 border-t border-black/5 bg-white">
+                      {deliveryAddresses.length > 0 && (
+                        <div className="mb-4">
+                          <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                          <select
+                            value={selectedDeliveryAddress ?? ''}
+                            onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
+                            className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                          >
+                            <option value="">-- Pasirinkite adresą --</option>
+                            {deliveryAddresses.map((addr, idx) => (
+                              <option key={idx} value={idx}>
+                                {addr.name} - {addr.address}, {addr.city}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      {deliveryAddresses.length === 0 && (
+                        <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
+                          Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                        </div>
+                      )}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm text-[var(--foreground)]">
+                          <span>Suma iš viso</span><span className="font-semibold">{currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0).toFixed(2)} €</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-[var(--foreground)]">
+                          <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0) - currentTotal).toFixed(2)} €</span>
+                        </div>
                       </div>
-                    ))
-                  }
-              </div>
-                )}
-              {isCartVisible && currentCart.length > 0 && (
-                <div className="p-5 border-t border-black/5 bg-white">
-                  {deliveryAddresses.length > 0 && (
-                    <div className="mb-4">
-                      <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
-                      <select
-                        value={selectedDeliveryAddress ?? ''}
-                        onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
+                        <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
+                      </div>
+                      <button 
+                        onClick={submitOrder}
+                        disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
+                        className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                       >
-                        <option value="">-- Pasirinkite adresą --</option>
-                        {deliveryAddresses.map((addr, idx) => (
-                          <option key={idx} value={idx}>
-                            {addr.name} - {addr.address}, {addr.city}
-                          </option>
-                        ))}
-                      </select>
+                        Užsakyti
+                      </button>
                     </div>
                   )}
-                  {deliveryAddresses.length === 0 && (
-                    <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
-                      Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
-                    </div>
-                  )}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm text-[var(--foreground)]">
-                      <span>Suma iš viso</span><span className="font-semibold">{currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0).toFixed(2)} €</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-[var(--foreground)]">
-                      <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0) - currentTotal).toFixed(2)} €</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
-                    <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
-                  </div>
-                  <button 
-                    onClick={submitOrder}
-                    disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
-                    className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  >
-                    Užsakyti
-                  </button>
                 </div>
               )}
             </div>
