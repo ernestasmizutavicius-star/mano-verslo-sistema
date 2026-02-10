@@ -1412,7 +1412,7 @@ export default function B2BPortal() {
             )}
           </div>
         ) : (
-          <div className="flex gap-8 max-w-7xl mx-auto w-full">
+          <div className="flex gap-8">
             {/* Kategorijų Sidebar */}
             <div className="w-48 bg-white p-6 rounded-2xl shadow-sm border h-fit">
               <h3 className="text-lg font-bold mb-6 text-slate-800">Kategorijos</h3>
@@ -1447,7 +1447,7 @@ export default function B2BPortal() {
             {/* Produktai ir Krepšelis */}
             <div className="flex-1 flex flex-col lg:flex-row gap-8">
               <div className="flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6">
                   {filteredProducts.map(p => (
                     <ProductCard 
                       key={p.id} 
