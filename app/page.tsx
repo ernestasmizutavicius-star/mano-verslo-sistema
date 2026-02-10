@@ -1392,12 +1392,17 @@ export default function B2BPortal() {
                         <span className="font-bold">Užsakymas #{order.order_number}</span>
                         <span className="text-gray-500 text-sm ml-4">{order.date}</span>
                       </div>
-                      <button 
-                        onClick={() => exportOrderToPDF(order)}
-                        className="bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition text-sm whitespace-nowrap ml-4"
-                      >
-                        📥 PDF
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiųsta' ? 'bg-blue-100 text-blue-800' : order.status === 'Dostavinta' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {order.status || 'Nežinomas'}
+                        </span>
+                        <button 
+                          onClick={() => exportOrderToPDF(order)}
+                          className="bg-[#c29a74] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#b8885e] transition text-sm whitespace-nowrap"
+                        >
+                          📥 PDF
+                        </button>
+                      </div>
                     </div>
                     {order.items.map((it: any, idx: number) => (
                       <div key={idx} className="text-sm flex justify-between py-1">
