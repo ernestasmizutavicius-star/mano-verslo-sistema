@@ -271,7 +271,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[320px]">
+    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[280px]">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
       <div className="flex items-start justify-between gap-3 mb-2">
         <h2 className="text-sm font-semibold leading-tight text-[var(--foreground)] min-h-[2.5rem] flex-1">{product.name}</h2>
@@ -1806,7 +1806,7 @@ export default function B2BPortal() {
             </div>
             {isProductsLoading ? (
               <div className="py-8">
-                <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 320px))', justifyContent: 'start' }}>
+                <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 280px))', justifyContent: 'start' }}>
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="bg-[var(--surface)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
                       <div className="w-full aspect-[4/3] bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
@@ -1824,7 +1824,7 @@ export default function B2BPortal() {
                 </div>
               </div>
             ) : (
-              <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 320px))', justifyContent: 'start' }}>
+              <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 280px))', justifyContent: 'start' }}>
                 {filteredProducts.map(p => (
                   <ProductCard 
                     key={p.id} 
