@@ -19,7 +19,7 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
   if (!images || images.length === 0) {
-    return null;
+    return <div className="w-full aspect-[4/3] mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
   }
 
   return (
