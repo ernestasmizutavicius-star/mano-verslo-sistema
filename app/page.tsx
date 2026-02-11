@@ -131,6 +131,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const price = getPrice(product.basePrice);
   const hasDiscount = price < product.basePrice;
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
   const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
   const hasSizeLabels = hasSizes && product.sizes.some((s: any) => s.size);
   const sortedSizes = hasSizes
@@ -198,9 +199,27 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const sizeOptions = hasSizeLabels ? sortedSizes.filter((s: any) => s.size) : [];
 
   return (
-    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[320px]">
+    <div className={`bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[320px] transition ${isExpanded ? 'scale-[1.02] shadow-[var(--shadow-strong)]' : ''}`}>
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
-      <h2 className="text-sm font-semibold leading-tight mb-3 text-[var(--foreground)] min-h-[2.5rem]">{product.name}</h2>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h2 className="text-sm font-semibold leading-tight text-[var(--foreground)] min-h-[2.5rem] flex-1">{product.name}</h2>
+        {product.description && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`w-7 h-7 rounded-full border text-xs font-bold flex items-center justify-center transition ${isExpanded ? 'bg-[var(--foreground)] text-white border-[var(--foreground)]' : 'bg-white text-[var(--foreground)] border-black/10 hover:bg-[var(--surface)]'}`}
+            aria-label="Rodyti sudeti"
+          >
+            i
+          </button>
+        )}
+      </div>
+      {isExpanded && product.description && (
+        <div className="mb-3 text-xs text-[var(--ink-soft)]">
+          <span className="font-semibold text-[var(--foreground)]">Sudėtis: </span>
+          {product.description}
+        </div>
+      )}
       {hasSizeLabels && (
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
@@ -359,7 +378,8 @@ export default function B2BPortal() {
             client: row.client ?? 'all',
             itemNo: row.item_no ?? row.itemNo ?? null,
             connection: connection ?? null,
-            size: row.size ?? null
+            size: row.size ?? null,
+            description: row.description ?? null
           };
         });
         const connectionMap = new Map<string, any[]>();
@@ -389,7 +409,8 @@ export default function B2BPortal() {
             client: row.client,
             itemNo: row.itemNo,
             connection: row.connection,
-            size: row.size
+            size: row.size,
+            description: row.description ?? main.description ?? null
           }));
           const sortedSizeOptions = [...sizeOptions].sort((a: any, b: any) => {
             const parse = (value: any) => {
