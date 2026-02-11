@@ -129,6 +129,7 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
 
 const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const price = getPrice(product.basePrice);
+  const hasDiscount = price < product.basePrice;
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
   const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
 
@@ -185,7 +186,9 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
       )}
       <div className="flex justify-between items-center mt-auto">
         <div>
-          <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+          {hasDiscount && (
+            <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+          )}
           <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
         </div>
         <button
@@ -837,6 +840,7 @@ export default function B2BPortal() {
               if (clientCode) localStorage.setItem('clientCode', clientCode);
               if (clientName) localStorage.setItem('client_name', clientName);
               if (discountGroup) localStorage.setItem('discount_group', discountGroup);
+              else localStorage.removeItem('discount_group');
               if (managerEmail) localStorage.setItem('manager_email', managerEmail);
               if (companyCode) localStorage.setItem('company_code', companyCode);
               if (phone) localStorage.setItem('phone', phone);
