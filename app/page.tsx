@@ -354,7 +354,7 @@ export default function B2BPortal() {
             id: row.id,
             name: row.name,
             basePrice: row.price ?? row.base_price ?? row.basePrice ?? 0,
-            category: row.category ?? 'general',
+            category: typeof row.category === 'string' && row.category.trim() !== '' ? row.category.trim() : null,
             images,
             client: row.client ?? 'all',
             itemNo: row.item_no ?? row.itemNo ?? null,
@@ -613,9 +613,18 @@ export default function B2BPortal() {
   };
 
 
-  const filteredProducts = selectedCategory
+  const availableCategories = Array.from(
+    new Set(
+      products
+        .map((p) => (typeof p.category === 'string' ? p.category.trim() : null))
+        .filter(Boolean)
+    )
+  ).sort((a: any, b: any) => String(a).localeCompare(String(b), 'lt-LT'));
+
+  const filteredProducts = (selectedCategory
     ? products.filter((p) => p.category === selectedCategory)
-    : products;
+    : products
+  ).slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'lt-LT'));
 
   const addToCart = (product: any, addedQty: number) => {
     const price = getPrice(product.basePrice);
@@ -848,9 +857,6 @@ export default function B2BPortal() {
         <div className="absolute inset-0 bg-white/0" />
         <div className="relative w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="hidden lg:block">
-            <div className="inline-flex items-center gap-3 rounded-full bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--ink-soft)]">
-              Flokati B2B
-            </div>
             <h1 className="mt-6 text-4xl font-semibold leading-tight text-white">
               Premium tekstile verslui.
               <span className="block text-white/80">Užsakymai be triukšmo.</span>
@@ -1695,24 +1701,15 @@ export default function B2BPortal() {
                 >
                   Visos prekės
                 </button>
-                <button
-                  onClick={() => setSelectedCategory("antklodės")}
-                  className={`font-medium transition ${selectedCategory === "antklodės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
-                >
-                  Antklodės
-                </button>
-                <button
-                  onClick={() => setSelectedCategory("pagalvės")}
-                  className={`font-medium transition ${selectedCategory === "pagalvės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
-                >
-                  Pagalvės
-                </button>
-                <button
-                  onClick={() => setSelectedCategory("šlepetės")}
-                  className={`font-medium transition ${selectedCategory === "šlepetės" ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
-                >
-                  Šlepetės
-                </button>
+                {availableCategories.map((category: string) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`font-medium transition ${selectedCategory === category ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
             </div>
             {isProductsLoading ? (
