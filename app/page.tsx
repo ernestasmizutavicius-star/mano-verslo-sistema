@@ -19,7 +19,7 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
   if (!images || images.length === 0) {
-    return <div className="w-full aspect-[4/3] mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
+    return null;
   }
 
   return (
@@ -337,7 +337,7 @@ export default function B2BPortal() {
         }
         const normalized = (data || []).map((row: any) => {
           // Determine images from image_url, images, image fields
-          let images: string[] = ['/placeholder.jpg'];
+          let images: string[] = [];
           if (row.image_url) {
             if (Array.isArray(row.image_url)) images = row.image_url;
             else if (typeof row.image_url === 'string') images = [row.image_url];
