@@ -382,6 +382,16 @@ export default function B2BPortal() {
 
   const [products, setProducts] = useState<any[]>([]);
 
+  const parseDiscountGroup = (value: string | null) => {
+    if (!value) return 1;
+    if (value.startsWith('D')) {
+      const pct = parseInt(value.slice(1), 10);
+      return Number.isFinite(pct) ? 1 - pct / 100 : 1;
+    }
+    const num = parseFloat(value);
+    return Number.isFinite(num) ? num : 1;
+  };
+
   // Set loading state when clientCode changes
   useEffect(() => {
     if (isLoggedIn && clientCode) {
@@ -568,7 +578,7 @@ export default function B2BPortal() {
       const profileDiscountGroup = localStorage.getItem('discount_group');
       
       // Parse discount (stored as string like "0.8" or "1.0")
-      const discount = profileDiscountGroup ? parseFloat(profileDiscountGroup) : 1.0;
+      const discount = parseDiscountGroup(profileDiscountGroup);
       
       setClients({
         [savedClientCode]: {
@@ -703,6 +713,11 @@ export default function B2BPortal() {
     }
     return basePrice * multiplier;
   };
+
+  const currentClientName = clients[clientCode]?.name || clientCode || '';
+  const filteredOrders = currentClientName
+    ? orderHistory.filter((o) => o.client === currentClientName)
+    : [];
 
 
   const availableCategories = Array.from(
@@ -932,6 +947,13 @@ export default function B2BPortal() {
   };
 
   const currentCart = allCarts[clientCode] || [];
+  const getBaseLineTotal = (item: any) => {
+    const basePrice = Number.isFinite(item.basePrice)
+      ? item.basePrice
+      : (Number.isFinite(item.price) ? item.price : 0);
+    return basePrice * item.qty;
+  };
+  const currentBaseTotal = currentCart.reduce((s: number, i: any) => s + getBaseLineTotal(i), 0);
   const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
   const cartItemCount = currentCart.reduce((s: number, i: any) => s + i.qty, 0);
 
@@ -1028,7 +1050,7 @@ export default function B2BPortal() {
               setView("katalogas");
               
               // Populate clients object
-              const discount = discountGroup ? parseFloat(discountGroup) : 1.0;
+              const discount = parseDiscountGroup(discountGroup);
               setClients({
                 [clientCode]: {
                   name: clientName || clientCode,
@@ -1747,11 +1769,11 @@ export default function B2BPortal() {
         ) : view === "uzsakymai" ? (
           <div className="bg-[var(--surface)] p-8 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
             <h2 className="text-2xl font-semibold mb-6">Užsakymų istorija</h2>
-            {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).length === 0 ? (
+            {filteredOrders.sort((a, b) => b.order_number - a.order_number).length === 0 ? (
               <p className="text-gray-400 italic text-center py-10">Istorija tuščia.</p>
             ) : (
               <div className="space-y-6">
-                {orderHistory.filter(o => o.client === clients[clientCode].name).sort((a, b) => b.order_number - a.order_number).map(order => (
+                {filteredOrders.sort((a, b) => b.order_number - a.order_number).map(order => (
                   <div key={order.id} className="border border-black/5 rounded-3xl p-6 bg-[var(--surface-muted)]">
                     <div className="flex justify-between mb-4 border-b border-black/5 pb-2 items-center">
                       <div className="flex-1">
@@ -1990,10 +2012,10 @@ export default function B2BPortal() {
                       )}
                       <div className="space-y-2 mb-4">
                         <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Suma iš viso</span><span className="font-semibold">{currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0).toFixed(2)} €</span>
+                          <span>Suma iš viso</span><span className="font-semibold">{currentBaseTotal.toFixed(2)} €</span>
                         </div>
                         <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentCart.reduce((s: number, i: any) => s + (i.basePrice || i.price) * i.qty, 0) - currentTotal).toFixed(2)} €</span>
+                          <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentBaseTotal - currentTotal).toFixed(2)} €</span>
                         </div>
                       </div>
                       <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
