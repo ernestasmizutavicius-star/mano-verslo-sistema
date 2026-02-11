@@ -283,7 +283,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
             aria-label="Rodyti sudeti"
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" fill="currentColor" />
+              <circle cx="12" cy="12" r="10" fill="#000000" />
               <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
               <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
             </svg>
