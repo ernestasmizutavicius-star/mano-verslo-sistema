@@ -199,7 +199,79 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const sizeOptions = hasSizeLabels ? sortedSizes.filter((s: any) => s.size) : [];
 
   return (
-    <div className={`bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[320px] transition ${isExpanded ? 'scale-[1.02] shadow-[var(--shadow-strong)]' : ''}`}>
+    <>
+    {isExpanded && (
+      <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setIsExpanded(false)} />
+    )}
+    {isExpanded && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsExpanded(false)}>
+        <div
+          className="bg-[var(--surface-muted)] p-8 rounded-3xl shadow-[var(--shadow-strong)] border border-black/5 w-full max-w-[960px]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <h2 className="text-lg font-semibold leading-tight text-[var(--foreground)] flex-1">{product.name}</h2>
+            {product.description && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded(false)}
+                className="text-[var(--ink-soft)] hover:text-[var(--foreground)] text-xs font-semibold"
+                aria-label="Uždaryti sudėtį"
+              >
+                Uždaryti
+              </button>
+            )}
+          </div>
+          {product.description && (
+            <div className="mb-4 text-sm text-[var(--ink-soft)]">
+              <span className="font-semibold text-[var(--foreground)]">Sudėtis: </span>
+              {product.description}
+            </div>
+          )}
+          {hasSizeLabels && (
+            <div className="mb-4">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
+              <div className="flex flex-wrap gap-2">
+                {sizeOptions.map((sizeProduct: any) => (
+                  <button
+                    key={sizeProduct.id}
+                    onClick={() => toggleSize(sizeProduct.id)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                      selectedSizes.includes(sizeProduct.id)
+                        ? 'bg-[var(--foreground)] text-white border-[var(--foreground)]'
+                        : 'bg-white text-[var(--foreground)] border-black/10 hover:bg-[var(--surface)]'
+                    }`}
+                    type="button"
+                  >
+                    {sizeProduct.size || '—'}
+                  </button>
+                ))}
+              </div>
+              {selectedSizes.length === 0 && (
+                <div className="mt-2 text-[10px] text-[var(--ink-soft)]">Pasirinkite dydį</div>
+              )}
+            </div>
+          )}
+          <div className="flex justify-between items-center">
+            <div>
+              {hasDiscount && (
+                <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+              )}
+              <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
+            </div>
+            <button
+              onClick={handleAdd}
+              disabled={hasSizeLabels && selectedSizes.length === 0}
+              className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Užsakyti
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[320px]">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
       <div className="flex items-start justify-between gap-3 mb-2">
         <h2 className="text-sm font-semibold leading-tight text-[var(--foreground)] min-h-[2.5rem] flex-1">{product.name}</h2>
@@ -207,19 +279,13 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
-            className={`w-7 h-7 rounded-full border text-xs font-bold flex items-center justify-center transition ${isExpanded ? 'bg-[var(--foreground)] text-white border-[var(--foreground)]' : 'bg-white text-[var(--foreground)] border-black/10 hover:bg-[var(--surface)]'}`}
+            className="text-[var(--ink-soft)] hover:text-[var(--foreground)] text-xs font-semibold bg-transparent border-0 p-0"
             aria-label="Rodyti sudeti"
           >
             i
           </button>
         )}
       </div>
-      {isExpanded && product.description && (
-        <div className="mb-3 text-xs text-[var(--ink-soft)]">
-          <span className="font-semibold text-[var(--foreground)]">Sudėtis: </span>
-          {product.description}
-        </div>
-      )}
       {hasSizeLabels && (
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
@@ -260,6 +326,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 
