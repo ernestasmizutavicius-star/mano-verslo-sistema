@@ -129,17 +129,72 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
 
 const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const price = getPrice(product.basePrice);
+  const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
+  const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
+
+  useEffect(() => {
+    if (hasSizes && product.sizes.length === 1) {
+      setSelectedSizes([product.sizes[0].id]);
+    }
+  }, [hasSizes, product.sizes]);
+
+  const toggleSize = (sizeId: number) => {
+    setSelectedSizes((prev) =>
+      prev.includes(sizeId) ? prev.filter((id) => id !== sizeId) : [...prev, sizeId]
+    );
+  };
+
+  const handleAdd = () => {
+    if (!hasSizes) {
+      onAdd(product, 1);
+      return;
+    }
+    if (selectedSizes.length === 0) return;
+    const selected = product.sizes.filter((s: any) => selectedSizes.includes(s.id));
+    selected.forEach((sizeProduct: any) => onAdd(sizeProduct, 1));
+    setSelectedSizes([]);
+  };
 
   return (
     <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
       <h2 className="text-sm font-semibold leading-tight mb-3 text-[var(--foreground)] min-h-[2.5rem]">{product.name}</h2>
+      {hasSizes && (
+        <div className="mb-3">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
+          <div className="flex flex-wrap gap-2">
+            {product.sizes.map((sizeProduct: any) => (
+              <button
+                key={sizeProduct.id}
+                onClick={() => toggleSize(sizeProduct.id)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                  selectedSizes.includes(sizeProduct.id)
+                    ? 'bg-[var(--foreground)] text-white border-[var(--foreground)]'
+                    : 'bg-white text-[var(--foreground)] border-black/10 hover:bg-[var(--surface)]'
+                }`}
+                type="button"
+              >
+                {sizeProduct.size || '—'}
+              </button>
+            ))}
+          </div>
+          {selectedSizes.length === 0 && (
+            <div className="mt-2 text-[10px] text-[var(--ink-soft)]">Pasirinkite dydį</div>
+          )}
+        </div>
+      )}
       <div className="flex justify-between items-center mt-auto">
         <div>
           <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
           <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
         </div>
-        <button onClick={() => onAdd(product, 1)} className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition">Užsakyti</button>
+        <button
+          onClick={handleAdd}
+          disabled={hasSizes && selectedSizes.length === 0}
+          className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Užsakyti
+        </button>
       </div>
     </div>
   );
@@ -236,7 +291,7 @@ export default function B2BPortal() {
           console.error('Klaida traukiant prekes:', error.message);
           return;
         }
-        const mapped = (data || []).map((row: any) => {
+        const normalized = (data || []).map((row: any) => {
           // Determine images from image_url, images, image fields
           let images: string[] = ['/placeholder.jpg'];
           if (row.image_url) {
@@ -248,15 +303,64 @@ export default function B2BPortal() {
             images = [row.image];
           }
 
+          const connectionRaw = row.conection ?? row.connection ?? row.conections ?? null;
+          const connection = typeof connectionRaw === 'string' && connectionRaw.trim() === '' ? null : connectionRaw;
+
           return {
             id: row.id,
             name: row.name,
             basePrice: row.price ?? row.base_price ?? row.basePrice ?? 0,
             category: row.category ?? 'general',
             images,
-            client: row.client ?? 'all'
+            client: row.client ?? 'all',
+            itemNo: row.item_no ?? row.itemNo ?? null,
+            connection: connection ?? null,
+            size: row.size ?? null
           };
         });
+        const connectionMap = new Map<string, any[]>();
+        normalized.forEach((row: any) => {
+          if (row.connection) {
+            const key = String(row.connection);
+            if (!connectionMap.has(key)) connectionMap.set(key, []);
+            connectionMap.get(key)!.push(row);
+          }
+        });
+
+        const mainProducts = normalized.filter((row: any) => !row.connection);
+        const mainItemNos = new Set(
+          mainProducts
+            .map((row: any) => (row.itemNo ? String(row.itemNo) : null))
+            .filter(Boolean)
+        );
+
+        const grouped = mainProducts.map((main: any) => {
+          const variants = main.itemNo ? connectionMap.get(String(main.itemNo)) || [] : [];
+          const sizeOptions = [main, ...variants].map((row: any) => ({
+            id: row.id,
+            name: row.name || main.name,
+            basePrice: row.basePrice,
+            category: row.category,
+            images: main.images,
+            client: row.client,
+            itemNo: row.itemNo,
+            connection: row.connection,
+            size: row.size
+          }));
+
+          return {
+            ...main,
+            sizes: sizeOptions
+          };
+        });
+
+        const orphans = normalized.filter((row: any) => row.connection && !mainItemNos.has(String(row.connection)));
+        const orphanProducts = orphans.map((row: any) => ({
+          ...row,
+          sizes: [row]
+        }));
+
+        const mapped = [...grouped, ...orphanProducts];
         console.log('📦 Mapped products count:', mapped.length);
         console.log('📦 Mapped products:', mapped);
         setProducts(mapped);
@@ -622,7 +726,8 @@ export default function B2BPortal() {
     // Prekės
     order.items.forEach((item: any) => {
       pdf.setFontSize(9);
-      pdf.text(item.name.substring(0, 45), 20, yPosition);
+      const itemLabel = item.size ? `${item.name} (${item.size})` : item.name;
+      pdf.text(itemLabel.substring(0, 45), 20, yPosition);
       pdf.text(item.qty.toString(), 100, yPosition);
       pdf.text(`${item.price.toFixed(2)} €`, 130, yPosition);
       pdf.text(`${item.totalPrice.toFixed(2)} €`, 160, yPosition);
@@ -1491,7 +1596,7 @@ export default function B2BPortal() {
                     </div>
                     {order.items.map((it: any, idx: number) => (
                       <div key={idx} className="text-sm flex justify-between py-1">
-                        <span>{it.name} ({it.qty} vnt.)</span>
+                        <span>{it.name}{it.size ? ` (${it.size})` : ''} ({it.qty} vnt.)</span>
                         <span>{it.totalPrice.toFixed(2)} €</span>
                       </div>
                     ))}
@@ -1654,7 +1759,12 @@ export default function B2BPortal() {
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="flex justify-between items-start mb-1">
-                                <h3 className="font-semibold text-sm text-[var(--foreground)] pr-2">{item.name}</h3>
+                                <div className="pr-2">
+                                  <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
+                                  {item.size && (
+                                    <div className="text-xs font-semibold text-green-700">{item.size}</div>
+                                  )}
+                                </div>
                                 <button
                                   onClick={() => removeItem(item.id)}
                                   className="text-gray-400 hover:text-red-500 text-lg"
