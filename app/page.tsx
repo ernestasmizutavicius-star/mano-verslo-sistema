@@ -132,6 +132,41 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const hasDiscount = price < product.basePrice;
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
   const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
+  const sortedSizes = hasSizes
+    ? [...product.sizes].sort((a: any, b: any) => {
+        const parse = (value: any) => {
+          if (!value || typeof value !== 'string') return [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+          const alphaOrder: Record<string, number> = {
+            XS: 1,
+            S: 2,
+            M: 3,
+            L: 4,
+            XL: 5,
+            XXL: 6
+          };
+          const alphaTokens = value
+            .split('/')
+            .map((t) => t.trim().toUpperCase())
+            .filter(Boolean);
+          const alphaRanks = alphaTokens.map((t) => alphaOrder[t]).filter((n) => Number.isFinite(n));
+          if (alphaRanks.length > 0) {
+            const minRank = Math.min(...alphaRanks);
+            return [minRank, minRank];
+          }
+          const normalized = value.replace(',', '.');
+          const parts = normalized
+            .split(/[xX\-]/)
+            .map((p) => parseFloat(p.trim()))
+            .filter((n) => Number.isFinite(n));
+          if (parts.length === 0) return [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+          return [parts[0], parts[1] ?? parts[0]];
+        };
+        const [a1, a2] = parse(a.size);
+        const [b1, b2] = parse(b.size);
+        if (a1 !== b1) return a1 - b1;
+        return a2 - b2;
+      })
+    : [];
 
   useEffect(() => {
     if (hasSizes && product.sizes.length === 1) {
@@ -164,7 +199,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
           <div className="flex flex-wrap gap-2">
-            {product.sizes.map((sizeProduct: any) => (
+            {sortedSizes.map((sizeProduct: any) => (
               <button
                 key={sizeProduct.id}
                 onClick={() => toggleSize(sizeProduct.id)}
@@ -350,10 +385,43 @@ export default function B2BPortal() {
             connection: row.connection,
             size: row.size
           }));
+          const sortedSizeOptions = [...sizeOptions].sort((a: any, b: any) => {
+            const parse = (value: any) => {
+              if (!value || typeof value !== 'string') return [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+              const alphaOrder: Record<string, number> = {
+                XS: 1,
+                S: 2,
+                M: 3,
+                L: 4,
+                XL: 5,
+                XXL: 6
+              };
+              const alphaTokens = value
+                .split('/')
+                .map((t) => t.trim().toUpperCase())
+                .filter(Boolean);
+              const alphaRanks = alphaTokens.map((t) => alphaOrder[t]).filter((n) => Number.isFinite(n));
+              if (alphaRanks.length > 0) {
+                const minRank = Math.min(...alphaRanks);
+                return [minRank, minRank];
+              }
+              const normalized = value.replace(',', '.');
+              const parts = normalized
+                .split(/[xX\-]/)
+                .map((p) => parseFloat(p.trim()))
+                .filter((n) => Number.isFinite(n));
+              if (parts.length === 0) return [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+              return [parts[0], parts[1] ?? parts[0]];
+            };
+            const [a1, a2] = parse(a.size);
+            const [b1, b2] = parse(b.size);
+            if (a1 !== b1) return a1 - b1;
+            return a2 - b2;
+          });
 
           return {
             ...main,
-            sizes: sizeOptions
+            sizes: sortedSizeOptions
           };
         });
 
