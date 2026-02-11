@@ -279,10 +279,14 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="text-[var(--ink-soft)] hover:text-[var(--foreground)] text-xs font-semibold bg-transparent border-0 p-0"
+            className="text-[var(--foreground)] hover:text-black text-xs font-semibold bg-transparent border-0 p-0"
             aria-label="Rodyti sudeti"
           >
-            i
+            <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="currentColor" />
+              <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
+            </svg>
           </button>
         )}
       </div>
