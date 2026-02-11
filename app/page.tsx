@@ -132,6 +132,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   const hasDiscount = price < product.basePrice;
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
   const hasSizes = Array.isArray(product.sizes) && product.sizes.length > 0;
+  const hasSizeLabels = hasSizes && product.sizes.some((s: any) => s.size);
   const sortedSizes = hasSizes
     ? [...product.sizes].sort((a: any, b: any) => {
         const parse = (value: any) => {
@@ -169,10 +170,13 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
     : [];
 
   useEffect(() => {
-    if (hasSizes && product.sizes.length === 1) {
-      setSelectedSizes([product.sizes[0].id]);
+    if (hasSizeLabels) {
+      const labeled = product.sizes.filter((s: any) => s.size);
+      if (labeled.length === 1) {
+        setSelectedSizes([labeled[0].id]);
+      }
     }
-  }, [hasSizes, product.sizes]);
+  }, [hasSizeLabels, product.sizes]);
 
   const toggleSize = (sizeId: number) => {
     setSelectedSizes((prev) =>
@@ -181,7 +185,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
   };
 
   const handleAdd = () => {
-    if (!hasSizes) {
+    if (!hasSizeLabels) {
       onAdd(product, 1);
       return;
     }
@@ -191,15 +195,17 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
     setSelectedSizes([]);
   };
 
+  const sizeOptions = hasSizeLabels ? sortedSizes.filter((s: any) => s.size) : [];
+
   return (
     <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800">
       <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
       <h2 className="text-sm font-semibold leading-tight mb-3 text-[var(--foreground)] min-h-[2.5rem]">{product.name}</h2>
-      {hasSizes && (
+      {hasSizeLabels && (
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
           <div className="flex flex-wrap gap-2">
-            {sortedSizes.map((sizeProduct: any) => (
+            {sizeOptions.map((sizeProduct: any) => (
               <button
                 key={sizeProduct.id}
                 onClick={() => toggleSize(sizeProduct.id)}
@@ -228,7 +234,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
         <button
           onClick={handleAdd}
-          disabled={hasSizes && selectedSizes.length === 0}
+          disabled={hasSizeLabels && selectedSizes.length === 0}
           className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Užsakyti
