@@ -229,6 +229,12 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               {product.description}
             </div>
           )}
+          {product.clientItemNo && (
+            <div className="mb-4 text-sm text-[var(--ink-soft)]">
+              <span className="font-semibold text-[var(--foreground)]">Kliento prekės kodas: </span>
+              {product.clientItemNo}
+            </div>
+          )}
           {hasSizeLabels && (
             <div className="mb-4">
               <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
@@ -458,6 +464,7 @@ export default function B2BPortal() {
             images,
             client: row.client ?? 'all',
             itemNo: row.item_no ?? row.itemNo ?? null,
+            clientItemNo: row.client_item_no ?? row.clientItemNo ?? null,
             connection: connection ?? null,
             size: row.size ?? null,
             description: row.description ?? null
@@ -489,6 +496,7 @@ export default function B2BPortal() {
             images: main.images,
             client: row.client,
             itemNo: row.itemNo,
+            clientItemNo: row.clientItemNo,
             connection: row.connection,
             size: row.size,
             description: row.description ?? main.description ?? null
