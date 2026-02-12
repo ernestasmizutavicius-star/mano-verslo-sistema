@@ -2027,17 +2027,6 @@ export default function B2BPortal() {
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
-                      <button
-                        onClick={() => setIsCartVisible(false)}
-                        className="relative text-gray-400 hover:text-[var(--foreground)]"
-                        aria-label="Uždaryti krepšelį"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                          <circle cx="9" cy="20" r="1" />
-                          <circle cx="17" cy="20" r="1" />
-                          <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
-                        </svg>
-                      </button>
                     </div>
                     {currentCart.length > 0 && (
                       <div className="flex justify-end pb-3">
