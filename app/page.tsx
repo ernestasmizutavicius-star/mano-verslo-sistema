@@ -1046,6 +1046,30 @@ export default function B2BPortal() {
     setIsCartVisible(true);
   };
 
+  const handleCancelOrder = async (order: any) => {
+    const userId = await getUserId();
+    if (!userId) {
+      alert('Nepavyko nustatyti vartotojo. Prisijunkite iš naujo.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: 'Atšauktas' })
+      .eq('id', order.id)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Klaida atšaukiant užsakymą:', error.message);
+      alert('Nepavyko atšaukti užsakymo. Bandykite dar kartą.');
+      return;
+    }
+
+    setOrderHistory((prev) =>
+      prev.map((o: any) => (o.id === order.id ? { ...o, status: 'Atšauktas' } : o))
+    );
+  };
+
   const submitOrder = async () => {
     const cartItems = allCarts[clientCode] || [];
     if (!cartItems || cartItems.length === 0) {
@@ -2076,10 +2100,18 @@ export default function B2BPortal() {
                         <span className="text-gray-500 text-sm ml-4">{order.date}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-orange-100 text-orange-800' : order.status === 'Išsiųsta' ? 'bg-orange-100 text-orange-800' : order.status === 'Įvykdytas' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-orange-100 text-orange-800' : order.status === 'Išsiųsta' ? 'bg-orange-100 text-orange-800' : order.status === 'Įvykdytas' ? 'bg-green-100 text-green-800' : order.status === 'Atšauktas' ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-800'}`}>
                           {order.status || 'Nežinomas'}
                         </span>
                         {order.status === 'Išsiustas' && (
+                          <button
+                            onClick={() => handleCancelOrder(order)}
+                            className="bg-white border border-black/10 text-red-600 px-4 py-2 rounded-2xl font-semibold hover:bg-red-50 transition text-sm whitespace-nowrap"
+                          >
+                            Atšaukti
+                          </button>
+                        )}
+                        {(order.status === 'Išsiustas' || order.status === 'Atšauktas') && (
                           <button
                             onClick={() => handleEditOrder(order)}
                             className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--surface)] transition text-sm whitespace-nowrap"
