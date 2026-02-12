@@ -1053,12 +1053,18 @@ export default function B2BPortal() {
       return;
     }
 
+    const availableItems = cartItems.filter((item: any) => !item.unavailable);
+    if (availableItems.length === 0) {
+      alert('Užsakymas negali būti pateiktas, nes visų prekių nebeturime. Pašalinkite jas iš krepšelio.');
+      return;
+    }
+
     if (deliveryAddresses.length === 0 || selectedDeliveryAddress === null) {
       alert('Prieš pateikiant užsakymą, pasirinkite pristatymo adresą');
       return;
     }
 
-    const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
+    const total = availableItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
     const selectedAddress = deliveryAddresses[selectedDeliveryAddress];
 
     const userId = await getUserId();
@@ -1075,7 +1081,7 @@ export default function B2BPortal() {
     const payload = {
       user_id: userId,
       client_name: clients[clientCode]?.name || clientCode || 'unknown',
-      order_items: cartItems,
+      order_items: availableItems,
       total_price: total,
       manager_email: managerEmail || companyData?.email || 'orders@flokati.lt',
       delivery_address: selectedAddress,
@@ -1112,27 +1118,37 @@ export default function B2BPortal() {
         order_number: nextOrderNumber,
         date: new Date().toLocaleString('lt-LT'),
         client: payload.client_name,
-        items: [...cartItems],
+        items: [...availableItems],
         total: total,
         delivery_address: selectedAddress,
         status: payload.status,
         manager_email: payload.manager_email
       };
 
+      const remainingItems = applyAvailability(cartItems.filter((item: any) => item.unavailable));
       const { error: clearError } = await supabase
         .from('cart_items')
-        .update({ items: [] })
+        .update({ items: remainingItems })
         .eq('user_id', userId);
 
       if (clearError) {
-        console.error('Klaida išvalant krepšelį:', clearError.message);
-        alert('Užsakymas sukurtas, bet nepavyko išvalyti krepšelio. Bandykite vėliau.');
+        console.error('Klaida atnaujinant krepšelį:', clearError.message);
+        alert('Užsakymas sukurtas, bet nepavyko atnaujinti krepšelio. Bandykite vėliau.');
         return;
       }
 
       setOrderHistory([newOrder, ...orderHistory]);
-      clearCart();
-      setSelectedDeliveryAddress(null);
+      setAllCarts((prev: any) => ({
+        ...prev,
+        [clientCode]: remainingItems
+      }));
+      if (remainingItems.length === 0) {
+        setIsCartVisible(false);
+        setSelectedDeliveryAddress(null);
+        setCartNotice(null);
+      } else {
+        setCartNotice('Kai kurių prekių nebeturime. Jos pažymėtos krepšelyje.');
+      }
       alert(`Užsakymas išsiuštas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
     } catch (e) {
       console.error('submitOrder error', e);
