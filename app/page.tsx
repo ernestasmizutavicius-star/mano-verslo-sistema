@@ -349,6 +349,7 @@ export default function B2BPortal() {
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [allCarts, setAllCarts] = useState<any>({});
   const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [cartNotice, setCartNotice] = useState<string | null>(null);
   const cartSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCartRef = useRef<any[]>([]);
   
@@ -399,6 +400,32 @@ export default function B2BPortal() {
     }
     const num = parseFloat(value);
     return Number.isFinite(num) ? num : 1;
+  };
+
+  const getAvailableItemNoSet = () => {
+    const set = new Set<string>();
+    products.forEach((product: any) => {
+      if (product?.itemNo) set.add(String(product.itemNo));
+      if (Array.isArray(product?.sizes)) {
+        product.sizes.forEach((size: any) => {
+          if (size?.itemNo) set.add(String(size.itemNo));
+        });
+      }
+    });
+    return set;
+  };
+
+  const applyAvailability = (items: any[]) => {
+    const availableItemNos = getAvailableItemNoSet();
+    return items.map((item: any) => {
+      const itemNo = item.itemNo ?? item.item_no ?? null;
+      const isUnavailable = itemNo ? !availableItemNos.has(String(itemNo)) : false;
+      return {
+        ...item,
+        itemNo,
+        unavailable: isUnavailable
+      };
+    });
   };
 
   const getUserId = async () => {
@@ -774,6 +801,7 @@ export default function B2BPortal() {
         const qty = item.qty ?? 1;
         return {
           ...item,
+          itemNo: item.itemNo ?? item.item_no ?? null,
           basePrice,
           price,
           qty,
@@ -781,14 +809,29 @@ export default function B2BPortal() {
         };
       });
 
+      const nextItems = applyAvailability(normalizedItems);
+
       setAllCarts((prev: any) => ({
         ...prev,
-        [clientCode]: normalizedItems
+        [clientCode]: nextItems
       }));
     };
 
     loadCart();
   }, [isLoggedIn, clientCode]);
+
+  useEffect(() => {
+    if (!clientCode) return;
+    setAllCarts((prev: any) => {
+      const currentItems = prev[clientCode];
+      if (!Array.isArray(currentItems) || currentItems.length === 0) return prev;
+      const nextItems = applyAvailability(currentItems);
+      return {
+        ...prev,
+        [clientCode]: nextItems
+      };
+    });
+  }, [products, clientCode]);
 
   const getPrice = (basePrice: number) => {
     let multiplier = 1;
@@ -842,8 +885,9 @@ export default function B2BPortal() {
       } else {
         newItems = [...currentClientCart, { ...product, price, qty: addedQty, totalPrice: price * addedQty }];
       }
-      syncCartToDb(newItems);
-      return { ...prev, [clientCode]: newItems };
+      const nextItems = applyAvailability(newItems);
+      syncCartToDb(nextItems);
+      return { ...prev, [clientCode]: nextItems };
     });
   };
 
@@ -852,13 +896,16 @@ export default function B2BPortal() {
     if (!Number.isFinite(normalizedQty) || normalizedQty < 1) return;
     const price = getPrice(products.find(p => p.id === productId)?.basePrice || 0);
     setAllCarts((prev: any) => {
-      const nextItems = (prev[clientCode] || []).map((item: any) =>
-        item.id === productId ? { ...item, qty: normalizedQty, totalPrice: price * normalizedQty } : item
-      );
-      syncCartToDb(nextItems);
+      const nextItems = (prev[clientCode] || []).map((item: any) => {
+        if (item.id !== productId) return item;
+        if (item.unavailable) return item;
+        return { ...item, qty: normalizedQty, totalPrice: price * normalizedQty };
+      });
+      const withAvailability = applyAvailability(nextItems);
+      syncCartToDb(withAvailability);
       return {
         ...prev,
-        [clientCode]: nextItems
+        [clientCode]: withAvailability
       };
     });
   };
@@ -869,10 +916,11 @@ export default function B2BPortal() {
       if (nextItems.length === 0) {
         setIsCartVisible(false);
       }
-      syncCartToDb(nextItems);
+      const withAvailability = applyAvailability(nextItems);
+      syncCartToDb(withAvailability);
       return {
         ...prev,
-        [clientCode]: nextItems
+        [clientCode]: withAvailability
       };
     });
   };
@@ -882,6 +930,120 @@ export default function B2BPortal() {
     setSelectedDeliveryAddress(null);
     setIsCartVisible(false);
     syncCartToDb([]);
+  };
+
+  const handleEditOrder = async (order: any) => {
+    const confirmEdit = window.confirm(
+      'Ar tikrai norite koreguoti užsakymą? Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.'
+    );
+    if (!confirmEdit) return;
+
+    const userId = await getUserId();
+    if (!userId) {
+      alert('Nepavyko nustatyti vartotojo. Prisijunkite iš naujo.');
+      return;
+    }
+
+    const { data: cartRow, error: cartError } = await supabase
+      .from('cart_items')
+      .select('items')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (cartError) {
+      console.error('Klaida kraunant krepšeli:', cartError.message);
+      alert('Nepavyko užkrauti krepšelio. Bandykite dar kartą.');
+      return;
+    }
+
+    const existingItems = Array.isArray(cartRow?.items) ? cartRow?.items : [];
+    const normalizedExisting = existingItems.map((item: any) => {
+      const basePrice = item.basePrice ?? item.base_price ?? item.price ?? 0;
+      const price = getPrice(basePrice);
+      const qty = item.qty ?? 1;
+      return {
+        ...item,
+        itemNo: item.itemNo ?? item.item_no ?? null,
+        basePrice,
+        price,
+        qty,
+        totalPrice: price * qty
+      };
+    });
+
+    const orderItems = Array.isArray(order?.items) ? order.items : [];
+    const normalizedOrderItems = orderItems.map((item: any) => {
+      const basePrice = item.basePrice ?? item.base_price ?? item.price ?? 0;
+      const price = getPrice(basePrice);
+      const qty = item.qty ?? 1;
+      return {
+        ...item,
+        itemNo: item.itemNo ?? item.item_no ?? null,
+        basePrice,
+        price,
+        qty,
+        totalPrice: price * qty
+      };
+    });
+
+    const merged = [...normalizedExisting];
+    normalizedOrderItems.forEach((item: any) => {
+      const itemNo = item.itemNo;
+      const existingIdx = merged.findIndex((i: any) => i.itemNo && i.itemNo === itemNo);
+      if (existingIdx > -1) {
+        const nextQty = merged[existingIdx].qty + item.qty;
+        merged[existingIdx] = {
+          ...merged[existingIdx],
+          qty: nextQty,
+          price: item.price,
+          basePrice: item.basePrice,
+          totalPrice: nextQty * item.price
+        };
+      } else {
+        merged.push(item);
+      }
+    });
+
+    const mergedWithAvailability = applyAvailability(merged);
+
+    const { error: upsertError } = await supabase
+      .from('cart_items')
+      .upsert({ user_id: userId, items: mergedWithAvailability }, { onConflict: 'user_id' });
+
+    if (upsertError) {
+      console.error('Klaida saugant krepšeli:', upsertError.message);
+      alert('Nepavyko išsaugoti krepšelio. Bandykite dar kartą.');
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', order.id)
+      .eq('user_id', userId);
+
+    if (deleteError) {
+      console.error('Klaida atšaukiant užsakymą:', deleteError.message);
+      alert('Nepavyko atšaukti užsakymo. Bandykite dar kartą.');
+      return;
+    }
+
+    const unavailableNames = mergedWithAvailability
+      .filter((item: any) => item.unavailable)
+      .map((item: any) => item.name)
+      .filter(Boolean);
+    if (unavailableNames.length > 0) {
+      const uniqueNames = Array.from(new Set(unavailableNames));
+      setCartNotice(`Kai kurių prekių nebeturime: ${uniqueNames.join(', ')}. Jos pažymėtos krepšelyje.`);
+    }
+
+    setAllCarts((prev: any) => ({
+      ...prev,
+      [clientCode]: mergedWithAvailability
+    }));
+    setOrderHistory((prev) => prev.filter((o: any) => o.id !== order.id));
+    setView('katalogas');
+    setIsCartVisible(true);
   };
 
   const submitOrder = async () => {
@@ -1065,6 +1227,14 @@ export default function B2BPortal() {
   const currentBaseTotal = currentCart.reduce((s: number, i: any) => s + getBaseLineTotal(i), 0);
   const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
   const cartItemCount = currentCart.reduce((s: number, i: any) => s + i.qty, 0);
+
+  useEffect(() => {
+    if (!cartNotice) return;
+    const hasUnavailable = currentCart.some((item: any) => item.unavailable);
+    if (!hasUnavailable) {
+      setCartNotice(null);
+    }
+  }, [cartNotice, currentCart]);
 
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
@@ -1893,6 +2063,14 @@ export default function B2BPortal() {
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-orange-100 text-orange-800' : order.status === 'Išsiųsta' ? 'bg-orange-100 text-orange-800' : order.status === 'Įvykdytas' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                           {order.status || 'Nežinomas'}
                         </span>
+                        {order.status === 'Išsiustas' && (
+                          <button
+                            onClick={() => handleEditOrder(order)}
+                            className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--surface)] transition text-sm whitespace-nowrap"
+                          >
+                            Koreguoti
+                          </button>
+                        )}
                         <button 
                           onClick={() => exportOrderToPDF(order)}
                           className="bg-[var(--accent)] text-white px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition text-sm whitespace-nowrap"
@@ -2028,6 +2206,11 @@ export default function B2BPortal() {
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
                     </div>
+                    {cartNotice && (
+                      <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                        {cartNotice}
+                      </div>
+                    )}
                     {currentCart.length > 0 && (
                       <div className="flex justify-end pb-3">
                         <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
@@ -2046,7 +2229,7 @@ export default function B2BPortal() {
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="flex justify-between items-start mb-1">
-                                <div className="pr-2">
+                                <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
                                   <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
                                   {item.size && (
                                     <div className="text-xs font-semibold text-green-700">{item.size}</div>
@@ -2061,10 +2244,16 @@ export default function B2BPortal() {
                                   x
                                 </button>
                               </div>
-                              <div className="flex justify-between items-center mt-2">
+                              <div className={`flex justify-between items-center mt-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
                                 <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
                                 <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
-                                  <button onClick={() => updateQty(item.id, item.qty - 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">-</button>
+                                  <button
+                                    onClick={() => updateQty(item.id, item.qty - 1)}
+                                    className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={item.unavailable}
+                                  >
+                                    -
+                                  </button>
                                   <input
                                     type="number"
                                     inputMode="numeric"
@@ -2072,12 +2261,24 @@ export default function B2BPortal() {
                                     step={1}
                                     value={item.qty}
                                     onChange={(e) => updateQty(item.id, Number(e.target.value))}
-                                    className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
                                     aria-label="Kiekis"
+                                    readOnly={item.unavailable}
                                   />
-                                  <button onClick={() => updateQty(item.id, item.qty + 1)} className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold">+</button>
+                                  <button
+                                    onClick={() => updateQty(item.id, item.qty + 1)}
+                                    className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={item.unavailable}
+                                  >
+                                    +
+                                  </button>
                                 </div>
                               </div>
+                              {item.unavailable && (
+                                <div className="mt-2 text-xs font-semibold text-red-600">
+                                  Prekės nebeturime. Galite tik pašalinti ją iš krepšelio.
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
