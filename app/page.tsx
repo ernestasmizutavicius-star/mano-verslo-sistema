@@ -674,6 +674,10 @@ export default function B2BPortal() {
     }
   }, [view, isLoggedIn]);
 
+  useEffect(() => {
+    setIsCartVisible(false);
+  }, [view]);
+
   // Saugoti užsakymų istoriją į localStorage
   useEffect(() => {
     localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
