@@ -2292,7 +2292,7 @@ export default function B2BPortal() {
                               </div>
                               {item.unavailable && (
                                 <div className="mt-2 text-xs font-semibold text-red-600">
-                                  Prekės nebeturime. Galite tik pašalinti ją iš krepšelio.
+                                  Prekės nebeturime.
                                 </div>
                               )}
                             </div>
