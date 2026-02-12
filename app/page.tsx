@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { jsPDF } from 'jspdf';
 
@@ -348,6 +348,9 @@ export default function B2BPortal() {
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [allCarts, setAllCarts] = useState<any>({});
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const cartSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingCartRef = useRef<any[]>([]);
   
   // Modal būsena
   const [modalData, setModalData] = useState<{images: string[], index: number} | null>(null);
@@ -397,6 +400,46 @@ export default function B2BPortal() {
     const num = parseFloat(value);
     return Number.isFinite(num) ? num : 1;
   };
+
+  const getUserId = async () => {
+    if (authUserId) return authUserId;
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return null;
+    setAuthUserId(user.id);
+    return user.id;
+  };
+
+  const flushCartToDb = async (items: any[]) => {
+    const userId = await getUserId();
+    if (!userId) return;
+    const { error } = await supabase
+      .from('cart_items')
+      .upsert({ user_id: userId, items }, { onConflict: 'user_id' });
+    if (error) {
+      console.error('Klaida saugant krepšeli:', error.message);
+    }
+  };
+
+  const syncCartToDb = (items: any[]) => {
+    pendingCartRef.current = items;
+    if (cartSyncTimerRef.current) {
+      clearTimeout(cartSyncTimerRef.current);
+    }
+    cartSyncTimerRef.current = setTimeout(() => {
+      cartSyncTimerRef.current = null;
+      flushCartToDb(pendingCartRef.current);
+    }, 400);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (cartSyncTimerRef.current) {
+        clearTimeout(cartSyncTimerRef.current);
+        cartSyncTimerRef.current = null;
+        flushCartToDb(pendingCartRef.current);
+      }
+    };
+  }, []);
 
   // Set loading state when clientCode changes
   useEffect(() => {
@@ -706,6 +749,47 @@ export default function B2BPortal() {
     }
   }, [clientCode, isLoggedIn]);
 
+  useEffect(() => {
+    if (!isLoggedIn || !clientCode) return;
+
+    const loadCart = async () => {
+      const userId = await getUserId();
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select('items')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Klaida kraunant krepšeli:', error.message);
+        return;
+      }
+
+      const items = Array.isArray(data?.items) ? data?.items : [];
+      const normalizedItems = items.map((item: any) => {
+        const basePrice = item.basePrice ?? item.base_price ?? 0;
+        const price = getPrice(basePrice);
+        const qty = item.qty ?? 1;
+        return {
+          ...item,
+          basePrice,
+          price,
+          qty,
+          totalPrice: price * qty
+        };
+      });
+
+      setAllCarts((prev: any) => ({
+        ...prev,
+        [clientCode]: normalizedItems
+      }));
+    };
+
+    loadCart();
+  }, [isLoggedIn, clientCode]);
+
   const getPrice = (basePrice: number) => {
     let multiplier = 1;
     try {
@@ -758,6 +842,7 @@ export default function B2BPortal() {
       } else {
         newItems = [...currentClientCart, { ...product, price, qty: addedQty, totalPrice: price * addedQty }];
       }
+      syncCartToDb(newItems);
       return { ...prev, [clientCode]: newItems };
     });
   };
@@ -766,12 +851,16 @@ export default function B2BPortal() {
     const normalizedQty = Math.floor(newQty);
     if (!Number.isFinite(normalizedQty) || normalizedQty < 1) return;
     const price = getPrice(products.find(p => p.id === productId)?.basePrice || 0);
-    setAllCarts((prev: any) => ({
-      ...prev,
-      [clientCode]: prev[clientCode].map((item: any) => 
+    setAllCarts((prev: any) => {
+      const nextItems = (prev[clientCode] || []).map((item: any) =>
         item.id === productId ? { ...item, qty: normalizedQty, totalPrice: price * normalizedQty } : item
-      )
-    }));
+      );
+      syncCartToDb(nextItems);
+      return {
+        ...prev,
+        [clientCode]: nextItems
+      };
+    });
   };
 
   const removeItem = (productId: number) => {
@@ -780,6 +869,7 @@ export default function B2BPortal() {
       if (nextItems.length === 0) {
         setIsCartVisible(false);
       }
+      syncCartToDb(nextItems);
       return {
         ...prev,
         [clientCode]: nextItems
@@ -791,6 +881,7 @@ export default function B2BPortal() {
     setAllCarts((prev: any) => ({ ...prev, [clientCode]: [] }));
     setSelectedDeliveryAddress(null);
     setIsCartVisible(false);
+    syncCartToDb([]);
   };
 
   const submitOrder = async () => {
@@ -808,11 +899,10 @@ export default function B2BPortal() {
     const total = cartItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
     const selectedAddress = deliveryAddresses[selectedDeliveryAddress];
 
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError) {
-      console.error('Klaida gaunant vartotoją:', authError.message);
+    const userId = await getUserId();
+    if (!userId) {
+      console.error('Klaida gaunant vartotoją');
     }
-    const userId = authData?.user?.id || null;
     if (!userId) {
       alert('Nepavyko nustatyti vartotojo. Prisijunkite iš naujo.');
       return;
@@ -866,6 +956,17 @@ export default function B2BPortal() {
         status: payload.status,
         manager_email: payload.manager_email
       };
+
+      const { error: clearError } = await supabase
+        .from('cart_items')
+        .update({ items: [] })
+        .eq('user_id', userId);
+
+      if (clearError) {
+        console.error('Klaida išvalant krepšelį:', clearError.message);
+        alert('Užsakymas sukurtas, bet nepavyko išvalyti krepšelio. Bandykite vėliau.');
+        return;
+      }
 
       setOrderHistory([newOrder, ...orderHistory]);
       clearCart();

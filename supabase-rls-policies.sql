@@ -23,3 +23,34 @@ WITH CHECK (id = auth.uid());
 
 -- Verify policies
 SELECT * FROM pg_policies WHERE tablename = 'customers';
+
+-- RLS Policies for cart_items table
+ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "cart_items_read_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_insert_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_update_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_delete_own" ON cart_items;
+
+CREATE POLICY "cart_items_read_own"
+ON cart_items
+FOR SELECT
+USING (user_id = auth.uid());
+
+CREATE POLICY "cart_items_insert_own"
+ON cart_items
+FOR INSERT
+WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "cart_items_update_own"
+ON cart_items
+FOR UPDATE
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "cart_items_delete_own"
+ON cart_items
+FOR DELETE
+USING (user_id = auth.uid());
+
+SELECT * FROM pg_policies WHERE tablename = 'cart_items';
