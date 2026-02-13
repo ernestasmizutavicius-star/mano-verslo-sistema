@@ -2142,7 +2142,7 @@ export default function B2BPortal() {
                         {order.status === 'Išsiustas' && (
                           <button
                             onClick={() => handleCancelOrder(order)}
-                            className="bg-white border border-black/10 text-red-600 px-4 py-2 rounded-2xl font-semibold hover:bg-[#f2f5e8] transition text-sm whitespace-nowrap"
+                            className="bg-white border border-black/10 text-red-600 px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap"
                           >
                             Atšaukti
                           </button>
@@ -2150,16 +2150,16 @@ export default function B2BPortal() {
                         {(order.status === 'Išsiustas' || order.status === 'Atšauktas') && (
                           <button
                             onClick={() => handleEditOrder(order)}
-                            className="bg-white border border-black/10 text-[#2d3427] px-4 py-2 rounded-2xl font-semibold hover:bg-[#f2f5e8] transition text-sm whitespace-nowrap"
+                            className="bg-white border border-black/10 text-[#2d3427] px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap"
                           >
                             Koreguoti
                           </button>
                         )}
                         <button 
                           onClick={() => exportOrderToPDF(order)}
-                          className="bg-[#2d3427] text-white px-4 py-2 rounded-2xl font-semibold hover:opacity-90 transition text-sm whitespace-nowrap"
+                          className="bg-white border border-black/10 text-[#2d3427] px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap"
                         >
-                          📥 PDF
+                          PDF
                         </button>
                       </div>
                     </div>
