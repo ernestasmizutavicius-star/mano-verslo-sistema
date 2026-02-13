@@ -278,11 +278,20 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="w-full max-w-[280px] rounded-[2rem] overflow-hidden bg-white flex flex-col">
-      <div className="p-3">
-        <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
+    <div className="w-full max-w-[280px] min-h-[500px] rounded-[2rem] overflow-hidden bg-[#e2e8d4] flex flex-col">
+      <div className="w-full h-64">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={product.images[0]}
+            alt=""
+            className="h-full w-full object-cover"
+            onClick={() => onOpenModal(product.images, 0)}
+          />
+        ) : (
+          <div className="h-full w-full bg-[#e2e8d4]" />
+        )}
       </div>
-      <div className="bg-[#e2e8d4] px-4 pb-4 pt-3 flex flex-col gap-3 text-[#2d3427]">
+      <div className="px-4 pb-4 pt-3 flex flex-col flex-grow text-[#2d3427]">
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-sm font-semibold leading-tight min-h-[2.5rem] flex-1">{product.name}</h2>
           {product.description && (
@@ -301,7 +310,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           )}
         </div>
         {hasSizeLabels && (
-          <div>
+          <div className="min-h-[80px]">
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
             <div className="flex flex-wrap gap-2">
               {sizeOptions.map((sizeProduct: any) => (
