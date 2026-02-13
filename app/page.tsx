@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { jsPDF } from 'jspdf';
-import { LayoutGrid, ClipboardList, User, Menu, ShoppingCart } from 'lucide-react';
+import { LayoutGrid, ClipboardList, User, Menu, ShoppingCart, ChevronDown } from 'lucide-react';
 
 // --- KOMPONENTAI ---
 
@@ -278,8 +278,8 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="w-full max-w-[280px] min-h-[420px] sm:min-h-[500px] rounded-[2rem] overflow-hidden bg-[#e2e8d4] flex flex-col">
-      <div className="w-full h-40 sm:h-64">
+    <div className="w-full max-w-[280px] min-h-[380px] sm:min-h-[460px] rounded-none overflow-hidden bg-[#e2e8d4] flex flex-col">
+      <div className="w-full h-36 sm:h-56">
         {product.images && product.images.length > 0 ? (
           <img
             src={product.images[0]}
@@ -291,17 +291,17 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           <div className="h-full w-full bg-[#e2e8d4]" />
         )}
       </div>
-      <div className="px-4 pb-4 pt-3 flex flex-col flex-grow text-[#2d3427]">
+      <div className="px-3 pb-3 pt-2 flex flex-col flex-grow text-[#2d3427]">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-sm font-semibold leading-tight min-h-[2.5rem] flex-1">{product.name}</h2>
+          <h2 className="text-xs font-semibold leading-tight min-h-[2.5rem] flex-1">{product.name}</h2>
           {product.description && (
             <button
               type="button"
               onClick={() => setIsExpanded((prev) => !prev)}
-              className="text-[#2d3427] hover:text-black text-xs font-semibold bg-transparent border-0 p-0"
+              className="text-[#2d3427] hover:text-black text-[10px] font-semibold bg-transparent border-0 p-0"
               aria-label="Rodyti sudeti"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" fill="#2d3427" />
                 <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
                 <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
@@ -310,14 +310,14 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           )}
         </div>
         {hasSizeLabels && (
-          <div className="min-h-[80px]">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
-            <div className="flex flex-wrap gap-2">
+          <div className="min-h-[64px]">
+            <div className="text-[9px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
+            <div className="flex flex-wrap gap-1.5">
               {sizeOptions.map((sizeProduct: any) => (
                 <button
                   key={sizeProduct.id}
                   onClick={() => toggleSize(sizeProduct.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition ${
                     selectedSizes.includes(sizeProduct.id)
                       ? 'bg-[#2d3427] text-white border-[#2d3427]'
                       : 'bg-white text-[#2d3427] border-black/10 hover:bg-[#f2f5e8]'
@@ -329,21 +329,21 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               ))}
             </div>
             {selectedSizes.length === 0 && (
-              <div className="mt-2 text-[10px] text-[#2d3427]">Pasirinkite dydį</div>
+              <div className="mt-2 text-[9px] text-[#2d3427]">Pasirinkite dydį</div>
             )}
           </div>
         )}
         <div className="flex justify-between items-center mt-auto">
           <div>
             {hasDiscount && (
-              <p className="text-[10px] text-[#2d3427] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+              <p className="text-[9px] text-[#2d3427] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
             )}
-            <p className="text-[#166534] font-bold text-lg">{price.toFixed(2)} €</p>
+            <p className="text-[#166534] font-bold text-base">{price.toFixed(2)} €</p>
           </div>
           <button
             onClick={handleAdd}
             disabled={hasSizeLabels && selectedSizes.length === 0}
-            className="bg-white border border-black/10 text-[#2d3427] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-white border border-black/10 text-[#2d3427] px-3 py-2 rounded-xl text-[10px] font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Užsakyti
           </button>
@@ -360,6 +360,7 @@ export default function B2BPortal() {
   const [view, setView] = useState("katalogas");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [allCarts, setAllCarts] = useState<any>({});
@@ -1525,15 +1526,23 @@ export default function B2BPortal() {
           </div>
           {isMobileMenuOpen && (
             <div className="mt-3 rounded-[1.5rem] bg-[#e2e8d4] p-3">
-              <button
-                onClick={() => {
-                  setView("katalogas");
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
-              >
-                Katalogas
-              </button>
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                  }}
+                  className="flex-1 text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                >
+                  Katalogas
+                </button>
+                <button
+                  onClick={() => setIsMobileCategoriesOpen((prev) => !prev)}
+                  className="h-9 w-9 flex items-center justify-center rounded-xl text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                  aria-label="Rodyti kategorijas"
+                >
+                  <ChevronDown className={`h-4 w-4 transition ${isMobileCategoriesOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
               <button
                 onClick={() => {
                   setView("uzsakymai");
@@ -1552,16 +1561,16 @@ export default function B2BPortal() {
               >
                 Mano duomenys
               </button>
-              {view === "katalogas" && (
-                <div className="mt-3 border-t border-[#d6ddc7] pt-3">
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Kategorijos</div>
+              {isMobileCategoriesOpen && (
+                <div className="mt-1">
                   <button
                     onClick={() => {
                       setSelectedCategory(null);
                       setView("katalogas");
                       setIsMobileMenuOpen(false);
+                      setIsMobileCategoriesOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                   >
                     Visos prekės
                   </button>
@@ -1572,8 +1581,9 @@ export default function B2BPortal() {
                         setSelectedCategory(category);
                         setView("katalogas");
                         setIsMobileMenuOpen(false);
+                        setIsMobileCategoriesOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                     >
                       {category}
                     </button>
@@ -2375,7 +2385,7 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-none lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-full lg:w-[320px] lg:h-auto fixed inset-0 z-40 lg:absolute lg:right-0 lg:top-24 lg:inset-auto lg:z-20 flex flex-col">
+                <div className="bg-[var(--surface)] rounded-2xl lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] lg:w-[320px] lg:h-auto fixed left-3 right-3 top-16 z-40 lg:absolute lg:right-0 lg:top-24 lg:left-auto lg:inset-auto lg:z-20 flex flex-col">
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
