@@ -2226,28 +2226,7 @@ export default function B2BPortal() {
 
           <aside className="order-3 lg:order-none relative lg:justify-self-end">
             <div className="sticky top-6 space-y-3">
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => {
-                    if (cartItemCount > 0 || isCartVisible) {
-                      setIsCartVisible(!isCartVisible);
-                    }
-                  }}
-                  className="relative text-gray-400 hover:text-[var(--foreground)] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
-                  title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
-                  aria-label="Krepšelis"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                    <circle cx="9" cy="20" r="1" />
-                    <circle cx="17" cy="20" r="1" />
-                    <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
-                  </svg>
-                  {cartItemCount > 0 && (
-                    <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-white text-[10px] font-semibold flex items-center justify-center">
-                      {cartItemCount}
-                    </span>
-                  )}
-                </button>
+              <div className="flex flex-col items-end gap-3">
                 <button
                   onClick={() => {
                     setIsLoggedIn(false);
@@ -2262,10 +2241,10 @@ export default function B2BPortal() {
                     localStorage.removeItem('manager_email');
                     localStorage.removeItem('currentView');
                   }}
-                  className="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-2"
+                  className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] flex items-center gap-2"
                   aria-label="Atsijungti"
                 >
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-red-200">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                       <path d="M16 17l5-5-5-5" />
@@ -2273,6 +2252,27 @@ export default function B2BPortal() {
                     </svg>
                   </span>
                   Atsijungti
+                </button>
+                <button
+                  onClick={() => {
+                    if (cartItemCount > 0 || isCartVisible) {
+                      setIsCartVisible(!isCartVisible);
+                    }
+                  }}
+                  className="relative text-[#2d3427] hover:text-[#2d3427] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
+                  title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
+                  aria-label="Krepšelis"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                    <circle cx="9" cy="20" r="1" />
+                    <circle cx="17" cy="20" r="1" />
+                    <path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6" />
+                  </svg>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-[#2d3427] text-[10px] font-semibold flex items-center justify-center">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </button>
               </div>
               {isCartVisible && (
