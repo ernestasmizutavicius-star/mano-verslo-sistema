@@ -2241,7 +2241,7 @@ export default function B2BPortal() {
                     localStorage.removeItem('manager_email');
                     localStorage.removeItem('currentView');
                   }}
-                  className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] flex items-center gap-2"
+                  className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition flex items-center gap-2"
                   aria-label="Atsijungti"
                 >
                   <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
@@ -2259,7 +2259,7 @@ export default function B2BPortal() {
                       setIsCartVisible(!isCartVisible);
                     }
                   }}
-                  className="relative text-[#2d3427] hover:text-[#2d3427] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5"
+                  className="relative text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5 transition"
                   title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
                   aria-label="Krepšelis"
                 >
@@ -2276,7 +2276,7 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] lg:absolute lg:right-0 lg:top-12 lg:z-20">
+                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] lg:absolute lg:right-0 top-20 lg:top-24 lg:z-20">
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
