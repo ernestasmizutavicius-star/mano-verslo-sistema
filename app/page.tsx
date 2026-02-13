@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { jsPDF } from 'jspdf';
-import { LayoutGrid, ClipboardList, User, Menu, ShoppingCart } from 'lucide-react';
+import { LayoutGrid, ClipboardList, User, Menu, ShoppingCart, ChevronDown } from 'lucide-react';
 
 // --- KOMPONENTAI ---
 
@@ -360,6 +360,7 @@ export default function B2BPortal() {
   const [view, setView] = useState("katalogas");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [allCarts, setAllCarts] = useState<any>({});
@@ -1525,15 +1526,23 @@ export default function B2BPortal() {
           </div>
           {isMobileMenuOpen && (
             <div className="mt-3 rounded-[1.5rem] bg-[#e2e8d4] p-3">
-              <button
-                onClick={() => {
-                  setView("katalogas");
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
-              >
-                Katalogas
-              </button>
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    setView("katalogas");
+                  }}
+                  className="flex-1 text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                >
+                  Katalogas
+                </button>
+                <button
+                  onClick={() => setIsMobileCategoriesOpen((prev) => !prev)}
+                  className="h-9 w-9 flex items-center justify-center rounded-xl text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                  aria-label="Rodyti kategorijas"
+                >
+                  <ChevronDown className={`h-4 w-4 transition ${isMobileCategoriesOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
               <button
                 onClick={() => {
                   setView("uzsakymai");
@@ -1552,7 +1561,7 @@ export default function B2BPortal() {
               >
                 Mano duomenys
               </button>
-              {view === "katalogas" && (
+              {isMobileCategoriesOpen && (
                 <div className="mt-3 border-t border-[#d6ddc7] pt-3">
                   <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Kategorijos</div>
                   <button
@@ -1560,6 +1569,7 @@ export default function B2BPortal() {
                       setSelectedCategory(null);
                       setView("katalogas");
                       setIsMobileMenuOpen(false);
+                      setIsMobileCategoriesOpen(false);
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                   >
@@ -1572,6 +1582,7 @@ export default function B2BPortal() {
                         setSelectedCategory(category);
                         setView("katalogas");
                         setIsMobileMenuOpen(false);
+                        setIsMobileCategoriesOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                     >
@@ -2374,140 +2385,140 @@ export default function B2BPortal() {
                   )}
                 </button>
               </div>
-              {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-none lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-full lg:w-[320px] lg:h-auto fixed inset-0 z-40 lg:absolute lg:right-0 lg:top-24 lg:inset-auto lg:z-20 flex flex-col">
-                  <div className="p-5 pb-0">
-                    <div className="flex justify-between items-center mb-2">
-                      <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
-                    </div>
-                    {cartNotice && (
-                      <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
-                        {cartNotice}
-                      </div>
-                    )}
-                    {currentCart.length > 0 && (
-                      <div className="flex justify-end pb-3">
-                        <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh] lg:max-h-[50vh]">
-                    {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
-                      currentCart.map((item: any) => (
-                        <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
-                          <div className="flex gap-3">
-                            {item.images && item.images.length > 0 ? (
-                              <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start mb-1">
-                                <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
-                                  <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
-                                  {item.size && (
-                                    <div className="text-xs font-semibold text-green-700">{item.size}</div>
-                                  )}
-                                </div>
-                                <button
-                                  onClick={() => removeItem(item.id)}
-                                  className="text-gray-400 hover:text-red-500 text-lg"
-                                  title="Pašalinti prekę"
-                                  aria-label="Pašalinti prekę"
-                                >
-                                  x
-                                </button>
-                              </div>
-                              <div className={`flex justify-between items-center mt-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
-                                <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
-                                <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
-                                  <button
-                                    onClick={() => updateQty(item.id, item.qty - 1)}
-                                    className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={item.unavailable}
-                                  >
-                                    -
-                                  </button>
-                                  <input
-                                    type="number"
-                                    inputMode="numeric"
-                                    min={1}
-                                    step={1}
-                                    value={item.qty}
-                                    onChange={(e) => updateQty(item.id, Number(e.target.value))}
-                                    className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                    aria-label="Kiekis"
-                                    readOnly={item.unavailable}
-                                  />
-                                  <button
-                                    onClick={() => updateQty(item.id, item.qty + 1)}
-                                    className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={item.unavailable}
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </div>
-                              {item.unavailable && (
-                                <div className="mt-2 text-xs font-semibold text-red-600">
-                                  Prekės nebeturime.
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                  {currentCart.length > 0 && (
-                    <div className="p-5 border-t border-black/5 bg-white">
-                      {deliveryAddresses.length > 0 && (
-                        <div className="mb-4">
-                          <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
-                          <select
-                            value={selectedDeliveryAddress ?? ''}
-                            onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
-                            className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
-                          >
-                            <option value="">-- Pasirinkite adresą --</option>
-                            {deliveryAddresses.map((addr, idx) => (
-                              <option key={idx} value={idx}>
-                                {addr.name} - {addr.address}, {addr.city}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-                      {deliveryAddresses.length === 0 && (
-                        <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
-                          Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
-                        </div>
-                      )}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Suma iš viso</span><span className="font-semibold">{currentBaseTotal.toFixed(2)} €</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentBaseTotal - currentTotal).toFixed(2)} €</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
-                        <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
-                      </div>
-                      <button 
-                        onClick={submitOrder}
-                        disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
-                        className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                      >
-                        Užsakyti
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </aside>
       </div>
+      {isCartVisible && (
+        <div className="bg-[var(--surface)] rounded-none lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-full lg:w-[320px] lg:h-auto fixed inset-0 z-40 lg:absolute lg:right-6 lg:top-24 lg:inset-auto lg:z-20 flex flex-col">
+          <div className="p-5 pb-0">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
+            </div>
+            {cartNotice && (
+              <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                {cartNotice}
+              </div>
+            )}
+            {currentCart.length > 0 && (
+              <div className="flex justify-end pb-3">
+                <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+              </div>
+            )}
+          </div>
+          <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh] lg:max-h-[50vh]">
+            {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
+              currentCart.map((item: any) => (
+                <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
+                  <div className="flex gap-3">
+                    {item.images && item.images.length > 0 ? (
+                      <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
+                          <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
+                          {item.size && (
+                            <div className="text-xs font-semibold text-green-700">{item.size}</div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="text-gray-400 hover:text-red-500 text-lg"
+                          title="Pašalinti prekę"
+                          aria-label="Pašalinti prekę"
+                        >
+                          x
+                        </button>
+                      </div>
+                      <div className={`flex justify-between items-center mt-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
+                        <div className="text-lg font-bold text-[var(--foreground)]">{item.price.toFixed(2)} €</div>
+                        <div className="flex items-center gap-2 bg-white border border-black/10 rounded-full px-3 py-1">
+                          <button
+                            onClick={() => updateQty(item.id, item.qty - 1)}
+                            className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={item.unavailable}
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min={1}
+                            step={1}
+                            value={item.qty}
+                            onChange={(e) => updateQty(item.id, Number(e.target.value))}
+                            className="w-14 text-sm font-bold text-[var(--foreground)] text-center bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Kiekis"
+                            readOnly={item.unavailable}
+                          />
+                          <button
+                            onClick={() => updateQty(item.id, item.qty + 1)}
+                            className="text-gray-600 hover:text-[var(--foreground)] text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={item.unavailable}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      {item.unavailable && (
+                        <div className="mt-2 text-xs font-semibold text-red-600">
+                          Prekės nebeturime.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          {currentCart.length > 0 && (
+            <div className="p-5 border-t border-black/5 bg-white">
+              {deliveryAddresses.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                  <select
+                    value={selectedDeliveryAddress ?? ''}
+                    onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
+                    className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                  >
+                    <option value="">-- Pasirinkite adresą --</option>
+                    {deliveryAddresses.map((addr, idx) => (
+                      <option key={idx} value={idx}>
+                        {addr.name} - {addr.address}, {addr.city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {deliveryAddresses.length === 0 && (
+                <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
+                  Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                </div>
+              )}
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm text-[var(--foreground)]">
+                  <span>Suma iš viso</span><span className="font-semibold">{currentBaseTotal.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-sm text-[var(--foreground)]">
+                  <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentBaseTotal - currentTotal).toFixed(2)} €</span>
+                </div>
+              </div>
+              <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
+                <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
+              </div>
+              <button 
+                onClick={submitOrder}
+                disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
+                className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              >
+                Užsakyti
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   </div>
   );
