@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { jsPDF } from 'jspdf';
-import { LayoutGrid, ClipboardList, User } from 'lucide-react';
+import { LayoutGrid, ClipboardList, User, Menu, ShoppingCart } from 'lucide-react';
 
 // --- KOMPONENTAI ---
 
@@ -359,6 +359,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
 export default function B2BPortal() {
   const [view, setView] = useState("katalogas");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [allCarts, setAllCarts] = useState<any>({});
@@ -1494,9 +1495,68 @@ export default function B2BPortal() {
         />
       )}
 
-      <div className="max-w-[1800px] mx-auto px-4 lg:px-6 py-6">
-        <div className="grid gap-10 lg:gap-x-10 lg:gap-y-10 lg:grid-cols-[240px_1fr_auto] items-start">
-          <aside className="order-1 lg:order-none bg-transparent p-3 sticky top-6">
+      <div className="max-w-[1800px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+        <div className="lg:hidden mb-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-black/10 text-[#2d3427] hover:bg-[#e2e8d4] transition"
+              aria-label="Meniu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => {
+                if (cartItemCount > 0 || isCartVisible) {
+                  setIsCartVisible(!isCartVisible);
+                }
+              }}
+              className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
+              title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
+              aria-label="Krepšelis"
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {cartItemCount > 0 && (
+                <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-[#2d3427] text-[10px] font-semibold flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+          </div>
+          {isMobileMenuOpen && (
+            <div className="mt-3 rounded-[1.5rem] bg-[#e2e8d4] p-3">
+              <button
+                onClick={() => {
+                  setView("katalogas");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+              >
+                Katalogas
+              </button>
+              <button
+                onClick={() => {
+                  setView("uzsakymai");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+              >
+                Užsakymai
+              </button>
+              <button
+                onClick={() => {
+                  setView("mano-duomenis");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+              >
+                Mano duomenys
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="grid gap-6 sm:gap-8 lg:gap-x-10 lg:gap-y-10 lg:grid-cols-[240px_1fr_auto] items-start">
+          <aside className="order-1 lg:order-none bg-transparent p-3 sticky top-6 hidden lg:block">
             <div className="mb-6">
               <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
               <div className="text-lg font-semibold">B2B Portalas</div>
@@ -2219,7 +2279,7 @@ export default function B2BPortal() {
                 </div>
               </div>
             ) : (
-              <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 280px))', justifyContent: 'start' }}>
+              <div className="grid gap-3 sm:gap-4 justify-items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredProducts.map(p => (
                   <ProductCard 
                     key={p.id} 
@@ -2235,7 +2295,7 @@ export default function B2BPortal() {
         )}
           </main>
 
-          <aside className="order-3 lg:order-none relative lg:justify-self-end">
+          <aside className="order-3 lg:order-none relative lg:justify-self-end hidden lg:block">
             <div className="sticky top-6 space-y-3">
               <div className="flex flex-col items-end gap-3">
                 <button
@@ -2287,7 +2347,7 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] lg:absolute lg:right-0 top-20 lg:top-24 lg:z-20">
+                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] fixed right-3 top-20 z-40 lg:absolute lg:right-0 lg:top-24 lg:z-20">
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
