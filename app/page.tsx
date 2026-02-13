@@ -278,8 +278,8 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="w-full max-w-[280px] min-h-[500px] rounded-[2rem] overflow-hidden bg-[#e2e8d4] flex flex-col">
-      <div className="w-full h-64">
+    <div className="w-full max-w-[280px] min-h-[420px] sm:min-h-[500px] rounded-[2rem] overflow-hidden bg-[#e2e8d4] flex flex-col">
+      <div className="w-full h-40 sm:h-64">
         {product.images && product.images.length > 0 ? (
           <img
             src={product.images[0]}
@@ -1552,6 +1552,34 @@ export default function B2BPortal() {
               >
                 Mano duomenys
               </button>
+              {view === "katalogas" && (
+                <div className="mt-3 border-t border-[#d6ddc7] pt-3">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Kategorijos</div>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setView("katalogas");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                  >
+                    Visos prekės
+                  </button>
+                  {availableCategories.map((category: string) => (
+                    <button
+                      key={category}
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setView("katalogas");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -2261,7 +2289,7 @@ export default function B2BPortal() {
             </div>
             {isProductsLoading ? (
               <div className="py-8">
-                <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 280px))', justifyContent: 'start' }}>
+                <div className="grid gap-3 sm:gap-4 justify-items-start grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="bg-white p-3 rounded-[2rem] animate-pulse">
                       <div className="w-full aspect-[4/3] bg-[#e2e8d4] rounded-[2rem] mb-3"></div>
@@ -2279,7 +2307,7 @@ export default function B2BPortal() {
                 </div>
               </div>
             ) : (
-              <div className="grid gap-3 sm:gap-4 justify-items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-3 sm:gap-4 justify-items-start grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredProducts.map(p => (
                   <ProductCard 
                     key={p.id} 
@@ -2347,7 +2375,7 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full lg:w-[320px] fixed right-3 top-20 z-40 lg:absolute lg:right-0 lg:top-24 lg:z-20">
+                <div className="bg-[var(--surface)] rounded-none lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-full lg:w-[320px] lg:h-auto fixed inset-0 z-40 lg:absolute lg:right-0 lg:top-24 lg:inset-auto lg:z-20 flex flex-col">
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
@@ -2363,7 +2391,7 @@ export default function B2BPortal() {
                       </div>
                     )}
                   </div>
-                  <div className="space-y-0 mb-0 max-h-[50vh] overflow-y-auto">
+                  <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh] lg:max-h-[50vh]">
                     {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
                       currentCart.map((item: any) => (
                         <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
