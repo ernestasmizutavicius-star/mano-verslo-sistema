@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { jsPDF } from 'jspdf';
+import { LayoutGrid, ClipboardList, User } from 'lucide-react';
 
 // --- KOMPONENTAI ---
 
@@ -19,12 +20,12 @@ const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick
   const prev = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx - 1 + images.length) % images.length); };
 
   if (!images || images.length === 0) {
-    return <div className="w-full aspect-[4/3] mb-3 rounded-3xl bg-[var(--surface-muted)]" />;
+    return <div className="w-full aspect-[4/3] mb-3 rounded-[2rem] bg-[var(--surface-muted)]" />;
   }
 
   return (
     <div className="relative w-full aspect-[4/3] mb-3 group cursor-zoom-in" onClick={() => onImageClick(currentIdx)}>
-      <img src={images[currentIdx]} alt="" className="w-full h-full object-cover rounded-3xl bg-[var(--surface-muted)] transition group-hover:opacity-90" />
+      <img src={images[currentIdx]} alt="" className="w-full h-full object-cover rounded-[2rem] bg-[var(--surface-muted)] transition group-hover:opacity-90" />
       {images.length > 1 && (
         <><button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">◀</button>
         <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition text-black shadow">▶</button></>
@@ -264,7 +265,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               {hasDiscount && (
                 <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
               )}
-              <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
+              <p className="text-[#166534] font-bold text-lg">{price.toFixed(2)} €</p>
             </div>
             <button
               onClick={handleAdd}
@@ -277,63 +278,67 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="bg-[var(--surface-muted)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 flex flex-col text-slate-800 w-full max-w-[280px]">
-      <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h2 className="text-sm font-semibold leading-tight text-[var(--foreground)] min-h-[2.5rem] flex-1">{product.name}</h2>
-        {product.description && (
-          <button
-            type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className="text-[var(--foreground)] hover:text-black text-xs font-semibold bg-transparent border-0 p-0"
-            aria-label="Rodyti sudeti"
-          >
-            <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" fill="#000000" />
-              <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
-              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
-            </svg>
-          </button>
-        )}
+    <div className="w-full max-w-[280px] rounded-[2rem] overflow-hidden bg-white flex flex-col">
+      <div className="p-3">
+        <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
       </div>
-      {hasSizeLabels && (
-        <div className="mb-3">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
-          <div className="flex flex-wrap gap-2">
-            {sizeOptions.map((sizeProduct: any) => (
-              <button
-                key={sizeProduct.id}
-                onClick={() => toggleSize(sizeProduct.id)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
-                  selectedSizes.includes(sizeProduct.id)
-                    ? 'bg-[var(--foreground)] text-white border-[var(--foreground)]'
-                    : 'bg-white text-[var(--foreground)] border-black/10 hover:bg-[var(--surface)]'
-                }`}
-                type="button"
-              >
-                {sizeProduct.size || '—'}
-              </button>
-            ))}
+      <div className="bg-[#e2e8d4] px-4 pb-4 pt-3 flex flex-col gap-3 text-[#2d3427]">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-sm font-semibold leading-tight min-h-[2.5rem] flex-1">{product.name}</h2>
+          {product.description && (
+            <button
+              type="button"
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className="text-[#2d3427] hover:text-black text-xs font-semibold bg-transparent border-0 p-0"
+              aria-label="Rodyti sudeti"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="#2d3427" />
+                <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {hasSizeLabels && (
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
+            <div className="flex flex-wrap gap-2">
+              {sizeOptions.map((sizeProduct: any) => (
+                <button
+                  key={sizeProduct.id}
+                  onClick={() => toggleSize(sizeProduct.id)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                    selectedSizes.includes(sizeProduct.id)
+                      ? 'bg-[#2d3427] text-white border-[#2d3427]'
+                      : 'bg-white text-[#2d3427] border-black/10 hover:bg-[#f2f5e8]'
+                  }`}
+                  type="button"
+                >
+                  {sizeProduct.size || '—'}
+                </button>
+              ))}
+            </div>
+            {selectedSizes.length === 0 && (
+              <div className="mt-2 text-[10px] text-[#2d3427]">Pasirinkite dydį</div>
+            )}
           </div>
-          {selectedSizes.length === 0 && (
-            <div className="mt-2 text-[10px] text-[var(--ink-soft)]">Pasirinkite dydį</div>
-          )}
+        )}
+        <div className="flex justify-between items-center mt-auto">
+          <div>
+            {hasDiscount && (
+              <p className="text-[10px] text-[#2d3427] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+            )}
+            <p className="text-[#166534] font-bold text-lg">{price.toFixed(2)} €</p>
+          </div>
+          <button
+            onClick={handleAdd}
+            disabled={hasSizeLabels && selectedSizes.length === 0}
+            className="bg-white border border-black/10 text-[#2d3427] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Užsakyti
+          </button>
         </div>
-      )}
-      <div className="flex justify-between items-center mt-auto">
-        <div>
-          {hasDiscount && (
-            <p className="text-[10px] text-[var(--ink-soft)] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
-          )}
-          <p className="text-green-700 font-bold text-lg">{price.toFixed(2)} €</p>
-        </div>
-        <button
-          onClick={handleAdd}
-          disabled={hasSizeLabels && selectedSizes.length === 0}
-          className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Užsakyti
-        </button>
       </div>
     </div>
     </>
@@ -1470,7 +1475,7 @@ export default function B2BPortal() {
   }
 
   return (
-    <div className="min-h-screen text-slate-800 font-sans">
+    <div className="min-h-screen text-[#2d3427] font-sans">
       {/* Modal Langas */}
       {modalData && (
         <ImageModal 
@@ -1481,26 +1486,44 @@ export default function B2BPortal() {
       )}
 
       <div className="max-w-[1800px] mx-auto px-4 lg:px-6 py-6">
-        <div className="grid gap-6 lg:gap-x-6 lg:gap-y-6 lg:grid-cols-[260px_1fr_auto] items-start">
-          <aside className="order-1 lg:order-none bg-[var(--surface)] rounded-3xl p-5 shadow-[var(--shadow-soft)] border border-black/5 sticky top-6">
+        <div className="grid gap-10 lg:gap-x-10 lg:gap-y-10 lg:grid-cols-[240px_1fr_auto] items-start">
+          <aside className="order-1 lg:order-none bg-transparent p-3 sticky top-6">
             <div className="mb-6">
               <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
               <div className="text-lg font-semibold">B2B Portalas</div>
             </div>
             <nav className="space-y-2">
-              <button onClick={() => setView("katalogas")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'katalogas' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Katalogas</button>
-              <button onClick={() => setView("uzsakymai")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'uzsakymai' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Užsakymai</button>
-              <button onClick={() => setView("mano-duomenis")} className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold transition ${view === 'mano-duomenis' ? 'bg-[var(--foreground)] text-white' : 'bg-white hover:bg-[var(--surface-muted)] text-[var(--ink-soft)]'}`}>Mano duomenys</button>
+              <button
+                onClick={() => setView("katalogas")}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'katalogas' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Katalogas
+              </button>
+              <button
+                onClick={() => setView("uzsakymai")}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'uzsakymai' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
+              >
+                <ClipboardList className="h-4 w-4" />
+                Užsakymai
+              </button>
+              <button
+                onClick={() => setView("mano-duomenis")}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'mano-duomenis' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
+              >
+                <User className="h-4 w-4" />
+                Mano duomenys
+              </button>
             </nav>
           </aside>
 
           <main className="order-2 lg:order-none">
             {view === "mano-duomenis" ? (
-              <div className="bg-[var(--surface)] p-8 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
+              <div className="bg-white p-8 rounded-[2rem]">
             <h2 className="text-2xl font-extralight mb-8">Mano duomenys</h2>
             
             {/* Įmonės duomenys */}
-            <div className="mb-10 pb-8 border-b border-black/5">
+            <div className="mb-10 pb-8 border-b border-[#d6ddc7]">
               <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)] flex items-center justify-between">
                 Įmonės informacija
                 {!editingCompany && companyData.name && (
@@ -1509,7 +1532,7 @@ export default function B2BPortal() {
                       setEditCompanyData(companyData);
                       setEditingCompany(true);
                     }}
-                    className="text-sm bg-[var(--surface-muted)] text-[var(--foreground)] px-3 py-1 rounded-2xl hover:opacity-80 transition"
+                    className="text-sm bg-[#e2e8d4] text-[#2d3427] px-3 py-1 rounded-2xl hover:opacity-80 transition"
                   >
                     Redaguoti
                   </button>
@@ -1521,57 +1544,57 @@ export default function B2BPortal() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.name} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės kodas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės kodas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.code} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
-                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                            className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Kontaktinis asmuo</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Kontaktinis asmuo</label>
                       <input 
                         type="text" 
                         value={editCompanyData.contactPerson} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, contactPerson: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
                       <input 
                         type="tel" 
                         value={editCompanyData.phone} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">El. paštas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">El. paštas</label>
                       <input 
                         type="email" 
                         value={editCompanyData.email} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
-                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"                        
+                            className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"                        
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės registracijos adresas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės registracijos adresas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.address} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
-                            className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"                       
+                            className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"                       
                       />
                     </div>
                   </div>
@@ -1632,7 +1655,7 @@ export default function B2BPortal() {
                           alert('Klaida išsaugant duomenis');
                         }
                       }}
-                      className="flex-1 bg-[var(--foreground)] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
+                      className="flex-1 bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                     >
                       ✓ Išsaugoti
                     </button>
@@ -1641,7 +1664,7 @@ export default function B2BPortal() {
                         setEditCompanyData(companyData);
                         setEditingCompany(false);
                       }}
-                      className="flex-1 bg-gray-200 text-[var(--foreground)] px-6 py-3 rounded-2xl font-semibold hover:bg-gray-300 transition"
+                      className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-6 py-3 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                     >
                       ✕ Atšaukti
                     </button>
@@ -1649,31 +1672,31 @@ export default function B2BPortal() {
                 </>
               ) : companyData.name ? (
                 // Peržiūros režimas su duomenimis
-                <div className="bg-[var(--surface-muted)] p-6 rounded-3xl border border-black/5">
+                <div className="bg-[#e2e8d4] p-6 rounded-[2rem]">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės pavadinimas</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.name}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.name}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės kodas</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.code || "—"}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.code || "—"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Kontaktinis asmuo</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.contactPerson || "—"}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.contactPerson || "—"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Telefonas</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.phone || "—"}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.phone || "—"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">El. paštas</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.email || "—"}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.email || "—"}</p>
                     </div>
                     <div className="md:col-span-2">
                       <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės registracijos adresas</p>
-                      <p className="text-lg text-slate-800 font-semibold">{companyData.address || "—"}</p>
+                      <p className="text-lg text-[#2d3427] font-semibold">{companyData.address || "—"}</p>
                     </div>
                   </div>
                 </div>
@@ -1682,52 +1705,52 @@ export default function B2BPortal() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.name} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, name: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. UAB Flokati"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės kodas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės kodas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.code} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, code: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. 305522547"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
                       <input 
                         type="tel" 
                         value={editCompanyData.phone} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, phone: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. +370 600 12345"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">El. paštas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">El. paštas</label>
                       <input 
                         type="email" 
                         value={editCompanyData.email} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, email: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. info@flokati.lt"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold mb-2 text-gray-700">Pagrindinės sėdybos adresas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pagrindinės sėdybos adresas</label>
                       <input 
                         type="text" 
                         value={editCompanyData.address} 
                         onChange={(e) => setEditCompanyData({...editCompanyData, address: e.target.value})}
-                        className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                        className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                         placeholder="pvz. Kalnu g. 5, Vilnius"
                       />
                     </div>
@@ -1788,7 +1811,7 @@ export default function B2BPortal() {
                         alert('Klaida išsaugant duomenis');
                       }
                     }}
-                    className="w-full bg-[var(--accent)] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition"
+                    className="w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                   >
                     Išsaugoti
                   </button>
@@ -1804,13 +1827,13 @@ export default function B2BPortal() {
               {deliveryAddresses.length > 0 && (
                 <div className="mb-8 space-y-3">
                   {deliveryAddresses.map((addr, idx) => (
-                    <div key={addr.id || idx} className="bg-[var(--surface-muted)] p-4 rounded-3xl border border-black/5">
+                    <div key={addr.id || idx} className="bg-[#e2e8d4] p-4 rounded-[2rem]">
                       {editingAddressIdx === idx ? (
                         // Redagavimo režimas
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
                               <input
                                 type="text" 
                                 value={addr.name} 
@@ -1819,11 +1842,11 @@ export default function B2BPortal() {
                                   updated[idx].name = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-gray-700">Adresas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Adresas</label>
                               <input 
                                 type="text" 
                                 value={addr.address} 
@@ -1832,11 +1855,11 @@ export default function B2BPortal() {
                                   updated[idx].address = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-gray-700">Miestas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Miestas</label>
                               <input 
                                 type="text" 
                                 value={addr.city} 
@@ -1845,11 +1868,11 @@ export default function B2BPortal() {
                                   updated[idx].city = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-gray-700">Pašto kodas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pašto kodas</label>
                               <input 
                                 type="text" 
                                 value={addr.postalCode} 
@@ -1858,11 +1881,11 @@ export default function B2BPortal() {
                                   updated[idx].postalCode = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
                               <input 
                                 type="tel" 
                                 value={addr.phone} 
@@ -1871,7 +1894,7 @@ export default function B2BPortal() {
                                   updated[idx].phone = e.target.value;
                                   setDeliveryAddresses(updated);
                                 }}
-                                className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                                className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                               />
                             </div>
                           </div>
@@ -1910,13 +1933,13 @@ export default function B2BPortal() {
                                   alert('Klaida išsaugant adresą');
                                 }
                               }}
-                              className="flex-1 bg-[var(--accent)] text-white px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition"
+                              className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-2xl font-semibold hover:opacity-90 transition"
                             >
                               ✓ Išsaugoti
                             </button>
                             <button 
                               onClick={() => setEditingAddressIdx(null)}
-                              className="flex-1 bg-gray-200 text-[var(--foreground)] px-4 py-2 rounded-2xl font-semibold hover:bg-gray-300 transition"
+                              className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-4 py-2 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                             >
                               ✕ Atšaukti
                             </button>
@@ -1925,12 +1948,12 @@ export default function B2BPortal() {
                       ) : (
                         // Peržiūros režimas
                         <div className="flex justify-between items-start">
-                          <div className="flex-1 cursor-pointer hover:text-[var(--accent)]" onClick={() => setEditingAddressIdx(idx)}>
-                            <h4 className="font-semibold text-slate-800 mb-1">{addr.name}</h4>
-                            <p className="text-sm text-gray-600">{addr.address}</p>
-                            <p className="text-sm text-gray-600">{addr.city}, {addr.postalCode}</p>
-                            {addr.phone && <p className="text-sm text-gray-600 mt-1">📞 {addr.phone}</p>}
-                            <p className="text-xs text-[var(--accent)] mt-2">Spustelekite redaguoti</p>
+                          <div className="flex-1 cursor-pointer hover:text-[#2d3427]" onClick={() => setEditingAddressIdx(idx)}>
+                            <h4 className="font-semibold text-[#2d3427] mb-1">{addr.name}</h4>
+                            <p className="text-sm text-[#2d3427] opacity-70">{addr.address}</p>
+                            <p className="text-sm text-[#2d3427] opacity-70">{addr.city}, {addr.postalCode}</p>
+                            {addr.phone && <p className="text-sm text-[#2d3427] opacity-70 mt-1">📞 {addr.phone}</p>}
+                            <p className="text-xs text-[#2d3427] mt-2">Spustelekite redaguoti</p>
                           </div>
                           <button 
                             onClick={async () => {
@@ -1971,7 +1994,7 @@ export default function B2BPortal() {
               {!showAddressForm && (
                 <button 
                   onClick={() => setShowAddressForm(true)}
-                  className="w-full bg-[var(--accent)] text-white px-6 py-3 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition mb-6"
+                  className="w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition mb-6"
                 >
                   Pridėti naują adresą
                 </button>
@@ -1979,53 +2002,53 @@ export default function B2BPortal() {
 
               {/* Naujo adreso forma */}
               {showAddressForm && (
-                <div className="bg-[var(--surface-muted)] p-6 rounded-3xl border border-black/5">
-                  <h4 className="font-semibold text-slate-800 mb-4">Pridėti naują adresą</h4>
+                <div className="bg-[#e2e8d4] p-6 rounded-[2rem]">
+                  <h4 className="font-semibold text-[#2d3427] mb-4">Pridėti naują adresą</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-gray-700">Įmonės pavadinimas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
                     <input 
                       type="text" 
                       value={newAddress.name} 
                       onChange={(e) => setNewAddress({...newAddress, name: e.target.value})}
-                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-gray-700">Adresas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Adresas</label>
                     <input 
                       type="text" 
                       value={newAddress.address} 
                       onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
-                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-gray-700">Miestas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Miestas</label>
                     <input 
                       type="text" 
                       value={newAddress.city} 
                       onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
-                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-gray-700">Pašto kodas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pašto kodas</label>
                     <input 
                       type="text" 
                       value={newAddress.postalCode} 
                       onChange={(e) => setNewAddress({...newAddress, postalCode: e.target.value})}
-                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-gray-700">Telefonas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
                     <input 
                       type="tel" 
                       value={newAddress.phone} 
                       onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
-                      className="w-full border border-black/10 rounded-2xl p-3 text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                      className="w-full border border-black/10 rounded-2xl p-3 text-[#2d3427] focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     />
                   </div>
                 </div>
@@ -2072,7 +2095,7 @@ export default function B2BPortal() {
                       alert("Prašome užpildyti visus laukus!");
                     }
                   }}
-                  className="mt-4 w-full bg-[var(--foreground)] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
+                  className="mt-4 w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                 >
                   Pridėti adresą
                 </button>
@@ -2081,7 +2104,7 @@ export default function B2BPortal() {
                     setShowAddressForm(false);
                     setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
                   }}
-                  className="mt-2 w-full bg-gray-200 text-[var(--foreground)] px-6 py-3 rounded-2xl font-semibold hover:bg-gray-300 transition"
+                  className="mt-2 w-full bg-[#e2e8d4] text-[#2d3427] px-6 py-3 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                 >
                   ✕ Atšaukti
                 </button>
@@ -2090,27 +2113,27 @@ export default function B2BPortal() {
             </div>
           </div>
         ) : view === "uzsakymai" ? (
-          <div className="bg-[var(--surface)] p-8 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
+          <div className="bg-white p-8 rounded-[2rem]">
             <h2 className="text-2xl font-semibold mb-6">Užsakymų istorija</h2>
             {filteredOrders.sort((a, b) => b.order_number - a.order_number).length === 0 ? (
-              <p className="text-gray-400 italic text-center py-10">Istorija tuščia.</p>
+              <p className="text-[#2d3427]/60 italic text-center py-10">Istorija tuščia.</p>
             ) : (
               <div className="space-y-6">
                 {filteredOrders.sort((a, b) => b.order_number - a.order_number).map(order => (
-                  <div key={order.id} className="border border-black/5 rounded-3xl p-6 bg-[var(--surface-muted)]">
-                    <div className="flex justify-between mb-4 border-b border-black/5 pb-2 items-center">
+                  <div key={order.id} className="rounded-[2rem] p-6 bg-[#e2e8d4]">
+                    <div className="flex justify-between mb-4 border-b border-[#d6ddc7] pb-2 items-center">
                       <div className="flex-1">
                         <span className="font-bold">Užsakymas #{order.order_number}</span>
-                        <span className="text-gray-500 text-sm ml-4">{order.date}</span>
+                        <span className="text-[#2d3427]/70 text-sm ml-4">{order.date}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-orange-100 text-orange-800' : order.status === 'Išsiųsta' ? 'bg-orange-100 text-orange-800' : order.status === 'Įvykdytas' ? 'bg-green-100 text-green-800' : order.status === 'Atšauktas' ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-800'}`}>
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-[#f2f5e8] text-[#2d3427]' : order.status === 'Išsiųsta' ? 'bg-[#f2f5e8] text-[#2d3427]' : order.status === 'Įvykdytas' ? 'bg-white text-[#2d3427]' : order.status === 'Atšauktas' ? 'bg-white text-[#2d3427]' : 'bg-white text-[#2d3427]'}`}>
                           {order.status || 'Nežinomas'}
                         </span>
                         {order.status === 'Išsiustas' && (
                           <button
                             onClick={() => handleCancelOrder(order)}
-                            className="bg-white border border-black/10 text-red-600 px-4 py-2 rounded-2xl font-semibold hover:bg-red-50 transition text-sm whitespace-nowrap"
+                            className="bg-white border border-black/10 text-red-600 px-4 py-2 rounded-2xl font-semibold hover:bg-[#f2f5e8] transition text-sm whitespace-nowrap"
                           >
                             Atšaukti
                           </button>
@@ -2118,14 +2141,14 @@ export default function B2BPortal() {
                         {(order.status === 'Išsiustas' || order.status === 'Atšauktas') && (
                           <button
                             onClick={() => handleEditOrder(order)}
-                            className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--surface)] transition text-sm whitespace-nowrap"
+                            className="bg-white border border-black/10 text-[#2d3427] px-4 py-2 rounded-2xl font-semibold hover:bg-[#f2f5e8] transition text-sm whitespace-nowrap"
                           >
                             Koreguoti
                           </button>
                         )}
                         <button 
                           onClick={() => exportOrderToPDF(order)}
-                          className="bg-[var(--accent)] text-white px-4 py-2 rounded-2xl font-semibold hover:bg-[var(--accent-strong)] transition text-sm whitespace-nowrap"
+                          className="bg-[#2d3427] text-white px-4 py-2 rounded-2xl font-semibold hover:opacity-90 transition text-sm whitespace-nowrap"
                         >
                           📥 PDF
                         </button>
@@ -2137,20 +2160,20 @@ export default function B2BPortal() {
                         <span>{it.totalPrice.toFixed(2)} €</span>
                       </div>
                     ))}
-                    <div className="text-right mt-4 font-black text-lg text-green-700">VISO: {order.total.toFixed(2)} €</div>
+                    <div className="text-right mt-4 font-black text-lg text-[#166534]">VISO: {order.total.toFixed(2)} €</div>
                   </div>
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-[var(--surface)] p-6 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5">
+          <div className="bg-white p-6 rounded-[2rem]">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-3">Katalogas</h2>
               <div className="flex gap-5 flex-wrap text-sm">
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className={`font-medium transition ${!selectedCategory ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
+                  className={`font-medium transition ${!selectedCategory ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
                 >
                   Visos prekės
                 </button>
@@ -2158,7 +2181,7 @@ export default function B2BPortal() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`font-medium transition ${selectedCategory === category ? 'text-[var(--accent)] underline' : 'text-[var(--ink-soft)] hover:text-[var(--foreground)]'}`}
+                    className={`font-medium transition ${selectedCategory === category ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
                   >
                     {category}
                   </button>
@@ -2169,16 +2192,16 @@ export default function B2BPortal() {
               <div className="py-8">
                 <div className="grid gap-4 justify-items-start" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 280px))', justifyContent: 'start' }}>
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-[var(--surface)] p-3 rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 animate-pulse">
-                      <div className="w-full aspect-[4/3] bg-[var(--surface-muted)] rounded-3xl mb-3"></div>
-                      <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-2 w-3/4"></div>
-                      <div className="h-5 bg-[var(--surface-muted)] rounded-2xl mb-4 w-1/2"></div>
+                    <div key={i} className="bg-white p-3 rounded-[2rem] animate-pulse">
+                      <div className="w-full aspect-[4/3] bg-[#e2e8d4] rounded-[2rem] mb-3"></div>
+                      <div className="h-5 bg-[#e2e8d4] rounded-2xl mb-2 w-3/4"></div>
+                      <div className="h-5 bg-[#e2e8d4] rounded-2xl mb-4 w-1/2"></div>
                       <div className="flex justify-between items-end mt-auto">
                         <div className="space-y-2">
-                          <div className="h-3 bg-[var(--surface-muted)] rounded-2xl w-16"></div>
-                          <div className="h-6 bg-[var(--surface-muted)] rounded-2xl w-20"></div>
+                          <div className="h-3 bg-[#e2e8d4] rounded-2xl w-16"></div>
+                          <div className="h-6 bg-[#e2e8d4] rounded-2xl w-20"></div>
                         </div>
-                        <div className="h-10 w-24 bg-[var(--surface-muted)] rounded-2xl"></div>
+                        <div className="h-10 w-24 bg-[#e2e8d4] rounded-2xl"></div>
                       </div>
                     </div>
                   ))}
