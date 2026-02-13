@@ -1539,24 +1539,6 @@ export default function B2BPortal() {
                   <ChevronDown className={`h-4 w-4 transition ${isMobileCategoriesOpen ? 'rotate-180' : ''}`} />
                 </button>
               </div>
-              <button
-                onClick={() => {
-                  setView("uzsakymai");
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
-              >
-                Užsakymai
-              </button>
-              <button
-                onClick={() => {
-                  setView("mano-duomenis");
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
-              >
-                Mano duomenys
-              </button>
               {isMobileCategoriesOpen && (
                 <div className="mt-1 pl-3 space-y-1">
                   <button
@@ -1594,6 +1576,24 @@ export default function B2BPortal() {
                   ))}
                 </div>
               )}
+              <button
+                onClick={() => {
+                  setView("uzsakymai");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+              >
+                Užsakymai
+              </button>
+              <button
+                onClick={() => {
+                  setView("mano-duomenis");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+              >
+                Mano duomenys
+              </button>
             </div>
           )}
           {isCartVisible && (
