@@ -1507,11 +1507,7 @@ export default function B2BPortal() {
               <Menu className="h-5 w-5" />
             </button>
             <button
-              onClick={() => {
-                if (cartItemCount > 0 || isCartVisible) {
-                  setIsCartVisible(!isCartVisible);
-                }
-              }}
+              onClick={() => setIsCartVisible(!isCartVisible)}
               className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
               title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
               aria-label="Krepšelis"
@@ -1562,7 +1558,7 @@ export default function B2BPortal() {
                 Mano duomenys
               </button>
               {isMobileCategoriesOpen && (
-                <div className="mt-1">
+                <div className="mt-1 pl-3 space-y-1">
                   <button
                     onClick={() => {
                       setSelectedCategory(null);
@@ -1570,7 +1566,11 @@ export default function B2BPortal() {
                       setIsMobileMenuOpen(false);
                       setIsMobileCategoriesOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                      selectedCategory === null
+                        ? 'bg-white text-[#2d3427]'
+                        : 'text-[#2d3427] hover:bg-[#f2f5e8]'
+                    }`}
                   >
                     Visos prekės
                   </button>
@@ -1583,13 +1583,101 @@ export default function B2BPortal() {
                         setIsMobileMenuOpen(false);
                         setIsMobileCategoriesOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                        selectedCategory === category
+                          ? 'bg-white text-[#2d3427]'
+                          : 'text-[#2d3427] hover:bg-[#f2f5e8]'
+                      }`}
                     >
                       {category}
                     </button>
                   ))}
                 </div>
               )}
+            </div>
+          )}
+          {isCartVisible && (
+            <div className="lg:hidden bg-[var(--surface)] rounded-2xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] fixed left-3 right-3 top-20 z-30 flex flex-col">
+              <div className="p-5 pb-0">
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
+                </div>
+                {cartNotice && (
+                  <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                    {cartNotice}
+                  </div>
+                )}
+                {currentCart.length > 0 && (
+                  <div className="flex justify-end pb-3">
+                    <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh]">
+                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
+                  currentCart.map((item: any) => (
+                    <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
+                      <div className="flex gap-3">
+                        {item.images && item.images.length > 0 ? (
+                          <img src={item.images[0]} alt="" className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0 object-cover" />
+                        ) : (
+                          <div className="w-16 h-16 bg-gray-200 rounded-xl flex-shrink-0"></div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start mb-1">
+                            <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
+                              <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
+                              {item.size && (
+                                <div className="text-xs font-semibold text-green-700">{item.size}</div>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="text-gray-400 hover:text-red-500 text-lg"
+                              title="Pašalinti prekę"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-semibold text-[var(--foreground)]">{(item.price || 0).toFixed(2)} €</div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateQty(item.id, item.qty - 1)}
+                                className={`w-7 h-7 flex items-center justify-center rounded-lg border border-black/10 text-[#2d3427] ${item.unavailable ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f5e8]'}`}
+                                disabled={item.unavailable}
+                              >
+                                -
+                              </button>
+                              <span className="text-sm font-semibold w-5 text-center">{item.qty}</span>
+                              <button
+                                onClick={() => updateQty(item.id, item.qty + 1)}
+                                className={`w-7 h-7 flex items-center justify-center rounded-lg border border-black/10 text-[#2d3427] ${item.unavailable ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#f2f5e8]'}`}
+                                disabled={item.unavailable}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+              <div className="p-5 border-t border-black/5">
+                <div className="flex justify-between text-sm font-semibold mb-3">
+                  <span>Viso</span>
+                  <span>{currentTotal.toFixed(2)} €</span>
+                </div>
+                <button
+                  onClick={submitOrder}
+                  disabled={currentCart.length === 0}
+                  className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90 disabled:opacity-40"
+                >
+                  Pateikti užsakymą
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -2363,11 +2451,7 @@ export default function B2BPortal() {
                   Atsijungti
                 </button>
                 <button
-                  onClick={() => {
-                    if (cartItemCount > 0 || isCartVisible) {
-                      setIsCartVisible(!isCartVisible);
-                    }
-                  }}
+                  onClick={() => setIsCartVisible(!isCartVisible)}
                   className="relative text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5 transition"
                   title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
                   aria-label="Krepšelis"
