@@ -293,15 +293,15 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
       </div>
       <div className="px-3 pb-3 pt-2 flex flex-col flex-grow text-[#2d3427]">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-xs font-semibold leading-tight min-h-[2.5rem] flex-1">{product.name}</h2>
+          <h2 className="text-[10px] font-semibold leading-tight min-h-[2rem] flex-1">{product.name}</h2>
           {product.description && (
             <button
               type="button"
               onClick={() => setIsExpanded((prev) => !prev)}
-              className="text-[#2d3427] hover:text-black text-[10px] font-semibold bg-transparent border-0 p-0"
+              className="text-[#2d3427] hover:text-black text-[9px] font-semibold bg-transparent border-0 p-0"
               aria-label="Rodyti sudeti"
             >
-              <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" fill="#2d3427" />
                 <circle cx="12" cy="7" r="1.6" fill="#ffffff" />
                 <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff" />
@@ -310,14 +310,14 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           )}
         </div>
         {hasSizeLabels && (
-          <div className="min-h-[64px]">
-            <div className="text-[9px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
+          <div className="min-h-[56px]">
+            <div className="text-[8px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
             <div className="flex flex-wrap gap-1.5">
               {sizeOptions.map((sizeProduct: any) => (
                 <button
                   key={sizeProduct.id}
                   onClick={() => toggleSize(sizeProduct.id)}
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition ${
+                  className={`px-2 py-0.5 rounded-full text-[9px] font-semibold border transition ${
                     selectedSizes.includes(sizeProduct.id)
                       ? 'bg-[#2d3427] text-white border-[#2d3427]'
                       : 'bg-white text-[#2d3427] border-black/10 hover:bg-[#f2f5e8]'
@@ -329,21 +329,21 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               ))}
             </div>
             {selectedSizes.length === 0 && (
-              <div className="mt-2 text-[9px] text-[#2d3427]">Pasirinkite dydį</div>
+              <div className="mt-2 text-[8px] text-[#2d3427]">Pasirinkite dydį</div>
             )}
           </div>
         )}
         <div className="flex justify-between items-center mt-auto">
           <div>
             {hasDiscount && (
-              <p className="text-[9px] text-[#2d3427] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
+              <p className="text-[8px] text-[#2d3427] line-through mb-1">{product.basePrice.toFixed(2)} €</p>
             )}
-            <p className="text-[#166534] font-bold text-base">{price.toFixed(2)} €</p>
+            <p className="text-[#166534] font-bold text-[13px]">{price.toFixed(2)} €</p>
           </div>
           <button
             onClick={handleAdd}
             disabled={hasSizeLabels && selectedSizes.length === 0}
-            className="bg-white border border-black/10 text-[#2d3427] px-3 py-2 rounded-xl text-[10px] font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-white border border-black/10 text-[#2d3427] px-2.5 py-1.5 rounded-xl text-[9px] font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Užsakyti
           </button>
@@ -2368,21 +2368,33 @@ export default function B2BPortal() {
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-3">Katalogas</h2>
               <div className="flex gap-5 flex-wrap text-sm">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`font-medium transition ${!selectedCategory ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
-                >
-                  Visos prekės
-                </button>
-                {availableCategories.map((category: string) => (
+                {selectedCategory ? (
                   <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`font-medium transition ${selectedCategory === category ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
+                    onClick={() => setSelectedCategory(null)}
+                    className="font-medium text-[#2d3427] underline"
+                    aria-label="Rodyti visas prekes"
                   >
-                    {category}
+                    {selectedCategory}
                   </button>
-                ))}
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className={`font-medium transition ${!selectedCategory ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
+                    >
+                      Visos prekės
+                    </button>
+                    {availableCategories.map((category: string) => (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`font-medium transition ${selectedCategory === category ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
             {isProductsLoading ? (
