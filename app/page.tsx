@@ -85,7 +85,13 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={onClose}>
-      <button className="absolute top-6 right-6 text-[var(--accent)] text-4xl hover:text-white transition" onClick={onClose}>&times;</button>
+      <button
+        className="absolute top-6 right-6 z-50 text-[var(--accent)] text-4xl hover:text-white transition"
+        onClick={onClose}
+        aria-label="Uždaryti"
+      >
+        &times;
+      </button>
       <div 
         className="relative max-w-4xl w-full h-full flex items-center justify-center" 
         onClick={e => e.stopPropagation()}
@@ -278,7 +284,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
       </div>
     )}
-    <div className="w-full max-w-[280px] min-h-[380px] sm:min-h-[460px] rounded-none overflow-hidden bg-[#e2e8d4] flex flex-col">
+    <div className="w-full max-w-[280px] min-h-[300px] sm:min-h-[380px] rounded-none overflow-hidden bg-[#e2e8d4] flex flex-col">
       <div className="w-full h-36 sm:h-56">
         {product.images && product.images.length > 0 ? (
           <img
@@ -310,7 +316,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
           )}
         </div>
         {hasSizeLabels && (
-          <div className="min-h-[56px]">
+          <div className="min-h-[24px]">
             <div className="text-[8px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
             <div className="flex flex-wrap gap-1.5">
               {sizeOptions.map((sizeProduct: any) => (
@@ -1666,6 +1672,23 @@ export default function B2BPortal() {
                 }
               </div>
               <div className="p-5 border-t border-black/5">
+                {currentCart.length > 0 && deliveryAddresses.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                    <select
+                      value={selectedDeliveryAddress ?? ''}
+                      onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
+                      className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
+                    >
+                      <option value="">-- Pasirinkite adresą --</option>
+                      {deliveryAddresses.map((addr, idx) => (
+                        <option key={idx} value={idx}>
+                          {addr.name} - {addr.address}, {addr.city}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-semibold mb-3">
                   <span>Viso</span>
                   <span>{currentTotal.toFixed(2)} €</span>
