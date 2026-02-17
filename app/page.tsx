@@ -933,7 +933,10 @@ export default function B2BPortal() {
   const updateQty = (productId: number, newQty: number) => {
     const normalizedQty = Math.floor(newQty);
     if (!Number.isFinite(normalizedQty) || normalizedQty < 1) return;
-    const price = getPrice(products.find(p => p.id === productId)?.basePrice || 0);
+    const currentItems = allCarts[clientCode] || [];
+    const cartItem = currentItems.find((item: any) => item.id === productId);
+    const basePrice = cartItem?.basePrice ?? cartItem?.base_price ?? cartItem?.price ?? products.find(p => p.id === productId)?.basePrice ?? 0;
+    const price = getPrice(basePrice);
     setAllCarts((prev: any) => {
       const nextItems = (prev[clientCode] || []).map((item: any) => {
         if (item.id !== productId) return item;
