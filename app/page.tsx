@@ -408,6 +408,8 @@ export default function B2BPortal() {
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [loginBgIndex, setLoginBgIndex] = useState(0);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [editOrderConfirm, setEditOrderConfirm] = useState<any | null>(null);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -423,6 +425,14 @@ export default function B2BPortal() {
     const num = parseFloat(value);
     return Number.isFinite(num) ? num : 1;
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const update = () => setIsMobileDevice(window.innerWidth <= 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const getAvailableItemNoSet = () => {
     const set = new Set<string>();
@@ -960,11 +970,13 @@ export default function B2BPortal() {
     syncCartToDb([]);
   };
 
-  const handleEditOrder = async (order: any) => {
-    const confirmEdit = window.confirm(
-      'Ar tikrai norite koreguoti užsakymą? Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.'
-    );
-    if (!confirmEdit) return;
+  const handleEditOrder = async (order: any, skipConfirm?: boolean) => {
+    if (!skipConfirm) {
+      const confirmEdit = window.confirm(
+        'Ar tikrai norite koreguoti užsakymą? Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.'
+      );
+      if (!confirmEdit) return;
+    }
 
     const userId = await getUserId();
     if (!userId) {
@@ -1072,6 +1084,18 @@ export default function B2BPortal() {
     setOrderHistory((prev) => prev.filter((o: any) => o.id !== order.id));
     setView('katalogas');
     setIsCartVisible(true);
+  };
+
+  const requestEditOrder = (order: any) => {
+    if (isMobileDevice) {
+      setEditOrderConfirm(order);
+      return;
+    }
+    handleEditOrder(order);
+  };
+
+  const handleExportPDF = (order: any) => {
+    exportOrderToPDF(order, isMobileDevice);
   };
 
   const handleCancelOrder = async (order: any) => {
@@ -1208,7 +1232,7 @@ export default function B2BPortal() {
     }
   };
 
-  const exportOrderToPDF = (order: any) => {
+  const exportOrderToPDF = (order: any, forceDownload?: boolean) => {
     const pdf = new jsPDF();
     let yPosition = 20;
 
@@ -1282,7 +1306,20 @@ export default function B2BPortal() {
     pdf.text(`Generuota: ${new Date().toLocaleString('lt-LT')}`, 20, yPosition);
     
     // Išsaugoti failą
-    pdf.save(`Uzsakymas_${order.id}_${Date.now()}.pdf`);
+    const fileName = `Uzsakymas_${order.id}_${Date.now()}.pdf`;
+    if (forceDownload && typeof window !== 'undefined') {
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }
+    pdf.save(fileName);
   };
 
   const currentCart = allCarts[clientCode] || [];
@@ -1502,6 +1539,34 @@ export default function B2BPortal() {
           startIndex={modalData.index} 
           onClose={() => setModalData(null)} 
         />
+      )}
+      {editOrderConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
+            <h3 className="text-lg font-semibold text-[#2d3427]">Koreguoti užsakymą?</h3>
+            <p className="mt-2 text-sm text-[#2d3427]/80">
+              Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.
+            </p>
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setEditOrderConfirm(null)}
+                className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#cfd8c0] transition"
+              >
+                Atšaukti
+              </button>
+              <button
+                onClick={async () => {
+                  const order = editOrderConfirm;
+                  setEditOrderConfirm(null);
+                  await handleEditOrder(order, true);
+                }}
+                className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              >
+                Tęsti
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="max-w-[1800px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
@@ -2370,14 +2435,14 @@ export default function B2BPortal() {
                       )}
                       {(order.status === 'Išsiustas' || order.status === 'Atšauktas') && (
                         <button
-                          onClick={() => handleEditOrder(order)}
+                          onClick={() => requestEditOrder(order)}
                           className="bg-white border border-black/10 text-[#2d3427] px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap hover:bg-[#f2f5e8]"
                         >
                           Koreguoti
                         </button>
                       )}
                       <button 
-                        onClick={() => exportOrderToPDF(order)}
+                        onClick={() => handleExportPDF(order)}
                         className="bg-white border border-black/10 text-[#2d3427] px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap hover:bg-[#f2f5e8]"
                       >
                         PDF
