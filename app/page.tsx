@@ -410,6 +410,7 @@ export default function B2BPortal() {
   const [loginBgIndex, setLoginBgIndex] = useState(0);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [editOrderConfirm, setEditOrderConfirm] = useState<any | null>(null);
+  const [submitOrderNotice, setSubmitOrderNotice] = useState<{ email: string; total: number } | null>(null);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -1098,6 +1099,10 @@ export default function B2BPortal() {
     exportOrderToPDF(order, isMobileDevice);
   };
 
+  const requestSubmitOrder = () => {
+    submitOrder();
+  };
+
   const handleCancelOrder = async (order: any) => {
     const userId = await getUserId();
     if (!userId) {
@@ -1225,7 +1230,7 @@ export default function B2BPortal() {
       } else {
         setCartNotice('Kai kurių prekių nebeturime. Jos pažymėtos krepšelyje.');
       }
-      alert(`Užsakymas išsiuštas ${payload.manager_email}!\nSuma: ${total.toFixed(2)} €`);
+      setSubmitOrderNotice({ email: payload.manager_email, total });
     } catch (e) {
       console.error('submitOrder error', e);
       alert('Įvyko klaida siunčiant užsakymą.');
@@ -1552,7 +1557,7 @@ export default function B2BPortal() {
                 onClick={() => setEditOrderConfirm(null)}
                 className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#cfd8c0] transition"
               >
-                Atšaukti
+                Ne
               </button>
               <button
                 onClick={async () => {
@@ -1562,7 +1567,26 @@ export default function B2BPortal() {
                 }}
                 className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
-                Tęsti
+                Taip
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {submitOrderNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
+            <h3 className="text-lg font-semibold text-[#2d3427]">Užsakymas išsiuštas</h3>
+            <div className="mt-2 text-sm text-[#2d3427]/80">
+              <div>{submitOrderNotice.email}!</div>
+              <div>Suma: {submitOrderNotice.total.toFixed(2)} €</div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={() => setSubmitOrderNotice(null)}
+                className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              >
+                Gerai
               </button>
             </div>
           </div>
@@ -1667,6 +1691,32 @@ export default function B2BPortal() {
               >
                 Mano duomenys
               </button>
+              <button
+                onClick={() => {
+                  setIsLoggedIn(false);
+                  setClientCode('');
+                  setFormEmail('');
+                  setFormPassword('');
+                  setShowPassword(false);
+                  localStorage.removeItem('isLoggedIn');
+                  localStorage.removeItem('clientCode');
+                  localStorage.removeItem('client_name');
+                  localStorage.removeItem('discount_group');
+                  localStorage.removeItem('manager_email');
+                  localStorage.removeItem('currentView');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition flex items-center gap-2"
+              >
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <path d="M16 17l5-5-5-5" />
+                    <path d="M21 12H9" />
+                  </svg>
+                </span>
+                Atsijungti
+              </button>
             </div>
           )}
           {isCartVisible && (
@@ -1761,7 +1811,7 @@ export default function B2BPortal() {
                   <span>{currentTotal.toFixed(2)} €</span>
                 </div>
                 <button
-                  onClick={submitOrder}
+                  onClick={requestSubmitOrder}
                   disabled={currentCart.length === 0}
                   className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90 disabled:opacity-40"
                 >
@@ -2691,7 +2741,7 @@ export default function B2BPortal() {
                         <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
                       </div>
                       <button 
-                        onClick={submitOrder}
+                        onClick={requestSubmitOrder}
                         disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
                         className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                       >
