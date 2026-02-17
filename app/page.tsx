@@ -1598,14 +1598,20 @@ export default function B2BPortal() {
 
       <div className="max-w-[1800px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
         <div className="lg:hidden mb-4">
+          <div className="relative">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-black/10 text-[#2d3427] hover:bg-[#e2e8d4] transition"
-              aria-label="Meniu"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-black/10 text-[#2d3427] hover:bg-[#e2e8d4] transition"
+                aria-label="Meniu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div className="text-sm font-semibold text-[#2d3427] whitespace-nowrap">
+                {view === 'katalogas' ? 'Katalogas' : view === 'uzsakymai' ? 'Užsakymai' : 'Mano duomenys'}
+              </div>
+            </div>
             <button
               onClick={() => setIsCartVisible(!isCartVisible)}
               className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
@@ -1620,12 +1626,41 @@ export default function B2BPortal() {
               )}
             </button>
           </div>
+          {view === 'katalogas' && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  !selectedCategory
+                    ? 'bg-white text-[#2d3427]'
+                    : 'text-[#2d3427] hover:bg-[#f2f5e8]'
+                }`}
+              >
+                Visos prekės
+              </button>
+              {availableCategories.map((category: string) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    selectedCategory === category
+                      ? 'bg-white text-[#2d3427]'
+                      : 'text-[#2d3427] hover:bg-[#f2f5e8]'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
           {isMobileMenuOpen && (
-            <div className="mt-3 rounded-[1.5rem] bg-[#e2e8d4] p-3">
+            <div className="absolute left-0 top-12 z-40 w-[240px] rounded-[1.5rem] bg-[#e2e8d4] p-3 shadow-[var(--shadow-soft)] border border-black/5">
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => {
                     setView("katalogas");
+                    setIsMobileMenuOpen(false);
+                    setIsMobileCategoriesOpen(false);
                   }}
                   className="flex-1 text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                 >
@@ -1722,6 +1757,7 @@ export default function B2BPortal() {
               </button>
             </div>
           )}
+          </div>
           {isCartVisible && (
             <div className="lg:hidden bg-[var(--surface)] rounded-2xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] fixed left-3 right-3 top-20 z-30 flex flex-col">
               <div className="p-5 pb-0">
@@ -1858,7 +1894,7 @@ export default function B2BPortal() {
           <main className="order-2 lg:order-none">
             {view === "mano-duomenis" ? (
               <div className="bg-white p-8 rounded-[2rem]">
-            <h2 className="text-2xl font-extralight mb-8">Mano duomenys</h2>
+            <h2 className="hidden lg:block text-2xl font-extralight mb-8">Mano duomenys</h2>
             
             {/* Įmonės duomenys */}
             <div className="mb-10 pb-8 border-b border-[#d6ddc7]">
@@ -2452,7 +2488,7 @@ export default function B2BPortal() {
           </div>
         ) : view === "uzsakymai" ? (
           <div className="bg-white p-8 rounded-[2rem]">
-            <h2 className="text-2xl font-semibold mb-6">Užsakymų istorija</h2>
+            <h2 className="hidden lg:block text-2xl font-semibold mb-6">Užsakymų istorija</h2>
             {filteredOrders.sort((a, b) => b.order_number - a.order_number).length === 0 ? (
               <p className="text-[#2d3427]/60 italic text-center py-10">Istorija tuščia.</p>
             ) : (
@@ -2508,7 +2544,7 @@ export default function B2BPortal() {
           </div>
         ) : (
           <div className="bg-white p-6 rounded-[2rem]">
-            <div className="mb-6">
+            <div className="mb-6 hidden lg:block">
               <h2 className="text-2xl font-semibold mb-3">Katalogas</h2>
               <div className="flex gap-5 flex-wrap text-sm">
                 {selectedCategory ? (
