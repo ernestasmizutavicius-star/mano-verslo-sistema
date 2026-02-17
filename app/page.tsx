@@ -374,6 +374,7 @@ export default function B2BPortal() {
   const [cartNotice, setCartNotice] = useState<string | null>(null);
   const cartSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCartRef = useRef<any[]>([]);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   
   // Modal būsena
   const [modalData, setModalData] = useState<{images: string[], index: number} | null>(null);
@@ -735,6 +736,23 @@ export default function B2BPortal() {
       return () => clearInterval(intervalId);
     }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (mobileMenuRef.current && target && !mobileMenuRef.current.contains(target)) {
+        setIsMobileMenuOpen(false);
+        setIsMobileCategoriesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isMobileMenuOpen]);
 
 
   // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
@@ -1598,7 +1616,7 @@ export default function B2BPortal() {
 
       <div className="max-w-[1800px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
         <div className="lg:hidden mb-4">
-          <div className="relative">
+          <div className="relative" ref={mobileMenuRef}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
