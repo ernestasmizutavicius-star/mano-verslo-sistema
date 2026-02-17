@@ -1471,16 +1471,16 @@ export default function B2BPortal() {
               alert(err?.message || "Prisijungimo klaida");
             }
           }} 
-            className="w-full max-w-md bg-[var(--surface)] rounded-3xl p-8 shadow-[var(--shadow-strong)] border border-black/5"
+            className="w-full max-w-[280px] sm:max-w-[320px] bg-transparent rounded-3xl p-3 sm:p-5 mt-8 text-white"
           >
             <div className="mb-8">
-              <div className="text-xs uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
-              <div className="text-3xl font-semibold text-[var(--foreground)] mt-2">B2B Prisijungimas</div>
+              <div className="text-xs uppercase tracking-[0.35em] text-white/80">FLOKATI</div>
+              <div className="text-3xl font-semibold text-white mt-2">B2B Prisijungimas</div>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">El. paštas</label>
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">El. paštas</label>
                 <input 
                   name="email"
                   type="email"
@@ -1493,7 +1493,7 @@ export default function B2BPortal() {
                 />
               </div>
               <div className="relative">
-                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Slaptažodis</label>
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Slaptažodis</label>
                 <input 
                   name="password"
                   value={formPassword}
@@ -1508,7 +1508,7 @@ export default function B2BPortal() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-[38px] text-[var(--ink-soft)] hover:text-[var(--foreground)]"
+                  className="absolute right-3 top-[38px] text-white/70 hover:text-white"
                   aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
                 >
                 {showPassword ? (
