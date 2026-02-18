@@ -36,6 +36,40 @@ ON customers
 FOR UPDATE 
 USING (id = auth.uid())
 WITH CHECK (id = auth.uid());
+
+-- Enable RLS on cart_items table
+ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "cart_items_read_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_insert_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_update_own" ON cart_items;
+DROP POLICY IF EXISTS "cart_items_delete_own" ON cart_items;
+
+-- Policy: Allow users to read their own cart
+CREATE POLICY "cart_items_read_own"
+ON cart_items
+FOR SELECT
+USING (user_id = auth.uid());
+
+-- Policy: Allow users to insert their own cart
+CREATE POLICY "cart_items_insert_own"
+ON cart_items
+FOR INSERT
+WITH CHECK (user_id = auth.uid());
+
+-- Policy: Allow users to update their own cart
+CREATE POLICY "cart_items_update_own"
+ON cart_items
+FOR UPDATE
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+-- Policy: Allow users to delete their own cart
+CREATE POLICY "cart_items_delete_own"
+ON cart_items
+FOR DELETE
+USING (user_id = auth.uid());
 ```
 
 ### 4. Paleiskite SQL užklausą
@@ -51,6 +85,12 @@ SELECT * FROM pg_policies WHERE tablename = 'customers';
 Turėtumėte matyti 2 politikas:
 - `customers_read_own` (FOR SELECT)
 - `customers_update_own` (FOR UPDATE)
+
+Taip pat patikrinkite `cart_items` politikas:
+
+```sql
+SELECT * FROM pg_policies WHERE tablename = 'cart_items';
+```
 
 ## Testavimas
 

@@ -213,22 +213,20 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
     {isExpanded && (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsExpanded(false)}>
         <div
-          className="bg-[var(--surface-muted)] p-8 rounded-3xl shadow-[var(--shadow-strong)] border border-black/5 w-full max-w-[960px]"
+          className="relative bg-[var(--surface-muted)] p-8 rounded-3xl shadow-[var(--shadow-strong)] border border-black/5 w-full max-w-[960px]"
           onClick={(e) => e.stopPropagation()}
         >
+          <button
+            type="button"
+            onClick={() => setIsExpanded(false)}
+            className="absolute top-4 right-4 text-[var(--ink-soft)] hover:text-[var(--foreground)] text-2xl leading-none"
+            aria-label="Uzdaryti"
+          >
+            x
+          </button>
           <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
           <div className="flex items-start justify-between gap-3 mb-2">
             <h2 className="text-lg font-semibold leading-tight text-[var(--foreground)] flex-1">{product.name}</h2>
-            {product.description && (
-              <button
-                type="button"
-                onClick={() => setIsExpanded(false)}
-                className="text-[var(--ink-soft)] hover:text-[var(--foreground)] text-xs font-semibold"
-                aria-label="Uždaryti sudėtį"
-              >
-                Uždaryti
-              </button>
-            )}
           </div>
           {product.description && (
             <div className="mb-4 text-sm text-[var(--ink-soft)]">
@@ -375,6 +373,10 @@ export default function B2BPortal() {
   const cartSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCartRef = useRef<any[]>([]);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileCartRef = useRef<HTMLDivElement | null>(null);
+  const desktopCartRef = useRef<HTMLDivElement | null>(null);
+  const mobileCartButtonRef = useRef<HTMLButtonElement | null>(null);
+  const desktopCartButtonRef = useRef<HTMLButtonElement | null>(null);
   
   // Modal būsena
   const [modalData, setModalData] = useState<{images: string[], index: number} | null>(null);
@@ -412,6 +414,9 @@ export default function B2BPortal() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [editOrderConfirm, setEditOrderConfirm] = useState<any | null>(null);
   const [submitOrderNotice, setSubmitOrderNotice] = useState<{ email: string; total: number } | null>(null);
+  const [loginErrorNotice, setLoginErrorNotice] = useState<string | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [profileNotice, setProfileNotice] = useState<{ title: string; message: string } | null>(null);
 
   // Client data will be loaded from localStorage after Supabase Auth login
   const [clients, setClients] = useState<any>({});
@@ -449,11 +454,28 @@ export default function B2BPortal() {
     return set;
   };
 
+  const getAvailableItemIdSet = () => {
+    const set = new Set<string>();
+    products.forEach((product: any) => {
+      if (product?.id != null) set.add(String(product.id));
+      if (Array.isArray(product?.sizes)) {
+        product.sizes.forEach((size: any) => {
+          if (size?.id != null) set.add(String(size.id));
+        });
+      }
+    });
+    return set;
+  };
+
   const applyAvailability = (items: any[]) => {
     const availableItemNos = getAvailableItemNoSet();
+    const availableItemIds = getAvailableItemIdSet();
     return items.map((item: any) => {
       const itemNo = item.itemNo ?? item.item_no ?? null;
-      const isUnavailable = itemNo ? !availableItemNos.has(String(itemNo)) : false;
+      const itemId = item.id ?? item.product_id ?? item.productId ?? null;
+      const hasItemNoMatch = itemNo ? availableItemNos.has(String(itemNo)) : false;
+      const hasItemIdMatch = itemId ? availableItemIds.has(String(itemId)) : false;
+      const isUnavailable = (itemNo || itemId) ? !(hasItemNoMatch || hasItemIdMatch) : false;
       return {
         ...item,
         itemNo,
@@ -699,6 +721,7 @@ export default function B2BPortal() {
         }
       });
     }
+    setIsAuthReady(true);
   }, []);
 
   // Saugoti dabartinį langą į localStorage
@@ -753,6 +776,25 @@ export default function B2BPortal() {
       document.removeEventListener('touchstart', handleOutside);
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!isCartVisible) return;
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (mobileCartRef.current?.contains(target)) return;
+      if (desktopCartRef.current?.contains(target)) return;
+      if (mobileCartButtonRef.current?.contains(target)) return;
+      if (desktopCartButtonRef.current?.contains(target)) return;
+      setIsCartVisible(false);
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isCartVisible]);
 
 
   // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
@@ -1109,11 +1151,7 @@ export default function B2BPortal() {
   };
 
   const requestEditOrder = (order: any) => {
-    if (isMobileDevice) {
-      setEditOrderConfirm(order);
-      return;
-    }
-    handleEditOrder(order);
+    setEditOrderConfirm(order);
   };
 
   const handleExportPDF = (order: any) => {
@@ -1367,6 +1405,14 @@ export default function B2BPortal() {
     }
   }, [cartNotice, currentCart]);
 
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-sm text-[#2d3427]/70">Kraunama...</div>
+      </div>
+    );
+  }
+
   // Redirect to login page if not authenticated
   if (!isLoggedIn) {
     return (
@@ -1401,13 +1447,13 @@ export default function B2BPortal() {
               });
 
               if (signInError) {
-                alert("Neteisingas prisijungimo vardas arba slaptažodis");
+                setLoginErrorNotice("Neteisingas prisijungimo vardas arba slaptažodis");
                 return;
               }
 
               const user = signInData.user;
               if (!user) {
-                alert("Vartotojas nerastas");
+                setLoginErrorNotice("Vartotojas nerastas");
                 return;
               }
 
@@ -1468,7 +1514,7 @@ export default function B2BPortal() {
                 }
               });
             } catch (err: any) {
-              alert(err?.message || "Prisijungimo klaida");
+              setLoginErrorNotice(err?.message || "Prisijungimo klaida");
             }
           }} 
             className="w-full max-w-[280px] sm:max-w-[320px] bg-transparent rounded-3xl p-3 sm:p-5 mt-8 text-white"
@@ -1487,7 +1533,7 @@ export default function B2BPortal() {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="" 
-                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
                   autoComplete="off"
                   required 
                 />
@@ -1500,7 +1546,7 @@ export default function B2BPortal() {
                   onChange={(e) => setFormPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
                   placeholder="" 
-                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
+                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
                   autoComplete="new-password"
                   required 
                 />
@@ -1508,7 +1554,7 @@ export default function B2BPortal() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-[38px] text-white/70 hover:text-white"
+                  className="absolute right-3 top-[38px] text-black/70 hover:text-black"
                   aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
                 >
                 {showPassword ? (
@@ -1613,6 +1659,42 @@ export default function B2BPortal() {
           </div>
         </div>
       )}
+      {loginErrorNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
+            <h3 className="text-lg font-semibold text-[#2d3427]">Prisijungimo klaida</h3>
+            <div className="mt-2 text-sm text-[#2d3427]/80">
+              {loginErrorNotice}
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={() => setLoginErrorNotice(null)}
+                className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              >
+                Gerai
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {profileNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
+            <h3 className="text-lg font-semibold text-[#2d3427]">{profileNotice.title}</h3>
+            <div className="mt-2 text-sm text-[#2d3427]/80">
+              {profileNotice.message}
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={() => setProfileNotice(null)}
+                className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
+              >
+                Gerai
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-[1800px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
         <div className="lg:hidden mb-4">
@@ -1635,6 +1717,7 @@ export default function B2BPortal() {
               className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
               title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
               aria-label="Krepšelis"
+              ref={mobileCartButtonRef}
             >
               <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (
@@ -1777,7 +1860,10 @@ export default function B2BPortal() {
           )}
           </div>
           {isCartVisible && (
-            <div className="lg:hidden bg-[var(--surface)] rounded-2xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] fixed left-3 right-3 top-20 z-30 flex flex-col">
+            <div
+              className="lg:hidden bg-[var(--surface)] rounded-2xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] fixed left-3 right-3 top-20 z-30 flex flex-col"
+              ref={mobileCartRef}
+            >
               <div className="p-5 pb-0">
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
@@ -1863,13 +1949,18 @@ export default function B2BPortal() {
                     </select>
                   </div>
                 )}
+                {currentCart.length > 0 && deliveryAddresses.length === 0 && (
+                  <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
+                    Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-semibold mb-3">
                   <span>Viso</span>
                   <span>{currentTotal.toFixed(2)} €</span>
                 </div>
                 <button
                   onClick={requestSubmitOrder}
-                  disabled={currentCart.length === 0}
+                  disabled={currentCart.length === 0 || deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
                   className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90 disabled:opacity-40"
                 >
                   Pateikti užsakymą
@@ -1996,7 +2087,7 @@ export default function B2BPortal() {
                         try {
                           const { data: { user } } = await supabase.auth.getUser();
                           if (!user) {
-                            alert('Vartotojas nerastas');
+                            setProfileNotice({ title: 'Mano duomenys', message: 'Vartotojas nerastas.' });
                             return;
                           }
                           
@@ -2027,7 +2118,7 @@ export default function B2BPortal() {
                           
                           if (error) {
                             console.error('❌ Klaida išsaugant:', error);
-                            alert(`Klaida išsaugant duomenis: ${error.message}`);
+                            setProfileNotice({ title: 'Mano duomenys', message: `Klaida išsaugant duomenis: ${error.message}` });
                             return;
                           }
                           
@@ -2041,10 +2132,10 @@ export default function B2BPortal() {
                           
                           setCompanyData(editCompanyData);
                           setEditingCompany(false);
-                          alert("Įmonės duomenys išsaugoti!");
+                          setProfileNotice({ title: 'Mano duomenys', message: 'Įmonės duomenys išsaugoti!' });
                         } catch (e) {
                           console.error('Save error:', e);
-                          alert('Klaida išsaugant duomenis');
+                          setProfileNotice({ title: 'Mano duomenys', message: 'Klaida išsaugant duomenis.' });
                         }
                       }}
                       className="flex-1 bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
@@ -2152,7 +2243,7 @@ export default function B2BPortal() {
                       try {
                         const { data: { user } } = await supabase.auth.getUser();
                         if (!user) {
-                          alert('Vartotojas nerastas');
+                          setProfileNotice({ title: 'Mano duomenys', message: 'Vartotojas nerastas.' });
                           return;
                         }
                         
@@ -2183,7 +2274,7 @@ export default function B2BPortal() {
                         
                         if (error) {
                           console.error('❌ Klaida išsaugant:', error);
-                          alert(`Klaida išsaugant duomenis: ${error.message}`);
+                          setProfileNotice({ title: 'Mano duomenys', message: `Klaida išsaugant duomenis: ${error.message}` });
                           return;
                         }
                         
@@ -2197,10 +2288,10 @@ export default function B2BPortal() {
                         
                         setCompanyData(editCompanyData);
                         setEditingCompany(false);
-                        alert("Įmonės duomenys išsaugoti!");
+                        setProfileNotice({ title: 'Mano duomenys', message: 'Įmonės duomenys išsaugoti!' });
                       } catch (e) {
                         console.error('Save error:', e);
-                        alert('Klaida išsaugant duomenis');
+                        setProfileNotice({ title: 'Mano duomenys', message: 'Klaida išsaugant duomenis.' });
                       }
                     }}
                     className="w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
@@ -2296,7 +2387,7 @@ export default function B2BPortal() {
                                 try {
                                   const { data: { user } } = await supabase.auth.getUser();
                                   if (!user) {
-                                    alert('Vartotojas nerastas');
+                                    setProfileNotice({ title: 'Pristatymo adresai', message: 'Vartotojas nerastas.' });
                                     return;
                                   }
                                   
@@ -2313,16 +2404,16 @@ export default function B2BPortal() {
                                   
                                   if (error) {
                                     console.error('❌ Klaida išsaugant adresą:', error);
-                                    alert(`Klaida išsaugant adresą: ${error.message}`);
+                                    setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida išsaugant adresą: ${error.message}` });
                                     return;
                                   }
                                   
                                   localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
                                   setEditingAddressIdx(null);
-                                  alert("Adresas atnaujintas!");
+                                  setProfileNotice({ title: 'Pristatymo adresai', message: 'Adresas atnaujintas!' });
                                 } catch (e) {
                                   console.error('Save address error:', e);
-                                  alert('Klaida išsaugant adresą');
+                                  setProfileNotice({ title: 'Pristatymo adresai', message: 'Klaida išsaugant adresą.' });
                                 }
                               }}
                               className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-2xl font-semibold hover:opacity-90 transition"
@@ -2360,7 +2451,7 @@ export default function B2BPortal() {
                                     .eq('id', user.id);
                                   if (error) {
                                     console.error('❌ Delete error:', error);
-                                    alert(`Klaida trinant adresą: ${error.message}`);
+                                    setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida trinant adresą: ${error.message}` });
                                     return;
                                   }
                                 }
@@ -2453,7 +2544,7 @@ export default function B2BPortal() {
                         
                         const { data: { user } } = await supabase.auth.getUser();
                         if (!user) {
-                          alert('Vartotojas nerastas');
+                          setProfileNotice({ title: 'Pristatymo adresai', message: 'Vartotojas nerastas.' });
                           return;
                         }
                         
@@ -2470,7 +2561,7 @@ export default function B2BPortal() {
                         
                         if (error) {
                           console.error('❌ Klaida pridedant adresą:', error);
-                          alert(`Klaida pridedant adresą: ${error.message}`);
+                          setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida pridedant adresą: ${error.message}` });
                           return;
                         }
                         
@@ -2478,13 +2569,13 @@ export default function B2BPortal() {
                         setDeliveryAddresses(updated);
                         setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
                         setShowAddressForm(false);
-                        alert("Adresas pridėtas!");
+                        setProfileNotice({ title: 'Pristatymo adresai', message: 'Adresas pridėtas!' });
                       } catch (e) {
                         console.error('Add address error:', e);
-                        alert('Klaida pridedant adresą');
+                        setProfileNotice({ title: 'Pristatymo adresai', message: 'Klaida pridedant adresą.' });
                       }
                     } else {
-                      alert("Prašome užpildyti visus laukus!");
+                      setProfileNotice({ title: 'Pristatymo adresai', message: 'Prašome užpildyti visus laukus!' });
                     }
                   }}
                   className="mt-4 w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
@@ -2664,6 +2755,7 @@ export default function B2BPortal() {
                   className="relative text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5 transition"
                   title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
                   aria-label="Krepšelis"
+                  ref={desktopCartButtonRef}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
                     <circle cx="9" cy="20" r="1" />
@@ -2678,7 +2770,10 @@ export default function B2BPortal() {
                 </button>
               </div>
               {isCartVisible && (
-                <div className="bg-[var(--surface)] rounded-2xl lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] lg:w-[320px] lg:h-auto fixed left-3 right-3 top-16 z-40 lg:absolute lg:right-0 lg:top-24 lg:left-auto lg:inset-auto lg:z-20 flex flex-col">
+                <div
+                  className="bg-[var(--surface)] rounded-2xl lg:rounded-3xl shadow-[var(--shadow-soft)] border border-black/5 overflow-hidden w-full h-[80vh] lg:w-[320px] lg:h-auto fixed left-3 right-3 top-16 z-40 lg:absolute lg:right-0 lg:top-24 lg:left-auto lg:inset-auto lg:z-20 flex flex-col"
+                  ref={desktopCartRef}
+                >
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
