@@ -408,6 +408,10 @@ export default function B2BPortal() {
   const [showPassword, setShowPassword] = useState(false);
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
+  const [formConfirmPassword, setFormConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register" | "forgot">("login");
+  const [authSuccessNotice, setAuthSuccessNotice] = useState<string | null>(null);
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [loginBgIndex, setLoginBgIndex] = useState(0);
@@ -747,7 +751,11 @@ export default function B2BPortal() {
     if (!isLoggedIn) {
       setFormEmail('');
       setFormPassword('');
+      setFormConfirmPassword('');
       setShowPassword(false);
+      setShowConfirmPassword(false);
+      setAuthMode('login');
+      setAuthSuccessNotice(null);
     }
   }, [isLoggedIn]);
 
@@ -1397,6 +1405,144 @@ export default function B2BPortal() {
   const currentTotal = currentCart.reduce((s: number, i: any) => s + i.totalPrice, 0);
   const cartItemCount = currentCart.reduce((s: number, i: any) => s + i.qty, 0);
 
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginErrorNotice(null);
+    setAuthSuccessNotice(null);
+
+    const email = formEmail.trim();
+    const password = formPassword;
+
+    if (authMode === 'forgot') {
+      try {
+        const redirectTo = `${window.location.origin}/update-password`;
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo
+        });
+
+        if (resetError) {
+          setLoginErrorNotice(resetError.message);
+          return;
+        }
+
+        setAuthSuccessNotice('Slaptažodžio atkūrimo nuoroda išsiųsta. Patikrinkite savo el. paštą.');
+        setAuthMode('login');
+        setFormPassword('');
+        setFormConfirmPassword('');
+      } catch (err: any) {
+        setLoginErrorNotice(err?.message || 'Nepavyko išsiųsti atkūrimo nuorodos');
+      }
+
+      return;
+    }
+
+    if (authMode === 'register') {
+      if (password !== formConfirmPassword) {
+        setLoginErrorNotice('Slaptažodžiai nesutampa');
+        return;
+      }
+
+      try {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password
+        });
+
+        if (signUpError) {
+          setLoginErrorNotice(signUpError.message);
+          return;
+        }
+
+        setAuthSuccessNotice('Paskyra sukurta! Patikrinkite savo el. paštą, kad patvirtintumėte prisijungimą');
+        setAuthMode('login');
+        setFormPassword('');
+        setFormConfirmPassword('');
+      } catch (err: any) {
+        setLoginErrorNotice(err?.message || 'Registracijos klaida');
+      }
+
+      return;
+    }
+
+    try {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) {
+        setLoginErrorNotice("Neteisingas prisijungimo vardas arba slaptažodis");
+        return;
+      }
+
+      const user = signInData.user;
+      if (!user) {
+        setLoginErrorNotice("Vartotojas nerastas");
+        return;
+      }
+
+      // Fetch profile from 'customers' table
+      const { data: profiles, error: profileError } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("id", user.id);
+
+      console.log('🔍 User ID:', user.id);
+      console.log('🔍 Profiles result:', profiles);
+      console.log('🔍 Profile error:', profileError);
+
+      if (profileError) {
+        console.warn("Klaida gaunant profile:", profileError.message);
+      }
+
+      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+      console.log('🔍 Selected profile:', profile);
+
+      const clientName = profile?.client_name || null;
+      const discountGroup = profile?.discount_group || null;
+      const managerEmail = profile?.manager_email || null;
+      const companyCode = profile?.company_code || null;
+      const phone = profile?.phone || null;
+      const companyEmail = profile?.email || null;
+      const registrationAddress = profile?.registration_address || null;
+      const contactPerson = profile?.contact_person || null;
+      const deliveryAddresses = profile?.delivery_addresses || [];
+      const resolvedClientCode = discountGroup || clientName || "";
+
+      // Save to localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      if (resolvedClientCode) localStorage.setItem('clientCode', resolvedClientCode);
+      if (clientName) localStorage.setItem('client_name', clientName);
+      if (discountGroup) localStorage.setItem('discount_group', discountGroup);
+      else localStorage.removeItem('discount_group');
+      if (managerEmail) localStorage.setItem('manager_email', managerEmail);
+      if (companyCode) localStorage.setItem('company_code', companyCode);
+      if (phone) localStorage.setItem('phone', phone);
+      if (companyEmail) localStorage.setItem('email', companyEmail);
+      if (registrationAddress) localStorage.setItem('registration_address', registrationAddress);
+      if (contactPerson) localStorage.setItem('contact_person', contactPerson);
+      localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
+
+      // Update state
+      setClientCode(resolvedClientCode);
+      setIsLoggedIn(true);
+      setIsCartVisible(false);
+      setView("katalogas");
+      setAuthSuccessNotice(null);
+
+      // Populate clients object
+      const discount = parseDiscountGroup(discountGroup);
+      setClients({
+        [resolvedClientCode]: {
+          name: clientName || resolvedClientCode,
+          discount: discount
+        }
+      });
+    } catch (err: any) {
+      setLoginErrorNotice(err?.message || "Prisijungimo klaida");
+    }
+  };
+
   useEffect(() => {
     if (!cartNotice) return;
     const hasUnavailable = currentCart.some((item: any) => item.unavailable);
@@ -1434,95 +1580,26 @@ export default function B2BPortal() {
           </div>
 
           <form 
-            key={isLoggedIn ? 'logged-in' : 'logged-out'}
-            onSubmit={async (e: any) => {
-            e.preventDefault();
-            const email = formEmail;
-            const password = formPassword;
-            
-            try {
-              const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ 
-                email, 
-                password 
-              });
-
-              if (signInError) {
-                setLoginErrorNotice("Neteisingas prisijungimo vardas arba slaptažodis");
-                return;
-              }
-
-              const user = signInData.user;
-              if (!user) {
-                setLoginErrorNotice("Vartotojas nerastas");
-                return;
-              }
-
-              // Fetch profile from 'customers' table
-              const { data: profiles, error: profileError } = await supabase
-                .from("customers")
-                .select("*")
-                .eq("id", user.id);
-
-              console.log('🔍 User ID:', user.id);
-              console.log('🔍 Profiles result:', profiles);
-              console.log('🔍 Profile error:', profileError);
-
-              if (profileError) {
-                console.warn("Klaida gaunant profile:", profileError.message);
-              }
-
-              const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-              console.log('🔍 Selected profile:', profile);
-
-              const clientName = profile?.client_name || null;
-              const discountGroup = profile?.discount_group || null;
-              const managerEmail = profile?.manager_email || null;
-              const companyCode = profile?.company_code || null;
-              const phone = profile?.phone || null;
-              const companyEmail = profile?.email || null;
-              const registrationAddress = profile?.registration_address || null;
-              const contactPerson = profile?.contact_person || null;
-              const deliveryAddresses = profile?.delivery_addresses || [];
-              const clientCode = discountGroup || clientName || "";
-
-              // Save to localStorage
-              localStorage.setItem('isLoggedIn', 'true');
-              if (clientCode) localStorage.setItem('clientCode', clientCode);
-              if (clientName) localStorage.setItem('client_name', clientName);
-              if (discountGroup) localStorage.setItem('discount_group', discountGroup);
-              else localStorage.removeItem('discount_group');
-              if (managerEmail) localStorage.setItem('manager_email', managerEmail);
-              if (companyCode) localStorage.setItem('company_code', companyCode);
-              if (phone) localStorage.setItem('phone', phone);
-              if (companyEmail) localStorage.setItem('email', companyEmail);
-              if (registrationAddress) localStorage.setItem('registration_address', registrationAddress);
-              if (contactPerson) localStorage.setItem('contact_person', contactPerson);
-              localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
-
-              // Update state
-              setClientCode(clientCode);
-              setIsLoggedIn(true);
-              setIsCartVisible(false);
-              setView("katalogas");
-              
-              // Populate clients object
-              const discount = parseDiscountGroup(discountGroup);
-              setClients({
-                [clientCode]: {
-                  name: clientName || clientCode,
-                  discount: discount
-                }
-              });
-            } catch (err: any) {
-              setLoginErrorNotice(err?.message || "Prisijungimo klaida");
-            }
-          }} 
+            key={`${isLoggedIn ? 'logged-in' : 'logged-out'}-${authMode}`}
+            onSubmit={handleAuthSubmit}
             className="w-full max-w-[280px] sm:max-w-[320px] bg-transparent rounded-3xl p-3 sm:p-5 mt-8 text-white"
           >
             <div className="mb-8">
               <div className="text-xs uppercase tracking-[0.35em] text-white/80">FLOKATI</div>
-              <div className="text-3xl font-semibold text-white mt-2">B2B Prisijungimas</div>
+              <div className="text-3xl font-semibold text-white mt-2">
+                {authMode === 'login'
+                  ? 'B2B Prisijungimas'
+                  : authMode === 'register'
+                  ? 'B2B Registracija'
+                  : 'Slaptažodžio atkūrimas'}
+              </div>
             </div>
+
+            {authSuccessNotice && (
+              <div className="mb-4 text-sm rounded-2xl bg-white/95 text-[#2d3427] px-4 py-3">
+                {authSuccessNotice}
+              </div>
+            )}
 
             <div className="space-y-5">
               <div>
@@ -1538,63 +1615,175 @@ export default function B2BPortal() {
                   required 
                 />
               </div>
-              <div className="relative">
-                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Slaptažodis</label>
-                <input 
-                  name="password"
-                  value={formPassword}
-                  onChange={(e) => setFormPassword(e.target.value)}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="" 
-                  className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
-                  autoComplete="new-password"
-                  required 
-                />
-                {formPassword.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-[38px] text-black/70 hover:text-black"
-                  aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
-                >
-                {showPassword ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
+              {authMode !== 'forgot' && (
+                <div className="relative">
+                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Slaptažodis</label>
+                  <input 
+                    name="password"
+                    value={formPassword}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="" 
+                    className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
+                    autoComplete="new-password"
+                    required 
+                  />
+                  {formPassword.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-[38px] text-black/70 hover:text-black"
+                    aria-label={showPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
                   >
-                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94" />
-                    <path d="M1 1l22 22" />
-                    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
-                    <path d="M14.12 14.12 9.88 9.88" />
-                    <path d="M7.12 7.12A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.68 21.68 0 0 1-4.87 6.06" />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-                </button>
-                )}
-              </div>
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
+                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94" />
+                      <path d="M1 1l22 22" />
+                      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                      <path d="M14.12 14.12 9.88 9.88" />
+                      <path d="M7.12 7.12A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.68 21.68 0 0 1-4.87 6.06" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                  </button>
+                  )}
+                </div>
+              )}
+              {authMode === 'register' && (
+                <div className="relative">
+                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Pakartokite slaptažodį</label>
+                  <input
+                    name="confirmPassword"
+                    value={formConfirmPassword}
+                    onChange={(e) => setFormConfirmPassword(e.target.value)}
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)] pr-10"
+                    autoComplete="new-password"
+                    required
+                  />
+                  {formConfirmPassword.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute right-3 top-[38px] text-black/70 hover:text-black"
+                      aria-label={showConfirmPassword ? "Slėpti slaptažodį" : "Rodyti slaptažodį"}
+                    >
+                      {showConfirmPassword ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-5 w-5"
+                        >
+                          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94" />
+                          <path d="M1 1l22 22" />
+                          <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                          <path d="M14.12 14.12 9.88 9.88" />
+                          <path d="M7.12 7.12A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.68 21.68 0 0 1-4.87 6.06" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-5 w-5"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
               <button className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90">
-                PRISIJUNGTI
+                {authMode === 'login'
+                  ? 'PRISIJUNGTI'
+                  : authMode === 'register'
+                  ? 'REGISTRUOTIS'
+                  : 'SIŲSTI ATKŪRIMO NUORODĄ'}
               </button>
+              {authMode === 'login' ? (
+                <>
+                  <p className="text-xs text-white/90">
+                    Neturite paskyros?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('register');
+                        setAuthSuccessNotice(null);
+                        setLoginErrorNotice(null);
+                        setFormPassword('');
+                        setFormConfirmPassword('');
+                      }}
+                      className="font-semibold underline"
+                    >
+                      Registruokitės
+                    </button>
+                  </p>
+                  <p className="text-xs text-white/90">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('forgot');
+                        setAuthSuccessNotice(null);
+                        setLoginErrorNotice(null);
+                        setFormPassword('');
+                        setFormConfirmPassword('');
+                      }}
+                      className="font-semibold underline"
+                    >
+                      Pamiršau slaptažodį
+                    </button>
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-white/90">
+                  {authMode === 'register' ? 'Jau turite paskyrą?' : 'Prisiminėte slaptažodį?'}{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('login');
+                      setLoginErrorNotice(null);
+                      setFormPassword('');
+                      setFormConfirmPassword('');
+                    }}
+                    className="font-semibold underline"
+                  >
+                    Prisijunkite
+                  </button>
+                </p>
+              )}
             </div>
           </form>
         </div>
