@@ -14,6 +14,194 @@ const loginBackgrounds = [
   "https://vltpeycabrrruokwmjvq.supabase.co/storage/v1/object/public/LoginPhotos/background5.jpg"
 ];
 
+const translations = {
+  lt: {
+    order: 'Užsakyti',
+    catalog: 'Katalogas',
+    orders: 'Užsakymai',
+    myData: 'Mano duomenys',
+    allProducts: 'Visos prekės',
+    emptyCart: 'Jūsų krepšelis tuščias',
+    cart: 'Krepšelis',
+    myCart: 'Mano krepšelis',
+    clear: 'Išvalyti',
+    removeItem: 'Pašalinti prekę',
+    deliveryAddress: 'Pristatymo adresas',
+    chooseAddress: '-- Pasirinkite adresą --',
+    submitOrder: 'Pateikti užsakymą',
+    total: 'Iš viso',
+    grandTotal: 'Suma iš viso',
+    discount: 'Nuolaida',
+    logout: 'Atsijungti',
+    loading: 'Kraunama...',
+    login: 'PRISIJUNGTI',
+    register: 'REGISTRUOTIS',
+    sendResetLink: 'SIŲSTI ATKŪRIMO NUORODĄ',
+    email: 'El. paštas',
+    password: 'Slaptažodis',
+    repeatPassword: 'Pakartokite slaptažodį',
+    forgotPassword: 'Pamiršau slaptažodį',
+    noAccount: 'Neturite paskyros?',
+    registerHere: 'Registruokitės',
+    rememberedPassword: 'Prisiminėte slaptažodį?',
+    loginHere: 'Prisijunkite',
+    alreadyHaveAccount: 'Jau turite paskyrą?',
+    b2bLogin: 'B2B Prisijungimas',
+    b2bRegister: 'B2B Registracija',
+    passwordRecovery: 'Slaptažodžio atkūrimas',
+    premiumTextiles: 'Premium tekstile verslui.',
+    ordersWithoutNoise: 'Užsakymai be triukšmo.',
+    composition: 'Sudėtis',
+    clientItemCode: 'Kliento prekės kodas',
+    size: 'Dydis',
+    selectSize: 'Pasirinkite dydį',
+    showComposition: 'Rodyti sudeti',
+    close: 'Uždaryti',
+    menu: 'Meniu',
+    showCategories: 'Rodyti kategorijas',
+    yes: 'Taip',
+    no: 'Ne',
+    ok: 'Gerai',
+    editOrderTitle: 'Koreguoti užsakymą?',
+    editOrderText: 'Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.',
+    orderSentTitle: 'Užsakymas išsiųstas',
+    loginErrorTitle: 'Prisijungimo klaida',
+    myDataTitle: 'Mano duomenys',
+    companyInfo: 'Įmonės informacija',
+    edit: 'Redaguoti',
+    save: 'Išsaugoti',
+    cancel: 'Atšaukti',
+    companyName: 'Įmonės pavadinimas',
+    companyCode: 'Įmonės kodas',
+    contactPerson: 'Kontaktinis asmuo',
+    phone: 'Telefonas',
+    companyRegistrationAddress: 'Įmonės registracijos adresas',
+    headquartersAddress: 'Pagrindinės sėdybos adresas',
+    deliveryAddresses: 'Pristatymo adresai',
+    addNewAddress: 'Pridėti naują adresą',
+    addAddress: 'Pridėti adresą',
+    address: 'Adresas',
+    city: 'Miestas',
+    postalCode: 'Pašto kodas',
+    clickToEdit: 'Spustelėkite redaguoti',
+    orderHistory: 'Užsakymų istorija',
+    historyEmpty: 'Istorija tuščia.',
+    orderLabel: 'Užsakymas',
+    unknown: 'Nežinomas',
+    beforeSubmitAddAddress: 'Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".',
+    pcs: 'vnt.',
+    totalUpper: 'VISO',
+    canceled: 'Atšauktas',
+    completed: 'Įvykdytas',
+    sent: 'Išsiųstas',
+    productUnavailable: 'Prekės nebeturime.',
+    userNotFound: 'Vartotojas nerastas.',
+    saveDataError: 'Klaida išsaugant duomenis',
+    companyDataSaved: 'Įmonės duomenys išsaugoti!',
+    genericSaveError: 'Klaida išsaugant duomenis.',
+    addressUpdated: 'Adresas atnaujintas!',
+    addressSavedError: 'Klaida išsaugant adresą.',
+    addressDeleteError: 'Klaida trinant adresą',
+    addressAdded: 'Adresas pridėtas!',
+    addressAddedError: 'Klaida pridedant adresą.',
+    fillAllFields: 'Prašome užpildyti visus laukus!'
+  },
+  en: {
+    order: 'Order',
+    catalog: 'Catalog',
+    orders: 'Orders',
+    myData: 'My Data',
+    allProducts: 'All products',
+    emptyCart: 'Your cart is empty',
+    cart: 'Cart',
+    myCart: 'My cart',
+    clear: 'Clear',
+    removeItem: 'Remove item',
+    deliveryAddress: 'Delivery address',
+    chooseAddress: '-- Select address --',
+    submitOrder: 'Submit order',
+    total: 'Total',
+    grandTotal: 'Grand total',
+    discount: 'Discount',
+    logout: 'Log out',
+    loading: 'Loading...',
+    login: 'LOGIN',
+    register: 'REGISTER',
+    sendResetLink: 'SEND RESET LINK',
+    email: 'Email',
+    password: 'Password',
+    repeatPassword: 'Repeat password',
+    forgotPassword: 'Forgot password',
+    noAccount: "Don't have an account?",
+    registerHere: 'Register',
+    rememberedPassword: 'Remembered your password?',
+    loginHere: 'Log in',
+    alreadyHaveAccount: 'Already have an account?',
+    b2bLogin: 'B2B Login',
+    b2bRegister: 'B2B Registration',
+    passwordRecovery: 'Password recovery',
+    premiumTextiles: 'Premium textiles for business.',
+    ordersWithoutNoise: 'Orders without noise.',
+    composition: 'Composition',
+    clientItemCode: 'Client item code',
+    size: 'Size',
+    selectSize: 'Select size',
+    showComposition: 'Show composition',
+    close: 'Close',
+    menu: 'Menu',
+    showCategories: 'Show categories',
+    yes: 'Yes',
+    no: 'No',
+    ok: 'OK',
+    editOrderTitle: 'Edit order?',
+    editOrderText: 'The current order will be canceled and items will return to cart.',
+    orderSentTitle: 'Order sent',
+    loginErrorTitle: 'Login error',
+    myDataTitle: 'My Data',
+    companyInfo: 'Company information',
+    edit: 'Edit',
+    save: 'Save',
+    cancel: 'Cancel',
+    companyName: 'Company name',
+    companyCode: 'Company code',
+    contactPerson: 'Contact person',
+    phone: 'Phone',
+    companyRegistrationAddress: 'Company registration address',
+    headquartersAddress: 'Headquarters address',
+    deliveryAddresses: 'Delivery addresses',
+    addNewAddress: 'Add new address',
+    addAddress: 'Add address',
+    address: 'Address',
+    city: 'City',
+    postalCode: 'Postal code',
+    clickToEdit: 'Click to edit',
+    orderHistory: 'Order history',
+    historyEmpty: 'History is empty.',
+    orderLabel: 'Order',
+    unknown: 'Unknown',
+    beforeSubmitAddAddress: 'Before submitting an order, add a delivery address in "My Data" section.',
+    pcs: 'pcs',
+    totalUpper: 'TOTAL',
+    canceled: 'Canceled',
+    completed: 'Completed',
+    sent: 'Sent',
+    productUnavailable: 'Item is unavailable.',
+    userNotFound: 'User not found.',
+    saveDataError: 'Error while saving data',
+    companyDataSaved: 'Company data saved!',
+    genericSaveError: 'Error while saving data.',
+    addressUpdated: 'Address updated!',
+    addressSavedError: 'Error while saving address.',
+    addressDeleteError: 'Error while deleting address',
+    addressAdded: 'Address added!',
+    addressAddedError: 'Error while adding address.',
+    fillAllFields: 'Please fill all fields!'
+  }
+} as const;
+
+type Locale = keyof typeof translations;
+type TranslationKey = keyof typeof translations.lt;
+
 const ImageGallery = ({ images, onImageClick }: { images: string[], onImageClick: (idx: number) => void }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const next = (e: any) => { e.stopPropagation(); setCurrentIdx((currentIdx + 1) % images.length); };
@@ -134,7 +322,7 @@ const ImageModal = ({ images, startIndex, onClose }: { images: string[], startIn
   );
 };
 
-const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
+const ProductCard = ({ product, onAdd, getPrice, onOpenModal, t, getProductName }: any) => {
   const price = getPrice(product.basePrice);
   const hasDiscount = price < product.basePrice;
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
@@ -220,29 +408,29 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
             type="button"
             onClick={() => setIsExpanded(false)}
             className="absolute top-4 right-4 text-[var(--ink-soft)] hover:text-[var(--foreground)] text-2xl leading-none"
-            aria-label="Uzdaryti"
+            aria-label={t('close')}
           >
             x
           </button>
           <ImageGallery images={product.images} onImageClick={(idx) => onOpenModal(product.images, idx)} />
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h2 className="text-lg font-semibold leading-tight text-[var(--foreground)] flex-1">{product.name}</h2>
+            <h2 className="text-lg font-semibold leading-tight text-[var(--foreground)] flex-1">{getProductName(product)}</h2>
           </div>
           {product.description && (
             <div className="mb-4 text-sm text-[var(--ink-soft)]">
-              <span className="font-semibold text-[var(--foreground)]">Sudėtis: </span>
+              <span className="font-semibold text-[var(--foreground)]">{t('composition')}: </span>
               {product.description}
             </div>
           )}
           {product.clientItemNo && (
             <div className="mb-4 text-sm text-[var(--ink-soft)]">
-              <span className="font-semibold text-[var(--foreground)]">Kliento prekės kodas: </span>
+              <span className="font-semibold text-[var(--foreground)]">{t('clientItemCode')}: </span>
               {product.clientItemNo}
             </div>
           )}
           {hasSizeLabels && (
             <div className="mb-4">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Dydis</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">{t('size')}</div>
               <div className="flex flex-wrap gap-2">
                 {sizeOptions.map((sizeProduct: any) => (
                   <button
@@ -260,7 +448,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
                 ))}
               </div>
               {selectedSizes.length === 0 && (
-                <div className="mt-2 text-[10px] text-[var(--ink-soft)]">Pasirinkite dydį</div>
+                <div className="mt-2 text-[10px] text-[var(--ink-soft)]">{t('selectSize')}</div>
               )}
             </div>
           )}
@@ -276,7 +464,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               disabled={hasSizeLabels && selectedSizes.length === 0}
               className="bg-white border border-black/10 text-[var(--foreground)] px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[var(--surface)] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Užsakyti
+              {t('order')}
             </button>
           </div>
         </div>
@@ -297,13 +485,13 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
       </div>
       <div className="px-3 pb-3 pt-2 flex flex-col flex-grow text-[#2d3427]">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-[10px] font-semibold leading-tight min-h-[2rem] flex-1">{product.name}</h2>
+          <h2 className="text-[10px] font-semibold leading-tight min-h-[2rem] flex-1">{getProductName(product)}</h2>
           {product.description && (
             <button
               type="button"
               onClick={() => setIsExpanded((prev) => !prev)}
               className="text-[#2d3427] hover:text-black text-[9px] font-semibold bg-transparent border-0 p-0"
-              aria-label="Rodyti sudeti"
+              aria-label={t('showComposition')}
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" fill="#2d3427" />
@@ -315,7 +503,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
         </div>
         {hasSizeLabels && (
           <div className="min-h-[24px]">
-            <div className="text-[8px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">Dydis</div>
+            <div className="text-[8px] uppercase tracking-[0.2em] text-[#2d3427] mb-2">{t('size')}</div>
             <div className="flex flex-wrap gap-1.5">
               {sizeOptions.map((sizeProduct: any) => (
                 <button
@@ -333,7 +521,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
               ))}
             </div>
             {selectedSizes.length === 0 && (
-              <div className="mt-2 text-[8px] text-[#2d3427]">Pasirinkite dydį</div>
+              <div className="mt-2 text-[8px] text-[#2d3427]">{t('selectSize')}</div>
             )}
           </div>
         )}
@@ -349,7 +537,7 @@ const ProductCard = ({ product, onAdd, getPrice, onOpenModal }: any) => {
             disabled={hasSizeLabels && selectedSizes.length === 0}
             className="bg-white border border-black/10 text-[#2d3427] px-2.5 py-1.5 rounded-xl text-[9px] font-semibold hover:bg-[#f2f5e8] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Užsakyti
+            {t('order')}
           </button>
         </div>
       </div>
@@ -412,6 +600,7 @@ export default function B2BPortal() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register" | "forgot">("login");
   const [authSuccessNotice, setAuthSuccessNotice] = useState<string | null>(null);
+  const [language, setLanguage] = useState<Locale>('lt');
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [loginBgIndex, setLoginBgIndex] = useState(0);
@@ -426,6 +615,22 @@ export default function B2BPortal() {
   const [clients, setClients] = useState<any>({});
 
   const [products, setProducts] = useState<any[]>([]);
+
+  const t = (key: TranslationKey) => translations[language][key];
+
+  const getProductName = (product: any) => {
+    if (language === 'en') return product?.name_en || product?.name_lt || product?.name || '';
+    return product?.name_lt || product?.name_en || product?.name || '';
+  };
+
+  const getOrderStatusLabel = (status?: string | null) => {
+    if (!status) return t('unknown');
+    if (language === 'lt') return status;
+    if (status === 'Išsiustas' || status === 'Išsiųsta') return t('sent');
+    if (status === 'Įvykdytas') return t('completed');
+    if (status === 'Atšauktas') return t('canceled');
+    return status;
+  };
 
   const parseDiscountGroup = (value: string | null) => {
     if (!value) return 1;
@@ -588,7 +793,11 @@ export default function B2BPortal() {
 
           return {
             id: row.id,
-            name: row.name,
+            name: language === 'en'
+              ? (row.name_en ?? row.name_lt ?? row.name ?? '')
+              : (row.name_lt ?? row.name_en ?? row.name ?? ''),
+            name_lt: row.name_lt ?? row.name ?? row.name_en ?? '',
+            name_en: row.name_en ?? row.name ?? row.name_lt ?? '',
             basePrice: row.price ?? row.base_price ?? row.basePrice ?? 0,
             category: typeof row.category === 'string' && row.category.trim() !== '' ? row.category.trim() : null,
             images,
@@ -620,7 +829,11 @@ export default function B2BPortal() {
           const variants = main.itemNo ? connectionMap.get(String(main.itemNo)) || [] : [];
           const sizeOptions = [main, ...variants].map((row: any) => ({
             id: row.id,
-            name: row.name || main.name,
+            name: language === 'en'
+              ? (row.name_en || row.name_lt || row.name || main.name_en || main.name_lt || main.name)
+              : (row.name_lt || row.name_en || row.name || main.name_lt || main.name_en || main.name),
+            name_lt: row.name_lt || row.name || main.name_lt || main.name,
+            name_en: row.name_en || row.name || main.name_en || main.name,
             basePrice: row.basePrice,
             category: row.category,
             images: main.images,
@@ -689,14 +902,19 @@ export default function B2BPortal() {
       }
     };
     fetchProducts();
-  }, [isLoggedIn, clientCode, clients]);
+  }, [isLoggedIn, clientCode, clients, language]);
 
   // Patikrinti localStorage prisijungimo būsenai, saugytam langui ir užsakymams
   useEffect(() => {
     const savedLoggedIn = localStorage.getItem('isLoggedIn');
     const savedClientCode = localStorage.getItem('clientCode');
     const savedView = localStorage.getItem('currentView');
+    const savedLanguage = localStorage.getItem('language');
     const savedOrderHistory = localStorage.getItem('orderHistory');
+
+    if (savedLanguage === 'lt' || savedLanguage === 'en') {
+      setLanguage(savedLanguage);
+    }
     
     if (savedOrderHistory) {
       try {
@@ -727,6 +945,10 @@ export default function B2BPortal() {
     }
     setIsAuthReady(true);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
   // Saugoti dabartinį langą į localStorage
   useEffect(() => {
@@ -1044,9 +1266,7 @@ export default function B2BPortal() {
 
   const handleEditOrder = async (order: any, skipConfirm?: boolean) => {
     if (!skipConfirm) {
-      const confirmEdit = window.confirm(
-        'Ar tikrai norite koreguoti užsakymą? Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.'
-      );
+      const confirmEdit = window.confirm(`${t('editOrderTitle')} ${t('editOrderText')}`);
       if (!confirmEdit) return;
     }
 
@@ -1208,7 +1428,7 @@ export default function B2BPortal() {
     }
 
     if (deliveryAddresses.length === 0 || selectedDeliveryAddress === null) {
-      alert('Prieš pateikiant užsakymą, pasirinkite pristatymo adresą');
+      alert(t('beforeSubmitAddAddress'));
       return;
     }
 
@@ -1539,7 +1759,7 @@ export default function B2BPortal() {
         }
       });
     } catch (err: any) {
-      setLoginErrorNotice(err?.message || "Prisijungimo klaida");
+      setLoginErrorNotice(err?.message || t('loginErrorTitle'));
     }
   };
 
@@ -1554,7 +1774,7 @@ export default function B2BPortal() {
   if (!isAuthReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-sm text-[#2d3427]/70">Kraunama...</div>
+        <div className="text-sm text-[#2d3427]/70">{t('loading')}</div>
       </div>
     );
   }
@@ -1574,8 +1794,8 @@ export default function B2BPortal() {
         <div className="relative w-full max-w-5xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="hidden lg:block">
             <h1 className="mt-6 text-4xl font-semibold leading-tight text-white">
-              Premium tekstile verslui.
-              <span className="block text-white/80">Užsakymai be triukšmo.</span>
+              {t('premiumTextiles')}
+              <span className="block text-white/80">{t('ordersWithoutNoise')}</span>
             </h1>
           </div>
 
@@ -1588,10 +1808,10 @@ export default function B2BPortal() {
               <div className="text-xs uppercase tracking-[0.35em] text-white/80">FLOKATI</div>
               <div className="text-3xl font-semibold text-white mt-2">
                 {authMode === 'login'
-                  ? 'B2B Prisijungimas'
+                  ? t('b2bLogin')
                   : authMode === 'register'
-                  ? 'B2B Registracija'
-                  : 'Slaptažodžio atkūrimas'}
+                  ? t('b2bRegister')
+                  : t('passwordRecovery')}
               </div>
             </div>
 
@@ -1603,7 +1823,7 @@ export default function B2BPortal() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">El. paštas</label>
+                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">{t('email')}</label>
                 <input 
                   name="email"
                   type="email"
@@ -1617,7 +1837,7 @@ export default function B2BPortal() {
               </div>
               {authMode !== 'forgot' && (
                 <div className="relative">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Slaptažodis</label>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">{t('password')}</label>
                   <input 
                     name="password"
                     value={formPassword}
@@ -1673,7 +1893,7 @@ export default function B2BPortal() {
               )}
               {authMode === 'register' && (
                 <div className="relative">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">Pakartokite slaptažodį</label>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/80 mb-2">{t('repeatPassword')}</label>
                   <input
                     name="confirmPassword"
                     value={formConfirmPassword}
@@ -1728,15 +1948,15 @@ export default function B2BPortal() {
               )}
               <button className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90">
                 {authMode === 'login'
-                  ? 'PRISIJUNGTI'
+                  ? t('login')
                   : authMode === 'register'
-                  ? 'REGISTRUOTIS'
-                  : 'SIŲSTI ATKŪRIMO NUORODĄ'}
+                  ? t('register')
+                  : t('sendResetLink')}
               </button>
               {authMode === 'login' ? (
                 <>
                   <p className="text-xs text-white/90">
-                    Neturite paskyros?{' '}
+                    {t('noAccount')}{' '}
                     <button
                       type="button"
                       onClick={() => {
@@ -1748,7 +1968,7 @@ export default function B2BPortal() {
                       }}
                       className="font-semibold underline"
                     >
-                      Registruokitės
+                      {t('registerHere')}
                     </button>
                   </p>
                   <p className="text-xs text-white/90">
@@ -1763,13 +1983,13 @@ export default function B2BPortal() {
                       }}
                       className="font-semibold underline"
                     >
-                      Pamiršau slaptažodį
+                      {t('forgotPassword')}
                     </button>
                   </p>
                 </>
               ) : (
                 <p className="text-xs text-white/90">
-                  {authMode === 'register' ? 'Jau turite paskyrą?' : 'Prisiminėte slaptažodį?'}{' '}
+                  {authMode === 'register' ? t('alreadyHaveAccount') : t('rememberedPassword')}{' '}
                   <button
                     type="button"
                     onClick={() => {
@@ -1780,7 +2000,7 @@ export default function B2BPortal() {
                     }}
                     className="font-semibold underline"
                   >
-                    Prisijunkite
+                    {t('loginHere')}
                   </button>
                 </p>
               )}
@@ -1804,16 +2024,16 @@ export default function B2BPortal() {
       {editOrderConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
-            <h3 className="text-lg font-semibold text-[#2d3427]">Koreguoti užsakymą?</h3>
+            <h3 className="text-lg font-semibold text-[#2d3427]">{t('editOrderTitle')}</h3>
             <p className="mt-2 text-sm text-[#2d3427]/80">
-              Dabartinis užsakymas bus atšauktas ir prekės grįš į krepšelį.
+              {t('editOrderText')}
             </p>
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setEditOrderConfirm(null)}
                 className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#cfd8c0] transition"
               >
-                Ne
+                {t('no')}
               </button>
               <button
                 onClick={async () => {
@@ -1823,7 +2043,7 @@ export default function B2BPortal() {
                 }}
                 className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
-                Taip
+                {t('yes')}
               </button>
             </div>
           </div>
@@ -1832,7 +2052,7 @@ export default function B2BPortal() {
       {submitOrderNotice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
-            <h3 className="text-lg font-semibold text-[#2d3427]">Užsakymas išsiuštas</h3>
+            <h3 className="text-lg font-semibold text-[#2d3427]">{t('orderSentTitle')}</h3>
             <div className="mt-2 text-sm text-[#2d3427]/80">
               <div>{submitOrderNotice.email}!</div>
               <div>Suma: {submitOrderNotice.total.toFixed(2)} €</div>
@@ -1842,7 +2062,7 @@ export default function B2BPortal() {
                 onClick={() => setSubmitOrderNotice(null)}
                 className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
-                Gerai
+                {t('ok')}
               </button>
             </div>
           </div>
@@ -1851,7 +2071,7 @@ export default function B2BPortal() {
       {loginErrorNotice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg">
-            <h3 className="text-lg font-semibold text-[#2d3427]">Prisijungimo klaida</h3>
+            <h3 className="text-lg font-semibold text-[#2d3427]">{t('loginErrorTitle')}</h3>
             <div className="mt-2 text-sm text-[#2d3427]/80">
               {loginErrorNotice}
             </div>
@@ -1860,7 +2080,7 @@ export default function B2BPortal() {
                 onClick={() => setLoginErrorNotice(null)}
                 className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
-                Gerai
+                {t('ok')}
               </button>
             </div>
           </div>
@@ -1878,7 +2098,7 @@ export default function B2BPortal() {
                 onClick={() => setProfileNotice(null)}
                 className="w-full bg-[#2d3427] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
-                Gerai
+                {t('ok')}
               </button>
             </div>
           </div>
@@ -1893,19 +2113,19 @@ export default function B2BPortal() {
               <button
                 onClick={() => setIsMobileMenuOpen((prev) => !prev)}
                 className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-black/10 text-[#2d3427] hover:bg-[#e2e8d4] transition"
-                aria-label="Meniu"
+                aria-label={t('menu')}
               >
                 <Menu className="h-5 w-5" />
               </button>
               <div className="text-sm font-semibold text-[#2d3427] whitespace-nowrap">
-                {view === 'katalogas' ? 'Katalogas' : view === 'uzsakymai' ? 'Užsakymai' : 'Mano duomenys'}
+                {view === 'katalogas' ? t('catalog') : view === 'uzsakymai' ? t('orders') : t('myData')}
               </div>
             </div>
             <button
               onClick={() => setIsCartVisible(!isCartVisible)}
               className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
-              title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
-              aria-label="Krepšelis"
+              title={cartItemCount === 0 ? t('emptyCart') : ""}
+              aria-label={t('cart')}
               ref={mobileCartButtonRef}
             >
               <ShoppingCart className="h-6 w-6" />
@@ -1926,7 +2146,7 @@ export default function B2BPortal() {
                     : 'text-[#2d3427] hover:bg-[#f2f5e8]'
                 }`}
               >
-                Visos prekės
+                {t('allProducts')}
               </button>
               {availableCategories.map((category: string) => (
                 <button
@@ -1954,12 +2174,12 @@ export default function B2BPortal() {
                   }}
                   className="flex-1 text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
                 >
-                  Katalogas
+                  {t('catalog')}
                 </button>
                 <button
                   onClick={() => setIsMobileCategoriesOpen((prev) => !prev)}
                   className="h-9 w-9 flex items-center justify-center rounded-xl text-[#2d3427] hover:bg-[#f2f5e8] transition"
-                  aria-label="Rodyti kategorijas"
+                  aria-label={t('showCategories')}
                 >
                   <ChevronDown className={`h-4 w-4 transition ${isMobileCategoriesOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -1979,7 +2199,7 @@ export default function B2BPortal() {
                         : 'text-[#2d3427] hover:bg-[#f2f5e8]'
                     }`}
                   >
-                    Visos prekės
+                    {t('allProducts')}
                   </button>
                   {availableCategories.map((category: string) => (
                     <button
@@ -2008,7 +2228,7 @@ export default function B2BPortal() {
                 }}
                 className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
               >
-                Užsakymai
+                {t('orders')}
               </button>
               <button
                 onClick={() => {
@@ -2017,7 +2237,7 @@ export default function B2BPortal() {
                 }}
                 className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition"
               >
-                Mano duomenys
+                {t('myData')}
               </button>
               <button
                 onClick={() => {
@@ -2043,7 +2263,7 @@ export default function B2BPortal() {
                     <path d="M21 12H9" />
                   </svg>
                 </span>
-                Atsijungti
+                {t('logout')}
               </button>
             </div>
           )}
@@ -2055,7 +2275,7 @@ export default function B2BPortal() {
             >
               <div className="p-5 pb-0">
                 <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
+                  <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t('myCart')}</h2>
                 </div>
                 {cartNotice && (
                   <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
@@ -2064,12 +2284,12 @@ export default function B2BPortal() {
                 )}
                 {currentCart.length > 0 && (
                   <div className="flex justify-end pb-3">
-                    <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+                    <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">{t('clear')}</button>
                   </div>
                 )}
               </div>
               <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh]">
-                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
+                {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">{t('emptyCart')}</p> : 
                   currentCart.map((item: any) => (
                     <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
                       <div className="flex gap-3">
@@ -2081,7 +2301,7 @@ export default function B2BPortal() {
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start mb-1">
                             <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
-                              <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
+                              <h3 className="font-semibold text-sm text-[var(--foreground)]">{getProductName(item)}</h3>
                               {item.size && (
                                 <div className="text-xs font-semibold text-green-700">{item.size}</div>
                               )}
@@ -2089,7 +2309,7 @@ export default function B2BPortal() {
                             <button
                               onClick={() => removeItem(item.id)}
                               className="text-gray-400 hover:text-red-500 text-lg"
-                              title="Pašalinti prekę"
+                              title={t('removeItem')}
                             >
                               ×
                             </button>
@@ -2123,13 +2343,13 @@ export default function B2BPortal() {
               <div className="p-5 border-t border-black/5">
                 {currentCart.length > 0 && deliveryAddresses.length > 0 && (
                   <div className="mb-4">
-                    <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                    <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">{t('deliveryAddress')}</label>
                     <select
                       value={selectedDeliveryAddress ?? ''}
                       onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
                       className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                     >
-                      <option value="">-- Pasirinkite adresą --</option>
+                      <option value="">{t('chooseAddress')}</option>
                       {deliveryAddresses.map((addr, idx) => (
                         <option key={idx} value={idx}>
                           {addr.name} - {addr.address}, {addr.city}
@@ -2140,11 +2360,11 @@ export default function B2BPortal() {
                 )}
                 {currentCart.length > 0 && deliveryAddresses.length === 0 && (
                   <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
-                    Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                    {t('beforeSubmitAddAddress')}
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-semibold mb-3">
-                  <span>Viso</span>
+                  <span>{t('total')}</span>
                   <span>{currentTotal.toFixed(2)} €</span>
                 </div>
                 <button
@@ -2152,7 +2372,7 @@ export default function B2BPortal() {
                   disabled={currentCart.length === 0 || deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
                   className="w-full bg-[var(--foreground)] text-white py-3 rounded-2xl font-semibold uppercase tracking-[0.2em] transition-all hover:opacity-90 disabled:opacity-40"
                 >
-                  Pateikti užsakymą
+                  {t('submitOrder')}
                 </button>
               </div>
             </div>
@@ -2170,21 +2390,21 @@ export default function B2BPortal() {
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'katalogas' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
               >
                 <LayoutGrid className="h-4 w-4" />
-                Katalogas
+                {t('catalog')}
               </button>
               <button
                 onClick={() => setView("uzsakymai")}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'uzsakymai' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
               >
                 <ClipboardList className="h-4 w-4" />
-                Užsakymai
+                {t('orders')}
               </button>
               <button
                 onClick={() => setView("mano-duomenis")}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center gap-3 ${view === 'mano-duomenis' ? 'bg-[#e2e8d4] text-[#2d3427]' : 'text-[#2d3427] hover:bg-[#f2f5e8]'}`}
               >
                 <User className="h-4 w-4" />
-                Mano duomenys
+                {t('myData')}
               </button>
             </nav>
           </aside>
@@ -2192,12 +2412,12 @@ export default function B2BPortal() {
           <main className="order-2 lg:order-none">
             {view === "mano-duomenis" ? (
               <div className="bg-white p-8 rounded-[2rem]">
-            <h2 className="hidden lg:block text-2xl font-extralight mb-8">Mano duomenys</h2>
+            <h2 className="hidden lg:block text-2xl font-extralight mb-8">{t('myDataTitle')}</h2>
             
             {/* Įmonės duomenys */}
             <div className="mb-10 pb-8 border-b border-[#d6ddc7]">
               <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)] flex items-center justify-between">
-                Įmonės informacija
+                {t('companyInfo')}
                 {!editingCompany && companyData.name && (
                   <button 
                     onClick={() => {
@@ -2206,7 +2426,7 @@ export default function B2BPortal() {
                     }}
                     className="text-sm bg-[#e2e8d4] text-[#2d3427] px-3 py-1 rounded-2xl hover:opacity-80 transition"
                   >
-                    Redaguoti
+                    {t('edit')}
                   </button>
                 )}
               </h3>
@@ -2216,7 +2436,7 @@ export default function B2BPortal() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyName')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.name} 
@@ -2225,7 +2445,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės kodas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyCode')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.code} 
@@ -2234,7 +2454,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Kontaktinis asmuo</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('contactPerson')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.contactPerson} 
@@ -2243,7 +2463,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('phone')}</label>
                       <input 
                         type="tel" 
                         value={editCompanyData.phone} 
@@ -2252,7 +2472,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">El. paštas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('email')}</label>
                       <input 
                         type="email" 
                         value={editCompanyData.email} 
@@ -2261,7 +2481,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės registracijos adresas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyRegistrationAddress')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.address} 
@@ -2276,7 +2496,7 @@ export default function B2BPortal() {
                         try {
                           const { data: { user } } = await supabase.auth.getUser();
                           if (!user) {
-                            setProfileNotice({ title: 'Mano duomenys', message: 'Vartotojas nerastas.' });
+                            setProfileNotice({ title: t('myDataTitle'), message: t('userNotFound') });
                             return;
                           }
                           
@@ -2307,7 +2527,7 @@ export default function B2BPortal() {
                           
                           if (error) {
                             console.error('❌ Klaida išsaugant:', error);
-                            setProfileNotice({ title: 'Mano duomenys', message: `Klaida išsaugant duomenis: ${error.message}` });
+                            setProfileNotice({ title: t('myDataTitle'), message: `${t('saveDataError')}: ${error.message}` });
                             return;
                           }
                           
@@ -2321,15 +2541,15 @@ export default function B2BPortal() {
                           
                           setCompanyData(editCompanyData);
                           setEditingCompany(false);
-                          setProfileNotice({ title: 'Mano duomenys', message: 'Įmonės duomenys išsaugoti!' });
+                          setProfileNotice({ title: t('myDataTitle'), message: t('companyDataSaved') });
                         } catch (e) {
                           console.error('Save error:', e);
-                          setProfileNotice({ title: 'Mano duomenys', message: 'Klaida išsaugant duomenis.' });
+                          setProfileNotice({ title: t('myDataTitle'), message: t('genericSaveError') });
                         }
                       }}
                       className="flex-1 bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                     >
-                      ✓ Išsaugoti
+                      ✓ {t('save')}
                     </button>
                     <button 
                       onClick={() => {
@@ -2338,7 +2558,7 @@ export default function B2BPortal() {
                       }}
                       className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-6 py-3 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                     >
-                      ✕ Atšaukti
+                      ✕ {t('cancel')}
                     </button>
                   </div>
                 </>
@@ -2347,27 +2567,27 @@ export default function B2BPortal() {
                 <div className="bg-[#e2e8d4] p-6 rounded-[2rem]">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės pavadinimas</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('companyName')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.name}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės kodas</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('companyCode')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.code || "—"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Kontaktinis asmuo</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('contactPerson')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.contactPerson || "—"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Telefonas</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('phone')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.phone || "—"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">El. paštas</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('email')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.email || "—"}</p>
                     </div>
                     <div className="md:col-span-2">
-                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Įmonės registracijos adresas</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{t('companyRegistrationAddress')}</p>
                       <p className="text-lg text-[#2d3427] font-semibold">{companyData.address || "—"}</p>
                     </div>
                   </div>
@@ -2377,7 +2597,7 @@ export default function B2BPortal() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyName')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.name} 
@@ -2387,7 +2607,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės kodas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyCode')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.code} 
@@ -2397,7 +2617,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('phone')}</label>
                       <input 
                         type="tel" 
                         value={editCompanyData.phone} 
@@ -2407,7 +2627,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">El. paštas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('email')}</label>
                       <input 
                         type="email" 
                         value={editCompanyData.email} 
@@ -2417,7 +2637,7 @@ export default function B2BPortal() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pagrindinės sėdybos adresas</label>
+                      <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('headquartersAddress')}</label>
                       <input 
                         type="text" 
                         value={editCompanyData.address} 
@@ -2432,7 +2652,7 @@ export default function B2BPortal() {
                       try {
                         const { data: { user } } = await supabase.auth.getUser();
                         if (!user) {
-                          setProfileNotice({ title: 'Mano duomenys', message: 'Vartotojas nerastas.' });
+                          setProfileNotice({ title: t('myDataTitle'), message: t('userNotFound') });
                           return;
                         }
                         
@@ -2463,7 +2683,7 @@ export default function B2BPortal() {
                         
                         if (error) {
                           console.error('❌ Klaida išsaugant:', error);
-                          setProfileNotice({ title: 'Mano duomenys', message: `Klaida išsaugant duomenis: ${error.message}` });
+                          setProfileNotice({ title: t('myDataTitle'), message: `${t('saveDataError')}: ${error.message}` });
                           return;
                         }
                         
@@ -2477,15 +2697,15 @@ export default function B2BPortal() {
                         
                         setCompanyData(editCompanyData);
                         setEditingCompany(false);
-                        setProfileNotice({ title: 'Mano duomenys', message: 'Įmonės duomenys išsaugoti!' });
+                        setProfileNotice({ title: t('myDataTitle'), message: t('companyDataSaved') });
                       } catch (e) {
                         console.error('Save error:', e);
-                        setProfileNotice({ title: 'Mano duomenys', message: 'Klaida išsaugant duomenis.' });
+                        setProfileNotice({ title: t('myDataTitle'), message: t('genericSaveError') });
                       }
                     }}
                     className="w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                   >
-                    Išsaugoti
+                    {t('save')}
                   </button>
                 </>
               )}
@@ -2493,7 +2713,7 @@ export default function B2BPortal() {
 
             {/* Pristatymo adresai */}
             <div>
-              <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)]">Pristatymo adresai</h3>
+              <h3 className="text-xl font-semibold mb-6 text-[var(--foreground)]">{t('deliveryAddresses')}</h3>
               
               {/* Esamų adresų sąrašas */}
               {deliveryAddresses.length > 0 && (
@@ -2505,7 +2725,7 @@ export default function B2BPortal() {
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyName')}</label>
                               <input
                                 type="text" 
                                 value={addr.name} 
@@ -2518,7 +2738,7 @@ export default function B2BPortal() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Adresas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('address')}</label>
                               <input 
                                 type="text" 
                                 value={addr.address} 
@@ -2531,7 +2751,7 @@ export default function B2BPortal() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Miestas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('city')}</label>
                               <input 
                                 type="text" 
                                 value={addr.city} 
@@ -2544,7 +2764,7 @@ export default function B2BPortal() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pašto kodas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('postalCode')}</label>
                               <input 
                                 type="text" 
                                 value={addr.postalCode} 
@@ -2557,7 +2777,7 @@ export default function B2BPortal() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
+                              <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('phone')}</label>
                               <input 
                                 type="tel" 
                                 value={addr.phone} 
@@ -2576,7 +2796,7 @@ export default function B2BPortal() {
                                 try {
                                   const { data: { user } } = await supabase.auth.getUser();
                                   if (!user) {
-                                    setProfileNotice({ title: 'Pristatymo adresai', message: 'Vartotojas nerastas.' });
+                                    setProfileNotice({ title: t('deliveryAddresses'), message: t('userNotFound') });
                                     return;
                                   }
                                   
@@ -2593,27 +2813,27 @@ export default function B2BPortal() {
                                   
                                   if (error) {
                                     console.error('❌ Klaida išsaugant adresą:', error);
-                                    setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida išsaugant adresą: ${error.message}` });
+                                    setProfileNotice({ title: t('deliveryAddresses'), message: `${t('addressSavedError')} ${error.message}` });
                                     return;
                                   }
                                   
                                   localStorage.setItem('delivery_addresses', JSON.stringify(deliveryAddresses));
                                   setEditingAddressIdx(null);
-                                  setProfileNotice({ title: 'Pristatymo adresai', message: 'Adresas atnaujintas!' });
+                                  setProfileNotice({ title: t('deliveryAddresses'), message: t('addressUpdated') });
                                 } catch (e) {
                                   console.error('Save address error:', e);
-                                  setProfileNotice({ title: 'Pristatymo adresai', message: 'Klaida išsaugant adresą.' });
+                                  setProfileNotice({ title: t('deliveryAddresses'), message: t('addressSavedError') });
                                 }
                               }}
                               className="flex-1 bg-[#2d3427] text-white px-4 py-2 rounded-2xl font-semibold hover:opacity-90 transition"
                             >
-                              ✓ Išsaugoti
+                              ✓ {t('save')}
                             </button>
                             <button 
                               onClick={() => setEditingAddressIdx(null)}
                               className="flex-1 bg-[#e2e8d4] text-[#2d3427] px-4 py-2 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                             >
-                              ✕ Atšaukti
+                              ✕ {t('cancel')}
                             </button>
                           </div>
                         </div>
@@ -2625,7 +2845,7 @@ export default function B2BPortal() {
                             <p className="text-sm text-[#2d3427] opacity-70">{addr.address}</p>
                             <p className="text-sm text-[#2d3427] opacity-70">{addr.city}, {addr.postalCode}</p>
                             {addr.phone && <p className="text-sm text-[#2d3427] opacity-70 mt-1">📞 {addr.phone}</p>}
-                            <p className="text-xs text-[#2d3427] mt-2">Spustelekite redaguoti</p>
+                            <p className="text-xs text-[#2d3427] mt-2">{t('clickToEdit')}</p>
                           </div>
                           <button 
                             onClick={async () => {
@@ -2640,7 +2860,7 @@ export default function B2BPortal() {
                                     .eq('id', user.id);
                                   if (error) {
                                     console.error('❌ Delete error:', error);
-                                    setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida trinant adresą: ${error.message}` });
+                                    setProfileNotice({ title: t('deliveryAddresses'), message: `${t('addressDeleteError')}: ${error.message}` });
                                     return;
                                   }
                                 }
@@ -2668,17 +2888,17 @@ export default function B2BPortal() {
                   onClick={() => setShowAddressForm(true)}
                   className="w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition mb-6"
                 >
-                  Pridėti naują adresą
+                  {t('addNewAddress')}
                 </button>
               )}
 
               {/* Naujo adreso forma */}
               {showAddressForm && (
                 <div className="bg-[#e2e8d4] p-6 rounded-[2rem]">
-                  <h4 className="font-semibold text-[#2d3427] mb-4">Pridėti naują adresą</h4>
+                  <h4 className="font-semibold text-[#2d3427] mb-4">{t('addNewAddress')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Įmonės pavadinimas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('companyName')}</label>
                     <input 
                       type="text" 
                       value={newAddress.name} 
@@ -2687,7 +2907,7 @@ export default function B2BPortal() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Adresas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('address')}</label>
                     <input 
                       type="text" 
                       value={newAddress.address} 
@@ -2697,7 +2917,7 @@ export default function B2BPortal() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Miestas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('city')}</label>
                     <input 
                       type="text" 
                       value={newAddress.city} 
@@ -2706,7 +2926,7 @@ export default function B2BPortal() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Pašto kodas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('postalCode')}</label>
                     <input 
                       type="text" 
                       value={newAddress.postalCode} 
@@ -2715,7 +2935,7 @@ export default function B2BPortal() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">Telefonas</label>
+                    <label className="block text-sm font-semibold mb-2 text-[#2d3427]">{t('phone')}</label>
                     <input 
                       type="tel" 
                       value={newAddress.phone} 
@@ -2733,7 +2953,7 @@ export default function B2BPortal() {
                         
                         const { data: { user } } = await supabase.auth.getUser();
                         if (!user) {
-                          setProfileNotice({ title: 'Pristatymo adresai', message: 'Vartotojas nerastas.' });
+                          setProfileNotice({ title: t('deliveryAddresses'), message: t('userNotFound') });
                           return;
                         }
                         
@@ -2750,7 +2970,7 @@ export default function B2BPortal() {
                         
                         if (error) {
                           console.error('❌ Klaida pridedant adresą:', error);
-                          setProfileNotice({ title: 'Pristatymo adresai', message: `Klaida pridedant adresą: ${error.message}` });
+                          setProfileNotice({ title: t('deliveryAddresses'), message: `${t('addressAddedError')} ${error.message}` });
                           return;
                         }
                         
@@ -2758,18 +2978,18 @@ export default function B2BPortal() {
                         setDeliveryAddresses(updated);
                         setNewAddress({ id: "", name: "", address: "", city: "", postalCode: "", phone: "" });
                         setShowAddressForm(false);
-                        setProfileNotice({ title: 'Pristatymo adresai', message: 'Adresas pridėtas!' });
+                        setProfileNotice({ title: t('deliveryAddresses'), message: t('addressAdded') });
                       } catch (e) {
                         console.error('Add address error:', e);
-                        setProfileNotice({ title: 'Pristatymo adresai', message: 'Klaida pridedant adresą.' });
+                        setProfileNotice({ title: t('deliveryAddresses'), message: t('addressAddedError') });
                       }
                     } else {
-                      setProfileNotice({ title: 'Pristatymo adresai', message: 'Prašome užpildyti visus laukus!' });
+                      setProfileNotice({ title: t('deliveryAddresses'), message: t('fillAllFields') });
                     }
                   }}
                   className="mt-4 w-full bg-[#2d3427] text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition"
                 >
-                  Pridėti adresą
+                  {t('addAddress')}
                 </button>
                 <button 
                   onClick={() => {
@@ -2778,7 +2998,7 @@ export default function B2BPortal() {
                   }}
                   className="mt-2 w-full bg-[#e2e8d4] text-[#2d3427] px-6 py-3 rounded-2xl font-semibold hover:bg-[#cfd8c0] transition"
                 >
-                  ✕ Atšaukti
+                  ✕ {t('cancel')}
                 </button>
               </div>
               )}
@@ -2786,38 +3006,38 @@ export default function B2BPortal() {
           </div>
         ) : view === "uzsakymai" ? (
           <div className="bg-white p-8 rounded-[2rem]">
-            <h2 className="hidden lg:block text-2xl font-semibold mb-6">Užsakymų istorija</h2>
+            <h2 className="hidden lg:block text-2xl font-semibold mb-6">{t('orderHistory')}</h2>
             {filteredOrders.sort((a, b) => b.order_number - a.order_number).length === 0 ? (
-              <p className="text-[#2d3427]/60 italic text-center py-10">Istorija tuščia.</p>
+              <p className="text-[#2d3427]/60 italic text-center py-10">{t('historyEmpty')}</p>
             ) : (
               <div className="space-y-6">
                 {filteredOrders.sort((a, b) => b.order_number - a.order_number).map(order => (
                   <div key={order.id} className="rounded-[2rem] p-6 bg-[#e2e8d4]">
                     <div className="flex justify-between mb-4 border-b border-[#d6ddc7] pb-2 items-center">
                       <div className="flex-1">
-                        <span className="font-bold">Užsakymas #{order.order_number}</span>
+                        <span className="font-bold">{t('orderLabel')} #{order.order_number}</span>
                         <span className="text-[#2d3427]/70 text-sm ml-4">{order.date}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${order.status === 'Išsiustas' ? 'bg-[#f2f5e8] text-[#2d3427]' : order.status === 'Išsiųsta' ? 'bg-[#f2f5e8] text-[#2d3427]' : order.status === 'Įvykdytas' ? 'bg-white text-[#2d3427]' : order.status === 'Atšauktas' ? 'bg-white text-[#2d3427]' : 'bg-white text-[#2d3427]'}`}>
-                          {order.status || 'Nežinomas'}
+                          {getOrderStatusLabel(order.status)}
                         </span>
                       </div>
                     </div>
                     {order.items.map((it: any, idx: number) => (
                       <div key={idx} className="text-sm flex justify-between py-1">
-                        <span>{it.name}{it.size ? ` (${it.size})` : ''} ({it.qty} vnt.)</span>
+                        <span>{getProductName(it)}{it.size ? ` (${it.size})` : ''} ({it.qty} {t('pcs')})</span>
                         <span>{it.totalPrice.toFixed(2)} €</span>
                       </div>
                     ))}
-                    <div className="text-right mt-4 font-black text-lg text-[#166534]">VISO: {order.total.toFixed(2)} €</div>
+                    <div className="text-right mt-4 font-black text-lg text-[#166534]">{t('totalUpper')}: {order.total.toFixed(2)} €</div>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {order.status === 'Išsiustas' && (
                         <button
                           onClick={() => handleCancelOrder(order)}
                           className="bg-white border border-black/10 text-red-600 px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap hover:bg-[#f2f5e8]"
                         >
-                          Atšaukti
+                          {t('cancel')}
                         </button>
                       )}
                       {(order.status === 'Išsiustas' || order.status === 'Atšauktas') && (
@@ -2825,7 +3045,7 @@ export default function B2BPortal() {
                           onClick={() => requestEditOrder(order)}
                           className="bg-white border border-black/10 text-[#2d3427] px-3 py-1 rounded-full text-xs font-semibold transition whitespace-nowrap hover:bg-[#f2f5e8]"
                         >
-                          Koreguoti
+                          {t('edit')}
                         </button>
                       )}
                       <button 
@@ -2843,7 +3063,7 @@ export default function B2BPortal() {
         ) : (
           <div className="bg-white p-6 rounded-[2rem]">
             <div className="mb-6 hidden lg:block">
-              <h2 className="text-2xl font-semibold mb-3">Katalogas</h2>
+              <h2 className="text-2xl font-semibold mb-3">{t('catalog')}</h2>
               <div className="flex gap-5 flex-wrap text-sm">
                 {selectedCategory ? (
                   <button
@@ -2859,7 +3079,7 @@ export default function B2BPortal() {
                       onClick={() => setSelectedCategory(null)}
                       className={`font-medium transition ${!selectedCategory ? 'text-[#2d3427] underline' : 'text-[#2d3427]/70 hover:text-[#2d3427]'}`}
                     >
-                      Visos prekės
+                      {t('allProducts')}
                     </button>
                     {availableCategories.map((category: string) => (
                       <button
@@ -2901,6 +3121,8 @@ export default function B2BPortal() {
                     product={p} 
                     onAdd={addToCart} 
                     getPrice={getPrice}
+                    t={t}
+                    getProductName={getProductName}
                     onOpenModal={(images: string[], index: number) => setModalData({images, index})}
                   />
                 ))}
@@ -2913,6 +3135,23 @@ export default function B2BPortal() {
           <aside className="order-3 lg:order-none relative lg:justify-self-end hidden lg:block">
             <div className="sticky top-6 space-y-3">
               <div className="flex flex-col items-end gap-3">
+                <div className="flex items-center gap-2 rounded-xl bg-[#e2e8d4] px-2 py-1 text-xs font-semibold text-[#2d3427]">
+                  <button
+                    onClick={() => setLanguage('lt')}
+                    className={`${language === 'lt' ? 'underline' : 'opacity-70 hover:opacity-100'}`}
+                    type="button"
+                  >
+                    LT
+                  </button>
+                  <span>/</span>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`${language === 'en' ? 'underline' : 'opacity-70 hover:opacity-100'}`}
+                    type="button"
+                  >
+                    EN
+                  </button>
+                </div>
                 <button
                   onClick={() => {
                     setIsLoggedIn(false);
@@ -2928,7 +3167,7 @@ export default function B2BPortal() {
                     localStorage.removeItem('currentView');
                   }}
                   className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition flex items-center gap-2"
-                  aria-label="Atsijungti"
+                  aria-label={t('logout')}
                 >
                   <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
@@ -2937,13 +3176,13 @@ export default function B2BPortal() {
                       <path d="M21 12H9" />
                     </svg>
                   </span>
-                  Atsijungti
+                  {t('logout')}
                 </button>
                 <button
                   onClick={() => setIsCartVisible(!isCartVisible)}
                   className="relative text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5 transition"
-                  title={cartItemCount === 0 ? "Jūsų krepšelis tuščias" : ""}
-                  aria-label="Krepšelis"
+                  title={cartItemCount === 0 ? t('emptyCart') : ""}
+                  aria-label={t('cart')}
                   ref={desktopCartButtonRef}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
@@ -2965,7 +3204,7 @@ export default function B2BPortal() {
                 >
                   <div className="p-5 pb-0">
                     <div className="flex justify-between items-center mb-2">
-                      <h2 className="text-2xl font-semibold text-[var(--foreground)]">Mano krepšelis</h2>
+                      <h2 className="text-2xl font-semibold text-[var(--foreground)]">{t('myCart')}</h2>
                     </div>
                     {cartNotice && (
                       <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
@@ -2974,12 +3213,12 @@ export default function B2BPortal() {
                     )}
                     {currentCart.length > 0 && (
                       <div className="flex justify-end pb-3">
-                        <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">Išvalyti</button>
+                        <button onClick={clearCart} className="text-xs text-[var(--ink-soft)] hover:text-[var(--foreground)] font-semibold">{t('clear')}</button>
                       </div>
                     )}
                   </div>
                   <div className="space-y-0 mb-0 flex-1 overflow-y-auto max-h-[60vh] lg:max-h-[50vh]">
-                    {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">Jūsų krepšelis tuščias</p> : 
+                    {currentCart.length === 0 ? <p className="text-[var(--ink-soft)] italic text-center py-8 text-sm px-5">{t('emptyCart')}</p> : 
                       currentCart.map((item: any) => (
                         <div key={item.id} className="p-5 border-t border-black/5 hover:bg-[var(--surface-muted)] transition">
                           <div className="flex gap-3">
@@ -2991,7 +3230,7 @@ export default function B2BPortal() {
                             <div className="flex-1 min-w-0">
                               <div className="flex justify-between items-start mb-1">
                                 <div className={`pr-2 ${item.unavailable ? 'opacity-60 blur-[1px]' : ''}`}>
-                                  <h3 className="font-semibold text-sm text-[var(--foreground)]">{item.name}</h3>
+                                  <h3 className="font-semibold text-sm text-[var(--foreground)]">{getProductName(item)}</h3>
                                   {item.size && (
                                     <div className="text-xs font-semibold text-green-700">{item.size}</div>
                                   )}
@@ -2999,8 +3238,8 @@ export default function B2BPortal() {
                                 <button
                                   onClick={() => removeItem(item.id)}
                                   className="text-gray-400 hover:text-red-500 text-lg"
-                                  title="Pašalinti prekę"
-                                  aria-label="Pašalinti prekę"
+                                  title={t('removeItem')}
+                                  aria-label={t('removeItem')}
                                 >
                                   x
                                 </button>
@@ -3037,7 +3276,7 @@ export default function B2BPortal() {
                               </div>
                               {item.unavailable && (
                                 <div className="mt-2 text-xs font-semibold text-red-600">
-                                  Prekės nebeturime.
+                                  {t('productUnavailable')}
                                 </div>
                               )}
                             </div>
@@ -3050,13 +3289,13 @@ export default function B2BPortal() {
                     <div className="p-5 border-t border-black/5 bg-white">
                       {deliveryAddresses.length > 0 && (
                         <div className="mb-4">
-                          <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">Pristatymo adresas</label>
+                          <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ink-soft)] mb-2">{t('deliveryAddress')}</label>
                           <select
                             value={selectedDeliveryAddress ?? ''}
                             onChange={(e) => setSelectedDeliveryAddress(e.target.value ? parseInt(e.target.value) : null)}
                             className="w-full border border-black/10 rounded-2xl p-2 text-sm bg-white text-slate-800 focus:ring-2 focus:ring-[var(--accent)] outline-none"
                           >
-                            <option value="">-- Pasirinkite adresą --</option>
+                            <option value="">{t('chooseAddress')}</option>
                             {deliveryAddresses.map((addr, idx) => (
                               <option key={idx} value={idx}>
                                 {addr.name} - {addr.address}, {addr.city}
@@ -3067,26 +3306,26 @@ export default function B2BPortal() {
                       )}
                       {deliveryAddresses.length === 0 && (
                         <div className="mb-4 p-3 bg-[var(--surface-muted)] border border-black/5 rounded-2xl text-xs text-[var(--ink-soft)]">
-                          Prieš pateikiant užsakymą, pridėkite pristatymo adresą skiltyje "Mano duomenys".
+                          {t('beforeSubmitAddAddress')}
                         </div>
                       )}
                       <div className="space-y-2 mb-4">
                         <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Suma iš viso</span><span className="font-semibold">{currentBaseTotal.toFixed(2)} €</span>
+                          <span>{t('grandTotal')}</span><span className="font-semibold">{currentBaseTotal.toFixed(2)} €</span>
                         </div>
                         <div className="flex justify-between text-sm text-[var(--foreground)]">
-                          <span>Nuolaida</span><span className="font-semibold text-green-600">-{(currentBaseTotal - currentTotal).toFixed(2)} €</span>
+                          <span>{t('discount')}</span><span className="font-semibold text-green-600">-{(currentBaseTotal - currentTotal).toFixed(2)} €</span>
                         </div>
                       </div>
                       <div className="flex justify-between text-lg font-bold text-[var(--foreground)] mb-4 pb-4 border-b border-black/5">
-                        <span>Iš viso</span><span>{currentTotal.toFixed(2)} €</span>
+                        <span>{t('total')}</span><span>{currentTotal.toFixed(2)} €</span>
                       </div>
                       <button 
                         onClick={requestSubmitOrder}
                         disabled={deliveryAddresses.length === 0 || selectedDeliveryAddress === null}
                         className="w-full bg-[#3e5d4f] text-white py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition active:scale-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                       >
-                        Užsakyti
+                        {t('order')}
                       </button>
                     </div>
                   )}
