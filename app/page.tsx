@@ -552,6 +552,8 @@ export default function B2BPortal() {
   const [view, setView] = useState("katalogas");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileLanguageOpen, setIsMobileLanguageOpen] = useState(false);
+  const [isDesktopLanguageOpen, setIsDesktopLanguageOpen] = useState(false);
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
   const [clientCode, setClientCode] = useState("");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
@@ -561,6 +563,8 @@ export default function B2BPortal() {
   const cartSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCartRef = useRef<any[]>([]);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileLanguageRef = useRef<HTMLDivElement | null>(null);
+  const desktopLanguageRef = useRef<HTMLDivElement | null>(null);
   const mobileCartRef = useRef<HTMLDivElement | null>(null);
   const desktopCartRef = useRef<HTMLDivElement | null>(null);
   const mobileCartButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -1025,6 +1029,38 @@ export default function B2BPortal() {
       document.removeEventListener('touchstart', handleOutside);
     };
   }, [isCartVisible]);
+
+  useEffect(() => {
+    if (!isMobileLanguageOpen) return;
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (mobileLanguageRef.current && target && !mobileLanguageRef.current.contains(target)) {
+        setIsMobileLanguageOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isMobileLanguageOpen]);
+
+  useEffect(() => {
+    if (!isDesktopLanguageOpen) return;
+    const handleOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (desktopLanguageRef.current && target && !desktopLanguageRef.current.contains(target)) {
+        setIsDesktopLanguageOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isDesktopLanguageOpen]);
 
 
   // Kraustyti užsakymų istoriją iš Supabase kai vartotojas prisijungia
@@ -2121,20 +2157,51 @@ export default function B2BPortal() {
                 {view === 'katalogas' ? t('catalog') : view === 'uzsakymai' ? t('orders') : t('myData')}
               </div>
             </div>
-            <button
-              onClick={() => setIsCartVisible(!isCartVisible)}
-              className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
-              title={cartItemCount === 0 ? t('emptyCart') : ""}
-              aria-label={t('cart')}
-              ref={mobileCartButtonRef}
-            >
-              <ShoppingCart className="h-6 w-6" />
-              {cartItemCount > 0 && (
-                <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-[#2d3427] text-[10px] font-semibold flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="relative" ref={mobileLanguageRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileLanguageOpen((prev) => !prev)}
+                  className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition"
+                  aria-label="Language"
+                >
+                  {language.toUpperCase()}
+                </button>
+                {isMobileLanguageOpen && (
+                  <div className="absolute right-0 top-11 z-50 rounded-xl border border-black/10 bg-white shadow-[var(--shadow-soft)] p-1 min-w-[56px]">
+                    {(['lt', 'en'] as Locale[])
+                      .filter((code) => code !== language)
+                      .map((code) => (
+                        <button
+                          key={code}
+                          type="button"
+                          onClick={() => {
+                            setLanguage(code);
+                            setIsMobileLanguageOpen(false);
+                          }}
+                          className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8]"
+                        >
+                          {code.toUpperCase()}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => setIsCartVisible(!isCartVisible)}
+                className="relative text-[#2d3427] hover:bg-[#e2e8d4] p-2 rounded-xl border border-black/10 transition"
+                title={cartItemCount === 0 ? t('emptyCart') : ""}
+                aria-label={t('cart')}
+                ref={mobileCartButtonRef}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -right-2 -top-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent)] text-[#2d3427] text-[10px] font-semibold flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
           {view === 'katalogas' && (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -2382,7 +2449,7 @@ export default function B2BPortal() {
           <aside className="order-1 lg:order-none bg-transparent p-3 sticky top-6 hidden lg:block">
             <div className="mb-6">
               <div className="text-[10px] uppercase tracking-[0.35em] text-[var(--ink-soft)]">FLOKATI</div>
-              <div className="text-lg font-semibold">B2B Portalas</div>
+              <div className="text-lg font-semibold">B2B</div>
             </div>
             <nav className="space-y-2">
               <button
@@ -3134,50 +3201,64 @@ export default function B2BPortal() {
 
           <aside className="order-3 lg:order-none relative lg:justify-self-end hidden lg:block">
             <div className="sticky top-6 space-y-3">
-              <div className="flex flex-col items-end gap-3">
-                <div className="flex items-center gap-2 rounded-xl bg-[#e2e8d4] px-2 py-1 text-xs font-semibold text-[#2d3427]">
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="relative" ref={desktopLanguageRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsDesktopLanguageOpen((prev) => !prev)}
+                      className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition"
+                      aria-label="Language"
+                    >
+                      {language.toUpperCase()}
+                    </button>
+                    {isDesktopLanguageOpen && (
+                      <div className="absolute right-0 top-8 z-50 rounded-xl border border-black/10 bg-white shadow-[var(--shadow-soft)] p-1 min-w-[56px]">
+                        {(['lt', 'en'] as Locale[])
+                          .filter((code) => code !== language)
+                          .map((code) => (
+                            <button
+                              key={code}
+                              type="button"
+                              onClick={() => {
+                                setLanguage(code);
+                                setIsDesktopLanguageOpen(false);
+                              }}
+                              className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-semibold text-[#2d3427] hover:bg-[#f2f5e8]"
+                            >
+                              {code.toUpperCase()}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                   <button
-                    onClick={() => setLanguage('lt')}
-                    className={`${language === 'lt' ? 'underline' : 'opacity-70 hover:opacity-100'}`}
-                    type="button"
+                    onClick={() => {
+                      setIsLoggedIn(false);
+                      setClientCode('');
+                      setFormEmail('');
+                      setFormPassword('');
+                      setShowPassword(false);
+                      localStorage.removeItem('isLoggedIn');
+                      localStorage.removeItem('clientCode');
+                      localStorage.removeItem('client_name');
+                      localStorage.removeItem('discount_group');
+                      localStorage.removeItem('manager_email');
+                      localStorage.removeItem('currentView');
+                    }}
+                    className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition flex items-center gap-2"
+                    aria-label={t('logout')}
                   >
-                    LT
-                  </button>
-                  <span>/</span>
-                  <button
-                    onClick={() => setLanguage('en')}
-                    className={`${language === 'en' ? 'underline' : 'opacity-70 hover:opacity-100'}`}
-                    type="button"
-                  >
-                    EN
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                      </svg>
+                    </span>
+                    {t('logout')}
                   </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setIsLoggedIn(false);
-                    setClientCode('');
-                    setFormEmail('');
-                    setFormPassword('');
-                    setShowPassword(false);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('clientCode');
-                    localStorage.removeItem('client_name');
-                    localStorage.removeItem('discount_group');
-                    localStorage.removeItem('manager_email');
-                    localStorage.removeItem('currentView');
-                  }}
-                  className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition flex items-center gap-2"
-                  aria-label={t('logout')}
-                >
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#2d3427]">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <path d="M16 17l5-5-5-5" />
-                      <path d="M21 12H9" />
-                    </svg>
-                  </span>
-                  {t('logout')}
-                </button>
                 <button
                   onClick={() => setIsCartVisible(!isCartVisible)}
                   className="relative text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] p-2 bg-[var(--surface)] rounded-xl shadow-[var(--shadow-soft)] border border-black/5 transition"
