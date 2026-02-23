@@ -698,11 +698,40 @@ export default function B2BPortal() {
   };
 
   const getUserId = async () => {
-    if (authUserId) return authUserId;
     const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) return null;
-    setAuthUserId(user.id);
+    if (error || !user) {
+      setAuthUserId(null);
+      return null;
+    }
+    if (authUserId !== user.id) {
+      setAuthUserId(user.id);
+    }
     return user.id;
+  };
+
+  const handleLogout = async (closeMobileMenu = false) => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.warn('Klaida atsijungiant nuo Supabase:', error);
+    }
+
+    setAuthUserId(null);
+    setIsLoggedIn(false);
+    setClientCode('');
+    setFormEmail('');
+    setFormPassword('');
+    setShowPassword(false);
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('clientCode');
+    localStorage.removeItem('client_name');
+    localStorage.removeItem('discount_group');
+    localStorage.removeItem('manager_email');
+    localStorage.removeItem('currentView');
+
+    if (closeMobileMenu) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const flushCartToDb = async (items: any[]) => {
@@ -753,27 +782,26 @@ export default function B2BPortal() {
         return;
       }
 
-      const clientNameFromState = clients[clientCode]?.name;
       try {
-        const clientName = clientNameFromState || (typeof window !== 'undefined' ? localStorage.getItem('client_name') : null);
-        if (!clientName) {
-          setProducts([]);
-          setIsProductsLoading(false);
-          return;
+        const clientNameFromState = clients[clientCode]?.name;
+        let currentClientName = clientNameFromState || (typeof window !== 'undefined' ? localStorage.getItem('client_name') : null);
+        const userId = await getUserId();
+        if (userId) {
+          const { data: customerData } = await supabase
+            .from('customers')
+            .select('client_name')
+            .eq('id', userId)
+            .maybeSingle();
+          if (customerData?.client_name) {
+            currentClientName = customerData.client_name;
+          }
         }
+
         console.log('📦 Fetching products...');
         console.log('📦 isLoggedIn:', isLoggedIn);
         console.log('📦 clientCode:', clientCode);
-        console.log('📦 client_name from localStorage:', clientName);
-        const clientFilter = clientName ? `client.eq.${clientName}` : `client.eq.all`;
-        console.log('📦 Client filter query:', clientFilter);
-        let { data, error } = await supabase.from('products').select('*').or(clientFilter);
-        if (!error && clientName && (!data || data.length === 0)) {
-          console.log('📦 No client products found, falling back to all');
-          const fallback = await supabase.from('products').select('*').eq('client', 'all');
-          data = fallback.data;
-          error = fallback.error;
-        }
+        console.log('📦 currentClientName:', currentClientName);
+        let { data, error } = await supabase.from('products').select('*');
         console.log('📦 Products data:', data);
         console.log('📦 Products error:', error);
         if (error) {
@@ -895,9 +923,18 @@ export default function B2BPortal() {
         }));
 
         const mapped = [...grouped, ...orphanProducts];
+        const normalizeClient = (value: any) => String(value ?? '').trim().toLowerCase();
+        const targetClient = normalizeClient(currentClientName);
+        const hasClientSpecificProducts = targetClient
+          ? mapped.some((row: any) => normalizeClient(row.client) === targetClient)
+          : false;
+        const visibleProducts = hasClientSpecificProducts
+          ? mapped.filter((row: any) => normalizeClient(row.client) === targetClient)
+          : mapped.filter((row: any) => normalizeClient(row.client) === 'all');
         console.log('📦 Mapped products count:', mapped.length);
-        console.log('📦 Mapped products:', mapped);
-        setProducts(mapped);
+        console.log('📦 Visible products count:', visibleProducts.length);
+        console.log('📦 Visible products:', visibleProducts);
+        setProducts(visibleProducts);
       } catch (e) {
         console.error('Fetch products error', e);
         setIsProductsLoading(false);
@@ -1736,6 +1773,7 @@ export default function B2BPortal() {
         setLoginErrorNotice("Vartotojas nerastas");
         return;
       }
+      setAuthUserId(user.id);
 
       // Fetch profile from 'customers' table
       const { data: profiles, error: profileError } = await supabase
@@ -2308,18 +2346,7 @@ export default function B2BPortal() {
               </button>
               <button
                 onClick={() => {
-                  setIsLoggedIn(false);
-                  setClientCode('');
-                  setFormEmail('');
-                  setFormPassword('');
-                  setShowPassword(false);
-                  localStorage.removeItem('isLoggedIn');
-                  localStorage.removeItem('clientCode');
-                  localStorage.removeItem('client_name');
-                  localStorage.removeItem('discount_group');
-                  localStorage.removeItem('manager_email');
-                  localStorage.removeItem('currentView');
-                  setIsMobileMenuOpen(false);
+                  handleLogout(true);
                 }}
                 className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-[#2d3427] hover:bg-[#f2f5e8] transition flex items-center gap-2"
               >
@@ -3234,17 +3261,7 @@ export default function B2BPortal() {
                   </div>
                   <button
                     onClick={() => {
-                      setIsLoggedIn(false);
-                      setClientCode('');
-                      setFormEmail('');
-                      setFormPassword('');
-                      setShowPassword(false);
-                      localStorage.removeItem('isLoggedIn');
-                      localStorage.removeItem('clientCode');
-                      localStorage.removeItem('client_name');
-                      localStorage.removeItem('discount_group');
-                      localStorage.removeItem('manager_email');
-                      localStorage.removeItem('currentView');
+                      handleLogout(false);
                     }}
                     className="text-xs font-semibold text-[#2d3427] hover:text-[#2d3427] hover:bg-[#e2e8d4] rounded-xl px-2 py-1 transition flex items-center gap-2"
                     aria-label={t('logout')}
